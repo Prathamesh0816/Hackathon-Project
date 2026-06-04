@@ -1,0 +1,16 @@
+Employee,KnowledgeArea,DocumentationLevel
+Rahul,Payment Processing,Low
+Rahul,System Architecture,Low
+Sneha,CI/CD Pipeline,Medium
+Sneha,Cloud Deployments,Low
+Neha,Product Roadmap,Medium
+Pooja,Client Requirements,Low
+Vikram,Strategic Accounts,Low
+Meera,Support Escalation Process,Medium
+Sanjay,Security Controls,Low
+Sanjay,Incident Response,Low
+Nikhil,Cloud Infrastructure,Medium
+Nikhil,Disaster Recovery,Low
+Priya,Frontend Architecture,High
+Karan,Test Automation,Medium
+Isha,Vulnerability Management,High

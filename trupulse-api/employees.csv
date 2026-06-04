@@ -1,0 +1,21 @@
+Employee,Team,Role,Criticality,BackupAvailable,ExperienceYears
+Rahul,Engineering,Lead Backend Engineer,High,No,8
+Priya,Engineering,Senior Frontend Engineer,Medium,Yes,5
+Amit,Engineering,Backend Engineer,Medium,Yes,4
+Sneha,Engineering,DevOps Engineer,High,No,7
+Karan,Engineering,QA Lead,Medium,Yes,6
+Ravi,Engineering,QA Engineer,Low,Yes,2
+Neha,Product,Product Manager,High,No,9
+Arjun,Product,Business Analyst,Medium,Yes,4
+Pooja,Product,Product Owner,High,No,8
+Vikram,Sales,Sales Manager,High,No,10
+Anjali,Sales,Account Executive,Medium,Yes,3
+Rohit,Sales,Account Executive,Medium,Yes,2
+Meera,Support,Support Lead,High,No,8
+Deepak,Support,Support Engineer,Medium,Yes,3
+Kavya,Support,Support Engineer,Medium,Yes,2
+Sanjay,Security,Security Architect,High,No,11
+Isha,Security,Security Analyst,Medium,Yes,4
+Nikhil,Infrastructure,Cloud Architect,High,No,10
+Tanvi,Infrastructure,System Administrator,Medium,Yes,5
+Harsh,Infrastructure,Network Engineer,Medium,Yes,4

@@ -1,0 +1,16 @@
+Owner,Dependent,DependencyType
+Rahul,Amit,Technical Knowledge
+Rahul,Priya,API Integration
+Rahul,Karan,Architecture Approval
+Sneha,Rahul,Deployment Support
+Sneha,Amit,Environment Setup
+Neha,Pooja,Product Decisions
+Pooja,Arjun,Requirements Approval
+Vikram,Anjali,Client Access
+Vikram,Rohit,Strategic Accounts
+Meera,Deepak,Escalation Approval
+Meera,Kavya,Escalation Approval
+Sanjay,Isha,Security Guidance
+Nikhil,Sneha,Cloud Infrastructure
+Nikhil,Harsh,Network Dependencies
+Nikhil,Tanvi,Platform Operations
