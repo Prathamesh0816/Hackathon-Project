@@ -1,0 +1,159 @@
+OwnerID,Owner,DependentID,Dependent,DependencyType,Criticality
+EMP001,Sunita,EMP060,Shivani,Approval Chain,Low
+EMP002,Quasim,EMP059,Hari,Knowledge Transfer,Low
+EMP002,Quasim,EMP023,Jagdish,Technical Consultation,High
+EMP003,Farhan,EMP032,Vijay,Knowledge Transfer,High
+EMP003,Farhan,EMP079,Venkat,Knowledge Transfer,Medium
+EMP003,Farhan,EMP031,Vivek,Approval Chain,Medium
+EMP003,Farhan,EMP039,Nikhil,Project Handoff,Medium
+EMP004,Lalit,EMP077,Radha,Knowledge Transfer,Low
+EMP004,Lalit,EMP080,Vani,Project Handoff,Low
+EMP004,Lalit,EMP067,Sanjay,Project Handoff,Low
+EMP004,Lalit,EMP052,Ishita,Approval Chain,Low
+EMP005,Poonam,EMP069,Isha,Project Handoff,Medium
+EMP006,Ajay,EMP044,Prakash,Approval Chain,Low
+EMP010,Usha,EMP049,Manoj,Project Handoff,Low
+EMP011,Lakshmi,EMP050,Kavya,Approval Chain,Low
+EMP012,Neelam,EMP054,Pallavi,Knowledge Transfer,Low
+EMP012,Neelam,EMP085,Kamla,Client Relationship,Medium
+EMP013,Mohan,EMP044,Prakash,Approval Chain,Low
+EMP013,Mohan,EMP006,Ajay,Knowledge Transfer,Medium
+EMP013,Mohan,EMP022,Sarita,Technical Consultation,Low
+EMP013,Mohan,EMP047,Pooja,Approval Chain,Low
+EMP015,Nalini,EMP059,Hari,Approval Chain,High
+EMP019,Kirti,EMP025,Ojas,Project Handoff,High
+EMP019,Kirti,EMP046,Deepali,Knowledge Transfer,Medium
+EMP021,Anjali,EMP009,Manisha,Client Relationship,High
+EMP021,Anjali,EMP004,Lalit,Technical Consultation,Low
+EMP022,Sarita,EMP047,Pooja,Project Handoff,Medium
+EMP024,Mahesh,EMP066,Divya,Client Relationship,High
+EMP025,Ojas,EMP019,Kirti,Technical Consultation,High
+EMP026,Meera,EMP082,Rohit,Technical Consultation,High
+EMP027,Naresh,EMP012,Neelam,Knowledge Transfer,Medium
+EMP029,Bhavna,EMP049,Manoj,Client Relationship,Low
+EMP029,Bhavna,EMP068,Arjun,Technical Consultation,High
+EMP029,Bhavna,EMP084,Indira,Client Relationship,Medium
+EMP031,Vivek,EMP032,Vijay,Project Handoff,High
+EMP031,Vivek,EMP057,Rajesh,Approval Chain,Medium
+EMP031,Vivek,EMP039,Nikhil,Client Relationship,Low
+EMP033,Kavita,EMP068,Arjun,Client Relationship,Medium
+EMP033,Kavita,EMP084,Indira,Knowledge Transfer,Medium
+EMP035,Rajan,EMP045,Bela,Project Handoff,High
+EMP038,Tanvi,EMP051,Uday,Approval Chain,Low
+EMP038,Tanvi,EMP060,Shivani,Approval Chain,Low
+EMP038,Tanvi,EMP001,Sunita,Project Handoff,High
+EMP039,Nikhil,EMP032,Vijay,Client Relationship,Low
+EMP039,Nikhil,EMP031,Vivek,Approval Chain,Low
+EMP039,Nikhil,EMP057,Rajesh,Knowledge Transfer,Low
+EMP039,Nikhil,EMP079,Venkat,Approval Chain,Medium
+EMP040,Rahul,EMP030,Amit,Project Handoff,Medium
+EMP040,Rahul,EMP056,Harsh,Client Relationship,Medium
+EMP041,Priya,EMP059,Hari,Client Relationship,High
+EMP041,Priya,EMP015,Nalini,Client Relationship,Medium
+EMP041,Priya,EMP066,Divya,Client Relationship,Low
+EMP041,Priya,EMP023,Jagdish,Approval Chain,High
+EMP044,Prakash,EMP013,Mohan,Client Relationship,High
+EMP044,Prakash,EMP022,Sarita,Project Handoff,Medium
+EMP045,Bela,EMP020,Deepak,Project Handoff,Low
+EMP047,Pooja,EMP006,Ajay,Technical Consultation,Low
+EMP047,Pooja,EMP013,Mohan,Knowledge Transfer,Low
+EMP047,Pooja,EMP044,Prakash,Technical Consultation,Low
+EMP047,Pooja,EMP022,Sarita,Approval Chain,Low
+EMP053,Esha,EMP062,Rekha,Knowledge Transfer,High
+EMP054,Pallavi,EMP012,Neelam,Approval Chain,Medium
+EMP057,Rajesh,EMP079,Venkat,Approval Chain,Medium
+EMP057,Rajesh,EMP039,Nikhil,Technical Consultation,Medium
+EMP059,Hari,EMP066,Divya,Knowledge Transfer,High
+EMP059,Hari,EMP023,Jagdish,Client Relationship,Medium
+EMP060,Shivani,EMP038,Tanvi,Knowledge Transfer,Medium
+EMP060,Shivani,EMP001,Sunita,Technical Consultation,Low
+EMP061,Gopal,EMP057,Rajesh,Technical Consultation,Medium
+EMP061,Gopal,EMP039,Nikhil,Project Handoff,Medium
+EMP061,Gopal,EMP031,Vivek,Project Handoff,Low
+EMP061,Gopal,EMP003,Farhan,Knowledge Transfer,High
+EMP062,Rekha,EMP056,Harsh,Knowledge Transfer,High
+EMP066,Divya,EMP002,Quasim,Knowledge Transfer,Medium
+EMP066,Divya,EMP015,Nalini,Technical Consultation,High
+EMP070,Kishore,EMP071,Arun,Client Relationship,Low
+EMP070,Kishore,EMP065,Rishi,Approval Chain,High
+EMP074,Chandan,EMP012,Neelam,Project Handoff,Low
+EMP074,Chandan,EMP073,Omkar,Technical Consultation,Low
+EMP074,Chandan,EMP078,Sneha,Technical Consultation,High
+EMP075,Suresh,EMP081,Ravi,Technical Consultation,High
+EMP075,Suresh,EMP050,Kavya,Approval Chain,Medium
+EMP075,Suresh,EMP011,Lakshmi,Project Handoff,Low
+EMP075,Suresh,EMP034,Lalita,Technical Consultation,High
+EMP076,Tara,EMP036,Anita,Technical Consultation,High
+EMP077,Radha,EMP067,Sanjay,Client Relationship,High
+EMP082,Rohit,EMP005,Poonam,Client Relationship,Low
+EMP085,Kamla,EMP012,Neelam,Project Handoff,Low
+EMP085,Kamla,EMP078,Sneha,Client Relationship,High
+EMP086,Vikram Sharma,EMP014,Vikram,Project Handoff,High
+EMP086,Vikram Sharma,EMP038,Tanvi,Approval Chain,High
+EMP086,Vikram Sharma,EMP048,Jatin,Client Relationship,Medium
+EMP086,Vikram Sharma,EMP060,Shivani,Knowledge Transfer,High
+EMP087,Neha Kapoor,EMP004,Lalit,Technical Consultation,High
+EMP087,Neha Kapoor,EMP052,Ishita,Project Handoff,High
+EMP087,Neha Kapoor,EMP080,Vani,Knowledge Transfer,High
+EMP088,Ravi Deshmukh,EMP025,Ojas,Project Handoff,High
+EMP088,Ravi Deshmukh,EMP017,Hemant,Technical Consultation,Medium
+EMP089,Ananya Patel,EMP035,Rajan,Knowledge Transfer,High
+EMP089,Ananya Patel,EMP045,Bela,Technical Consultation,Medium
+EMP090,Deepak Joshi,EMP086,Vikram Sharma,Knowledge Transfer,High
+EMP090,Deepak Joshi,EMP048,Jatin,Approval Chain,Medium
+EMP091,Kiran Rao,EMP044,Prakash,Technical Consultation,High
+EMP091,Kiran Rao,EMP022,Sarita,Project Handoff,Medium
+EMP092,Meera Iyer,EMP033,Kavita,Approval Chain,High
+EMP092,Meera Iyer,EMP049,Manoj,Client Relationship,High
+EMP092,Meera Iyer,EMP068,Arjun,Project Handoff,Medium
+EMP093,Rohan Gupta,EMP067,Sanjay,Knowledge Transfer,High
+EMP093,Rohan Gupta,EMP077,Radha,Technical Consultation,Medium
+EMP094,Anita Verma,EMP026,Meera,Technical Consultation,High
+EMP094,Anita Verma,EMP069,Isha,Project Handoff,High
+EMP094,Anita Verma,EMP082,Rohit,Knowledge Transfer,Medium
+EMP095,Shikha Dubey,EMP041,Priya,Client Relationship,High
+EMP095,Shikha Dubey,EMP024,Mahesh,Approval Chain,High
+EMP095,Shikha Dubey,EMP059,Hari,Project Handoff,Medium
+EMP096,Akash Mehta,EMP061,Gopal,Client Relationship,High
+EMP096,Akash Mehta,EMP039,Nikhil,Knowledge Transfer,Medium
+EMP097,Pallavi Joshi,EMP030,Amit,Approval Chain,High
+EMP097,Pallavi Joshi,EMP040,Rahul,Knowledge Transfer,Medium
+EMP098,Rajiv Kumar,EMP012,Neelam,Project Handoff,High
+EMP098,Rajiv Kumar,EMP085,Kamla,Client Relationship,Medium
+EMP099,Dipti Nair,EMP065,Rishi,Technical Consultation,High
+EMP099,Dipti Nair,EMP071,Arun,Knowledge Transfer,High
+EMP100,Sameer Bhat,EMP036,Anita,Project Handoff,High
+EMP100,Sameer Bhat,EMP076,Tara,Knowledge Transfer,Medium
+EMP101,Akash Verma,EMP035,Rajan,Technical Consultation,High
+EMP101,Akash Verma,EMP045,Bela,Knowledge Transfer,Medium
+EMP102,Leena Nair,EMP014,Vikram,Project Handoff,High
+EMP102,Leena Nair,EMP060,Shivani,Client Relationship,Medium
+EMP103,Rohan Malhotra,EMP087,Neha Kapoor,Technical Consultation,High
+EMP103,Rohan Malhotra,EMP067,Sanjay,Knowledge Transfer,Medium
+EMP104,Deepa Shah,EMP095,Shikha Dubey,Approval Chain,High
+EMP104,Deepa Shah,EMP041,Priya,Knowledge Transfer,Medium
+EMP105,Kunal Saxena,EMP098,Rajiv Kumar,Approval Chain,High
+EMP105,Kunal Saxena,EMP074,Chandan,Project Handoff,Medium
+EMP106,Preeti Gupta,EMP100,Sameer Bhat,Approval Chain,High
+EMP106,Preeti Gupta,EMP076,Tara,Knowledge Transfer,Medium
+EMP107,Arvind Iyer,EMP097,Pallavi Joshi,Technical Consultation,High
+EMP107,Arvind Iyer,EMP030,Amit,Client Relationship,Medium
+EMP108,Nandini Rao,EMP092,Meera Iyer,Approval Chain,High
+EMP108,Nandini Rao,EMP068,Arjun,Knowledge Transfer,Medium
+EMP109,Vijay More,EMP088,Ravi Deshmukh,Project Handoff,High
+EMP109,Vijay More,EMP017,Hemant,Knowledge Transfer,Medium
+EMP110,Snehal Patil,EMP075,Suresh,Technical Consultation,High
+EMP110,Snehal Patil,EMP055,Dinesh,Client Relationship,High
+EMP110,Snehal Patil,EMP050,Kavya,Approval Chain,Medium
+EMP111,Manav Bhatia,EMP044,Prakash,Technical Consultation,High
+EMP111,Manav Bhatia,EMP047,Pooja,Project Handoff,High
+EMP111,Manav Bhatia,EMP022,Sarita,Knowledge Transfer,Medium
+EMP112,Ruchi Agarwal,EMP099,Dipti Nair,Approval Chain,High
+EMP112,Ruchi Agarwal,EMP070,Kishore,Knowledge Transfer,Medium
+EMP113,Tarun Kulkarni,EMP039,Nikhil,Project Handoff,High
+EMP113,Tarun Kulkarni,EMP061,Gopal,Knowledge Transfer,Medium
+EMP114,Jyoti Deshmukh,EMP094,Anita Verma,Technical Consultation,High
+EMP114,Jyoti Deshmukh,EMP042,Padma,Client Relationship,Medium
+EMP115,Prakash Menon,EMP101,Akash Verma,Project Handoff,High
+EMP115,Prakash Menon,EMP083,Aakash,Knowledge Transfer,High
+EMP115,Prakash Menon,EMP064,Shyam,Knowledge Transfer,Medium

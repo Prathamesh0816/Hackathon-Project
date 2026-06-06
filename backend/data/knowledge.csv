@@ -1,0 +1,469 @@
+EmployeeID,Employee,KnowledgeArea,DocumentationLevel,Proficiency,LastUpdated
+EMP001,Sunita,SEO & SEM,Low,Advanced,2024-11-22
+EMP001,Sunita,Risk Management,Low,Expert,2024-12-06
+EMP001,Sunita,Sales Pipeline Management,Low,Expert,2024-03-20
+EMP001,Sunita,Brand Strategy,Low,Beginner,2024-07-19
+EMP002,Quasim,Project Management (Agile),High,Expert,2024-03-02
+EMP002,Quasim,Sales Pipeline Management,High,Advanced,2024-07-11
+EMP002,Quasim,UX Design,High,Intermediate,2024-08-11
+EMP002,Quasim,ERP Systems,High,Advanced,2024-07-09
+EMP002,Quasim,SEO & SEM,High,Expert,2024-05-27
+EMP002,Quasim,Cloud Infrastructure (AWS/Azure),High,Beginner,2024-08-01
+EMP003,Farhan,Product Roadmap Planning,Low,Beginner,2024-01-08
+EMP003,Farhan,Compensation Planning,Low,Intermediate,2024-01-20
+EMP003,Farhan,Customer Success,Low,Intermediate,2024-04-05
+EMP003,Farhan,ERP Systems,Low,Expert,2024-11-04
+EMP003,Farhan,User Research,Low,Intermediate,2024-08-23
+EMP003,Farhan,Quality Assurance,Low,Advanced,2024-06-06
+EMP004,Lalit,A/B Testing,Low,Intermediate,2024-05-04
+EMP004,Lalit,Mentoring & Coaching,Low,Beginner,2024-05-19
+EMP004,Lalit,Negotiation,Low,Expert,2024-07-23
+EMP004,Lalit,System Architecture,Low,Intermediate,2024-02-19
+EMP004,Lalit,Quality Assurance,Low,Intermediate,2024-02-23
+EMP004,Lalit,Frontend Frameworks,Low,Advanced,2024-11-20
+EMP005,Poonam,Test Automation,High,Beginner,2024-06-18
+EMP005,Poonam,Machine Learning,High,Expert,2024-11-12
+EMP006,Ajay,Supply Chain Management,Medium,Beginner,2024-07-27
+EMP006,Ajay,ERP Systems,Medium,Beginner,2024-07-12
+EMP007,Aarti,Negotiation,High,Advanced,2024-10-26
+EMP007,Aarti,Database Administration,High,Expert,2024-08-14
+EMP007,Aarti,SEO & SEM,High,Advanced,2024-06-28
+EMP007,Aarti,Security Compliance,Low,Beginner,2024-05-15
+EMP007,Aarti,Presentation Skills,Low,Expert,2024-10-20
+EMP008,Gauri,Employee Relations,High,Intermediate,2024-08-07
+EMP008,Gauri,Sales Pipeline Management,High,Advanced,2024-05-11
+EMP008,Gauri,Risk Management,High,Advanced,2024-10-23
+EMP008,Gauri,Microservices Architecture,High,Advanced,2024-09-01
+EMP008,Gauri,Talent Acquisition,High,Intermediate,2024-02-08
+EMP009,Manisha,Risk Management,High,Expert,2024-11-23
+EMP009,Manisha,Data Analytics,High,Expert,2024-08-26
+EMP009,Manisha,Technical Writing,High,Beginner,2024-02-10
+EMP009,Manisha,Technical Support,High,Intermediate,2024-07-23
+EMP009,Manisha,Stakeholder Communication,High,Intermediate,2024-05-22
+EMP010,Usha,Organizational Development,High,Advanced,2024-06-23
+EMP010,Usha,Intellectual Property,Medium,Advanced,2024-05-09
+EMP010,Usha,Data Analytics,Low,Beginner,2024-12-07
+EMP010,Usha,Vendor Management,Medium,Beginner,2024-12-18
+EMP010,Usha,Compensation Planning,High,Intermediate,2024-04-07
+EMP010,Usha,SEO & SEM,High,Expert,2024-05-24
+EMP011,Lakshmi,Technical Writing,Low,Advanced,2024-04-12
+EMP011,Lakshmi,Vendor Management,Low,Advanced,2024-01-23
+EMP011,Lakshmi,A/B Testing,High,Intermediate,2024-05-02
+EMP011,Lakshmi,Budgeting & Forecasting,Low,Advanced,2024-12-05
+EMP011,Lakshmi,API Design,High,Expert,2024-02-28
+EMP011,Lakshmi,Backend Systems,Low,Advanced,2024-08-16
+EMP012,Neelam,Employee Relations,High,Expert,2024-02-27
+EMP012,Neelam,Security Compliance,High,Beginner,2024-07-16
+EMP012,Neelam,Product Roadmap Planning,High,Beginner,2024-10-21
+EMP012,Neelam,Incident Management,High,Beginner,2024-03-05
+EMP012,Neelam,Vulnerability Management,High,Advanced,2024-02-08
+EMP013,Mohan,Data Analytics,Low,Expert,2024-10-20
+EMP013,Mohan,Technical Writing,Low,Intermediate,2024-09-13
+EMP014,Vikram,Strategic Account Management,Low,Expert,2024-05-19
+EMP014,Vikram,Client Relationship Management,Low,Expert,2024-10-24
+EMP014,Vikram,Sales Pipeline Management,Low,Expert,2024-04-21
+EMP014,Vikram,Negotiation,Low,Advanced,2024-05-22
+EMP014,Vikram,Enterprise Sales Strategy,Low,Expert,2024-03-08
+EMP014,Vikram,Contract Negotiation,Low,Advanced,2024-06-15
+EMP015,Nalini,Data Analytics,High,Beginner,2024-07-15
+EMP015,Nalini,User Research,High,Expert,2024-05-02
+EMP015,Nalini,DevOps & CI/CD,High,Intermediate,2024-05-23
+EMP016,Rashmi,Stakeholder Communication,High,Intermediate,2024-05-26
+EMP016,Rashmi,Containerization (Docker/K8s),High,Intermediate,2024-07-04
+EMP016,Rashmi,Legal Compliance (SOC2/ISO27001),High,Intermediate,2024-11-05
+EMP016,Rashmi,User Research,High,Advanced,2024-03-03
+EMP017,Hemant,DevOps & CI/CD,Medium,Advanced,2024-08-04
+EMP017,Hemant,Test Automation,Medium,Advanced,2024-12-13
+EMP018,Sita,Supply Chain Management,Low,Beginner,2024-07-24
+EMP018,Sita,Process Optimization,Medium,Advanced,2024-01-03
+EMP018,Sita,Risk Management,Low,Beginner,2024-11-27
+EMP018,Sita,Contract Negotiation,Medium,Beginner,2024-03-16
+EMP019,Kirti,ERP Systems,Medium,Expert,2024-02-16
+EMP019,Kirti,Contract Negotiation,Medium,Expert,2024-06-11
+EMP019,Kirti,Identity & Access Management,High,Beginner,2024-03-11
+EMP019,Kirti,Financial Planning & Analysis,Medium,Expert,2024-05-22
+EMP019,Kirti,Security Compliance,Medium,Beginner,2024-08-03
+EMP019,Kirti,Business Intelligence,Medium,Advanced,2024-06-04
+EMP020,Deepak,Containerization (Docker/K8s),Low,Expert,2024-07-02
+EMP020,Deepak,Supply Chain Management,Low,Intermediate,2024-09-12
+EMP020,Deepak,Frontend Frameworks,Low,Expert,2024-11-15
+EMP020,Deepak,Strategic Account Management,Low,Beginner,2024-04-09
+EMP020,Deepak,Project Management (Agile),Low,Intermediate,2024-05-15
+EMP021,Anjali,System Architecture,High,Intermediate,2024-12-06
+EMP021,Anjali,Sales Pipeline Management,High,Advanced,2024-09-01
+EMP021,Anjali,CRM Tools (Salesforce),High,Expert,2024-02-08
+EMP021,Anjali,A/B Testing,High,Beginner,2024-08-04
+EMP021,Anjali,Mobile Development,High,Intermediate,2024-08-23
+EMP022,Sarita,Supply Chain Management,High,Expert,2024-08-08
+EMP022,Sarita,Negotiation,High,Expert,2024-09-05
+EMP022,Sarita,Financial Planning & Analysis,High,Expert,2024-04-20
+EMP022,Sarita,Content Writing,High,Intermediate,2024-02-09
+EMP023,Jagdish,Employee Relations,Low,Advanced,2024-12-10
+EMP023,Jagdish,Threat Modeling,High,Expert,2024-03-15
+EMP023,Jagdish,Test Automation,High,Expert,2024-06-11
+EMP023,Jagdish,Supply Chain Management,High,Expert,2024-08-11
+EMP023,Jagdish,Financial Planning & Analysis,Low,Intermediate,2024-10-13
+EMP024,Mahesh,Microservices Architecture,Low,Beginner,2024-06-24
+EMP024,Mahesh,Quality Assurance,Low,Expert,2024-12-26
+EMP024,Mahesh,Content Writing,Low,Expert,2024-07-22
+EMP025,Ojas,Risk Management,Low,Advanced,2024-02-28
+EMP025,Ojas,Client Relationship Management,Low,Expert,2024-02-17
+EMP025,Ojas,Cloud Infrastructure (AWS/Azure),Low,Expert,2024-01-24
+EMP026,Meera,Content Writing,Low,Intermediate,2024-02-16
+EMP026,Meera,Containerization (Docker/K8s),Low,Advanced,2024-06-20
+EMP026,Meera,ERP Systems,Low,Expert,2024-11-03
+EMP027,Naresh,Microservices Architecture,High,Advanced,2024-11-23
+EMP027,Naresh,Change Management,High,Expert,2024-09-02
+EMP027,Naresh,Process Optimization,High,Beginner,2024-04-21
+EMP027,Naresh,Brand Strategy,High,Advanced,2024-04-24
+EMP028,Neha,SEO & SEM,High,Beginner,2024-08-06
+EMP028,Neha,API Design,High,Advanced,2024-01-02
+EMP029,Bhavna,Test Automation,Low,Advanced,2024-07-05
+EMP029,Bhavna,Product Roadmap Planning,Low,Intermediate,2024-09-14
+EMP029,Bhavna,Budgeting & Forecasting,Low,Intermediate,2024-03-06
+EMP029,Bhavna,Compensation Planning,Low,Beginner,2024-10-28
+EMP030,Amit,Marketing Automation,High,Intermediate,2024-04-15
+EMP030,Amit,Change Management,High,Advanced,2024-08-09
+EMP030,Amit,Technical Support,High,Beginner,2024-08-10
+EMP030,Amit,Risk Management,High,Intermediate,2024-02-15
+EMP030,Amit,Identity & Access Management,Medium,Advanced,2024-11-14
+EMP031,Vivek,Legal Compliance (SOC2/ISO27001),Low,Expert,2024-08-04
+EMP031,Vivek,Microservices Architecture,Low,Intermediate,2024-07-19
+EMP031,Vivek,Accounts Payable/Receivable,Low,Advanced,2024-10-10
+EMP031,Vivek,Network Security,Low,Advanced,2024-01-27
+EMP032,Vijay,Financial Planning & Analysis,High,Beginner,2024-10-24
+EMP032,Vijay,Strategic Account Management,Medium,Advanced,2024-04-20
+EMP032,Vijay,Machine Learning,Medium,Intermediate,2024-11-07
+EMP032,Vijay,Containerization (Docker/K8s),High,Advanced,2024-11-25
+EMP032,Vijay,Change Management,High,Intermediate,2024-11-04
+EMP033,Kavita,Accounts Payable/Receivable,Medium,Beginner,2024-10-12
+EMP033,Kavita,Test Automation,High,Intermediate,2024-02-10
+EMP034,Lalita,Mentoring & Coaching,Low,Advanced,2024-09-17
+EMP034,Lalita,Content Writing,Medium,Intermediate,2024-05-27
+EMP034,Lalita,Security Compliance,Medium,Advanced,2024-12-28
+EMP034,Lalita,Network Security,Medium,Beginner,2024-08-03
+EMP035,Rajan,Technical Writing,High,Expert,2024-09-12
+EMP035,Rajan,Customer Success,High,Beginner,2024-07-01
+EMP035,Rajan,Containerization (Docker/K8s),High,Advanced,2024-09-04
+EMP036,Anita,Organizational Development,Low,Expert,2024-11-12
+EMP036,Anita,Change Management,Low,Beginner,2024-11-08
+EMP036,Anita,Mentoring & Coaching,Low,Expert,2024-01-20
+EMP036,Anita,Incident Management,Low,Advanced,2024-10-08
+EMP036,Anita,Business Intelligence,Low,Beginner,2024-11-27
+EMP037,Karan,Identity & Access Management,Low,Beginner,2024-03-02
+EMP037,Karan,Stakeholder Communication,Low,Beginner,2024-05-16
+EMP037,Karan,Accounts Payable/Receivable,Low,Beginner,2024-02-08
+EMP037,Karan,ERP Systems,Low,Intermediate,2024-07-15
+EMP037,Karan,Content Writing,Low,Advanced,2024-11-24
+EMP038,Tanvi,Content Writing,Low,Beginner,2024-08-20
+EMP038,Tanvi,Business Intelligence,Low,Expert,2024-05-02
+EMP038,Tanvi,Mentoring & Coaching,Low,Advanced,2024-04-15
+EMP038,Tanvi,Presentation Skills,Low,Expert,2024-04-28
+EMP038,Tanvi,Database Administration,Low,Advanced,2024-02-22
+EMP038,Tanvi,Vulnerability Management,Low,Advanced,2024-09-21
+EMP039,Nikhil,Product Roadmap Planning,Low,Beginner,2024-08-03
+EMP039,Nikhil,Campaign Management,Low,Intermediate,2024-11-21
+EMP039,Nikhil,Financial Planning & Analysis,Low,Beginner,2024-01-26
+EMP039,Nikhil,Network Security,Low,Advanced,2024-04-05
+EMP040,Rahul,Penetration Testing,Low,Intermediate,2024-04-11
+EMP040,Rahul,User Research,Low,Intermediate,2024-10-01
+EMP040,Rahul,Backend Systems,Low,Advanced,2024-03-05
+EMP040,Rahul,Technical Writing,Low,Advanced,2024-03-04
+EMP040,Rahul,Data Analytics,Low,Beginner,2024-03-01
+EMP040,Rahul,Vulnerability Management,Low,Advanced,2024-04-19
+EMP041,Priya,Sales Pipeline Management,Low,Intermediate,2024-12-14
+EMP041,Priya,Security Compliance,Low,Beginner,2024-12-03
+EMP041,Priya,Incident Management,Low,Expert,2024-08-25
+EMP041,Priya,Product Roadmap Planning,Low,Advanced,2024-09-19
+EMP042,Padma,Contract Negotiation,High,Intermediate,2024-10-02
+EMP042,Padma,Supply Chain Management,High,Advanced,2024-08-21
+EMP043,Ganesh,Product Roadmap Planning,Low,Expert,2024-07-22
+EMP043,Ganesh,Intellectual Property,Low,Beginner,2024-08-23
+EMP044,Prakash,User Research,High,Intermediate,2024-02-05
+EMP044,Prakash,Disaster Recovery,High,Advanced,2024-10-21
+EMP044,Prakash,UX Design,High,Advanced,2024-07-20
+EMP044,Prakash,Talent Acquisition,High,Advanced,2024-08-17
+EMP044,Prakash,A/B Testing,High,Expert,2024-02-26
+EMP045,Bela,Microservices Architecture,High,Intermediate,2024-07-15
+EMP045,Bela,ERP Systems,High,Intermediate,2024-07-11
+EMP046,Deepali,Campaign Management,Medium,Advanced,2024-11-09
+EMP046,Deepali,Content Writing,Medium,Intermediate,2024-11-16
+EMP046,Deepali,Presentation Skills,Low,Beginner,2024-02-03
+EMP046,Deepali,API Design,Medium,Beginner,2024-12-24
+EMP046,Deepali,Talent Acquisition,Medium,Intermediate,2024-09-02
+EMP047,Pooja,Data Analytics,Low,Advanced,2024-11-25
+EMP047,Pooja,Vulnerability Management,Low,Expert,2024-12-02
+EMP047,Pooja,Employee Relations,Low,Advanced,2024-10-10
+EMP047,Pooja,Project Management (Agile),Low,Advanced,2024-02-19
+EMP047,Pooja,System Architecture,Low,Intermediate,2024-03-22
+EMP047,Pooja,Content Writing,Low,Expert,2024-04-28
+EMP048,Jatin,Compensation Planning,Low,Advanced,2024-02-25
+EMP048,Jatin,Microservices Architecture,Low,Advanced,2024-10-08
+EMP049,Manoj,Microservices Architecture,High,Beginner,2024-10-22
+EMP049,Manoj,Data Analytics,High,Advanced,2024-01-06
+EMP049,Manoj,Quality Assurance,High,Advanced,2024-12-25
+EMP049,Manoj,Frontend Frameworks,High,Advanced,2024-06-12
+EMP049,Manoj,Marketing Automation,High,Beginner,2024-03-28
+EMP050,Kavya,Machine Learning,Low,Beginner,2024-03-24
+EMP050,Kavya,Project Management (Agile),Low,Beginner,2024-02-24
+EMP050,Kavya,Campaign Management,Low,Intermediate,2024-07-14
+EMP051,Uday,Employee Relations,Low,Advanced,2024-10-20
+EMP051,Uday,DevOps & CI/CD,Low,Beginner,2024-01-05
+EMP051,Uday,Organizational Development,Low,Intermediate,2024-10-02
+EMP051,Uday,Accounts Payable/Receivable,Low,Beginner,2024-05-15
+EMP051,Uday,Presentation Skills,Low,Expert,2024-08-20
+EMP052,Ishita,Content Writing,Low,Beginner,2024-06-14
+EMP052,Ishita,Financial Planning & Analysis,Low,Beginner,2024-05-22
+EMP052,Ishita,Penetration Testing,Low,Expert,2024-09-22
+EMP052,Ishita,Technical Writing,Low,Advanced,2024-01-08
+EMP052,Ishita,Supply Chain Management,Low,Expert,2024-10-02
+EMP053,Esha,Penetration Testing,Low,Intermediate,2024-03-25
+EMP053,Esha,Accounts Payable/Receivable,Low,Advanced,2024-05-11
+EMP054,Pallavi,Strategic Account Management,High,Expert,2024-03-05
+EMP054,Pallavi,Risk Management,Medium,Intermediate,2024-09-18
+EMP055,Dinesh,User Research,High,Beginner,2024-07-01
+EMP055,Dinesh,Campaign Management,High,Expert,2024-02-28
+EMP055,Dinesh,Containerization (Docker/K8s),High,Advanced,2024-10-14
+EMP055,Dinesh,Mentoring & Coaching,High,Expert,2024-12-21
+EMP056,Harsh,Budgeting & Forecasting,Low,Intermediate,2024-10-15
+EMP056,Harsh,System Architecture,Low,Advanced,2024-02-14
+EMP056,Harsh,Campaign Management,Low,Beginner,2024-04-14
+EMP056,Harsh,Sales Pipeline Management,Low,Expert,2024-09-03
+EMP056,Harsh,Talent Acquisition,Low,Expert,2024-05-24
+EMP057,Rajesh,Customer Success,Low,Beginner,2024-09-17
+EMP057,Rajesh,Employee Relations,Low,Advanced,2024-06-24
+EMP057,Rajesh,Quality Assurance,High,Intermediate,2024-04-04
+EMP057,Rajesh,DevOps & CI/CD,Low,Advanced,2024-04-06
+EMP058,Aditya,Database Administration,Low,Expert,2024-08-25
+EMP058,Aditya,Technical Writing,Low,Expert,2024-11-19
+EMP058,Aditya,Threat Modeling,Low,Advanced,2024-11-11
+EMP058,Aditya,ERP Systems,Low,Intermediate,2024-08-03
+EMP058,Aditya,User Research,Low,Expert,2024-08-21
+EMP058,Aditya,Security Compliance,Low,Advanced,2024-05-19
+EMP059,Hari,Compensation Planning,Low,Beginner,2024-05-15
+EMP059,Hari,Supply Chain Management,Low,Expert,2024-01-02
+EMP060,Shivani,Backend Systems,Low,Expert,2024-08-19
+EMP060,Shivani,Budgeting & Forecasting,High,Beginner,2024-08-26
+EMP060,Shivani,User Research,High,Intermediate,2024-06-20
+EMP060,Shivani,ERP Systems,Medium,Intermediate,2024-01-15
+EMP061,Gopal,Mobile Development,Low,Advanced,2024-12-03
+EMP061,Gopal,Disaster Recovery,Low,Intermediate,2024-01-08
+EMP062,Rekha,Contract Negotiation,Medium,Advanced,2024-07-14
+EMP062,Rekha,Vendor Management,Medium,Beginner,2024-11-21
+EMP062,Rekha,Marketing Automation,Medium,Beginner,2024-06-04
+EMP062,Rekha,DevOps & CI/CD,High,Expert,2024-05-09
+EMP062,Rekha,Organizational Development,High,Intermediate,2024-06-03
+EMP063,Mukesh,Project Management (Agile),High,Expert,2024-03-20
+EMP063,Mukesh,Database Administration,High,Beginner,2024-05-18
+EMP063,Mukesh,Identity & Access Management,High,Expert,2024-11-26
+EMP063,Mukesh,Compensation Planning,High,Advanced,2024-03-22
+EMP063,Mukesh,Accounts Payable/Receivable,High,Beginner,2024-11-22
+EMP063,Mukesh,ERP Systems,High,Expert,2024-09-12
+EMP064,Shyam,Organizational Development,Low,Intermediate,2024-04-11
+EMP064,Shyam,Accounts Payable/Receivable,Low,Expert,2024-04-08
+EMP065,Rishi,Database Administration,Low,Beginner,2024-09-25
+EMP065,Rishi,User Research,Low,Beginner,2024-11-11
+EMP065,Rishi,Budgeting & Forecasting,Low,Intermediate,2024-10-13
+EMP066,Divya,DevOps & CI/CD,High,Intermediate,2024-12-15
+EMP066,Divya,Security Compliance,Low,Expert,2024-06-22
+EMP066,Divya,Backend Systems,High,Intermediate,2024-08-20
+EMP067,Sanjay,Technical Writing,Low,Intermediate,2024-05-26
+EMP067,Sanjay,Mentoring & Coaching,Medium,Intermediate,2024-06-22
+EMP067,Sanjay,Test Automation,High,Expert,2024-08-25
+EMP067,Sanjay,Contract Negotiation,Medium,Expert,2024-09-17
+EMP068,Arjun,DevOps & CI/CD,Low,Advanced,2024-01-21
+EMP068,Arjun,Frontend Frameworks,Medium,Advanced,2024-09-04
+EMP068,Arjun,Network Security,High,Beginner,2024-05-03
+EMP068,Arjun,Mobile Development,Low,Advanced,2024-08-17
+EMP068,Arjun,A/B Testing,Low,Expert,2024-02-08
+EMP069,Isha,Monitoring & Observability,Low,Expert,2024-09-12
+EMP069,Isha,Compensation Planning,Low,Expert,2024-02-12
+EMP069,Isha,Threat Modeling,Low,Beginner,2024-06-04
+EMP069,Isha,Sales Pipeline Management,High,Advanced,2024-03-05
+EMP069,Isha,Content Writing,Low,Advanced,2024-08-23
+EMP070,Kishore,Technical Writing,Medium,Beginner,2024-02-01
+EMP070,Kishore,Negotiation,Medium,Intermediate,2024-03-18
+EMP070,Kishore,Intellectual Property,High,Expert,2024-02-25
+EMP071,Arun,Technical Support,Low,Intermediate,2024-07-21
+EMP071,Arun,Accounts Payable/Receivable,Low,Expert,2024-02-04
+EMP071,Arun,System Architecture,Low,Expert,2024-10-18
+EMP071,Arun,Product Roadmap Planning,Low,Beginner,2024-11-17
+EMP072,Geeta,Technical Support,High,Advanced,2024-04-19
+EMP072,Geeta,Negotiation,High,Expert,2024-03-22
+EMP072,Geeta,Database Administration,High,Beginner,2024-09-12
+EMP072,Geeta,Budgeting & Forecasting,High,Beginner,2024-09-18
+EMP072,Geeta,SEO & SEM,High,Beginner,2024-07-28
+EMP072,Geeta,Strategic Account Management,High,Expert,2024-01-21
+EMP073,Omkar,Organizational Development,Low,Advanced,2024-04-24
+EMP073,Omkar,Incident Management,High,Beginner,2024-10-24
+EMP073,Omkar,Mentoring & Coaching,Medium,Intermediate,2024-01-12
+EMP073,Omkar,Sales Pipeline Management,High,Advanced,2024-11-06
+EMP073,Omkar,Compensation Planning,High,Expert,2024-12-16
+EMP074,Chandan,Mobile Development,Low,Expert,2024-01-10
+EMP074,Chandan,Cloud Infrastructure (AWS/Azure),Low,Intermediate,2024-01-26
+EMP074,Chandan,User Research,Low,Intermediate,2024-01-11
+EMP075,Suresh,Supply Chain Management,Low,Expert,2024-05-02
+EMP075,Suresh,Campaign Management,Low,Intermediate,2024-05-12
+EMP075,Suresh,Frontend Frameworks,Low,Beginner,2024-11-11
+EMP075,Suresh,Process Optimization,Low,Advanced,2024-02-26
+EMP076,Tara,SEO & SEM,Medium,Expert,2024-06-06
+EMP076,Tara,Monitoring & Observability,Medium,Expert,2024-06-26
+EMP076,Tara,Campaign Management,High,Advanced,2024-02-24
+EMP076,Tara,Mentoring & Coaching,Medium,Beginner,2024-07-20
+EMP077,Radha,Process Optimization,High,Beginner,2024-02-11
+EMP077,Radha,Budgeting & Forecasting,High,Advanced,2024-05-15
+EMP077,Radha,Talent Acquisition,High,Expert,2024-03-23
+EMP078,Sneha,Compensation Planning,High,Advanced,2024-10-14
+EMP078,Sneha,Contract Negotiation,High,Advanced,2024-11-26
+EMP078,Sneha,Client Relationship Management,High,Beginner,2024-02-22
+EMP078,Sneha,Presentation Skills,High,Expert,2024-06-17
+EMP078,Sneha,Containerization (Docker/K8s),High,Intermediate,2024-01-05
+EMP079,Venkat,Change Management,Low,Advanced,2024-06-13
+EMP079,Venkat,Test Automation,High,Beginner,2024-10-05
+EMP079,Venkat,Contract Negotiation,High,Expert,2024-06-12
+EMP079,Venkat,Client Relationship Management,Medium,Beginner,2024-10-05
+EMP079,Venkat,Cloud Infrastructure (AWS/Azure),High,Advanced,2024-07-11
+EMP079,Venkat,User Research,High,Advanced,2024-04-04
+EMP080,Vani,Mentoring & Coaching,Medium,Expert,2024-09-04
+EMP080,Vani,Security Compliance,Medium,Advanced,2024-12-15
+EMP081,Ravi,Marketing Automation,High,Expert,2024-04-04
+EMP081,Ravi,Budgeting & Forecasting,High,Intermediate,2024-02-15
+EMP081,Ravi,Stakeholder Communication,High,Intermediate,2024-12-15
+EMP082,Rohit,Mobile Development,Medium,Advanced,2024-12-03
+EMP082,Rohit,Change Management,High,Advanced,2024-05-28
+EMP083,Aakash,Negotiation,High,Intermediate,2024-06-17
+EMP083,Aakash,Threat Modeling,High,Intermediate,2024-02-07
+EMP083,Aakash,Stakeholder Communication,High,Intermediate,2024-04-26
+EMP084,Indira,Sales Pipeline Management,High,Intermediate,2024-10-03
+EMP084,Indira,Organizational Development,Low,Advanced,2024-07-23
+EMP084,Indira,Data Analytics,High,Expert,2024-09-14
+EMP084,Indira,Machine Learning,Medium,Beginner,2024-03-11
+EMP084,Indira,Legal Compliance (SOC2/ISO27001),High,Beginner,2024-08-15
+EMP085,Kamla,Compensation Planning,High,Intermediate,2024-03-14
+EMP085,Kamla,Cloud Infrastructure (AWS/Azure),High,Beginner,2024-02-17
+EMP085,Kamla,Monitoring & Observability,High,Intermediate,2024-05-06
+EMP085,Kamla,Backend Systems,High,Intermediate,2024-06-23
+EMP085,Kamla,Quality Assurance,High,Intermediate,2024-06-17
+EMP085,Kamla,Data Analytics,High,Advanced,2024-02-09
+EMP086,Vikram Sharma,Strategic Account Management,Low,Expert,2024-06-01
+EMP086,Vikram Sharma,Enterprise Sales Strategy,Low,Expert,2024-07-15
+EMP086,Vikram Sharma,Client Relationship Management,Low,Expert,2024-05-20
+EMP086,Vikram Sharma,Revenue Forecasting,Low,Advanced,2024-08-10
+EMP086,Vikram Sharma,Executive Presentation,Low,Expert,2024-04-05
+EMP087,Neha Kapoor,System Architecture,Low,Expert,2024-03-12
+EMP087,Neha Kapoor,Microservices Architecture,Low,Expert,2024-06-18
+EMP087,Neha Kapoor,Cloud Infrastructure (AWS/Azure),Low,Advanced,2024-09-22
+EMP087,Neha Kapoor,API Design,Low,Expert,2024-02-14
+EMP087,Neha Kapoor,Technical Strategy,Low,Advanced,2024-11-30
+EMP088,Ravi Deshmukh,DevOps & CI/CD,High,Expert,2024-05-10
+EMP088,Ravi Deshmukh,Containerization (Docker/K8s),High,Expert,2024-08-25
+EMP088,Ravi Deshmukh,Cloud Infrastructure (AWS/Azure),High,Advanced,2024-03-18
+EMP088,Ravi Deshmukh,Monitoring & Observability,High,Advanced,2024-07-09
+EMP089,Ananya Patel,Machine Learning,Low,Expert,2024-04-22
+EMP089,Ananya Patel,Data Science,Low,Expert,2024-09-05
+EMP089,Ananya Patel,AI Architecture,Low,Expert,2024-01-15
+EMP089,Ananya Patel,Deep Learning,Low,Advanced,2024-11-10
+EMP089,Ananya Patel,NLP,Low,Expert,2024-06-30
+EMP090,Deepak Joshi,Strategic Account Management,High,Expert,2024-02-20
+EMP090,Deepak Joshi,Sales Operations,High,Advanced,2024-07-14
+EMP090,Deepak Joshi,CRM Tools (Salesforce),High,Expert,2024-05-08
+EMP090,Deepak Joshi,Team Leadership,High,Advanced,2024-10-01
+EMP091,Kiran Rao,Legal Compliance (SOC2/ISO27001),High,Advanced,2024-03-04
+EMP091,Kiran Rao,Risk Management,High,Advanced,2024-08-19
+EMP091,Kiran Rao,Data Privacy (GDPR/CCPA),High,Intermediate,2024-06-12
+EMP091,Kiran Rao,Audit Management,High,Intermediate,2024-11-25
+EMP092,Meera Iyer,Product Strategy,High,Expert,2024-01-10
+EMP092,Meera Iyer,User Research,High,Advanced,2024-04-28
+EMP092,Meera Iyer,Product Roadmap Planning,High,Expert,2024-09-15
+EMP092,Meera Iyer,Stakeholder Communication,High,Expert,2024-07-22
+EMP092,Meera Iyer,Data Analytics,High,Advanced,2024-03-30
+EMP093,Rohan Gupta,Backend Development,High,Intermediate,2024-05-05
+EMP093,Rohan Gupta,Frontend Frameworks,High,Intermediate,2024-08-18
+EMP093,Rohan Gupta,Test Automation,High,Beginner,2024-11-12
+EMP094,Anita Verma,Security Architecture,Low,Expert,2024-02-28
+EMP094,Anita Verma,Threat Modeling,Low,Expert,2024-06-14
+EMP094,Anita Verma,Incident Response,Low,Expert,2024-09-30
+EMP094,Anita Verma,Penetration Testing,Low,Advanced,2024-04-10
+EMP094,Anita Verma,Security Compliance,Low,Advanced,2024-12-05
+EMP095,Shikha Dubey,Marketing Strategy,Low,Expert,2024-03-08
+EMP095,Shikha Dubey,Brand Strategy,Low,Expert,2024-07-20
+EMP095,Shikha Dubey,Digital Marketing,Low,Advanced,2024-10-15
+EMP095,Shikha Dubey,Content Strategy,Low,Expert,2024-01-25
+EMP095,Shikha Dubey,Analytics & ROI Measurement,Low,Advanced,2024-05-30
+EMP096,Akash Mehta,Customer Success,High,Expert,2024-03-10
+EMP096,Akash Mehta,Account Management,High,Advanced,2024-07-22
+EMP096,Akash Mehta,Client Relationship Management,High,Advanced,2024-11-05
+EMP097,Pallavi Joshi,Financial Planning & Analysis,High,Expert,2024-02-15
+EMP097,Pallavi Joshi,Budgeting & Forecasting,High,Expert,2024-06-30
+EMP097,Pallavi Joshi,Risk Management,High,Advanced,2024-10-18
+EMP098,Rajiv Kumar,Process Optimization,High,Expert,2024-04-05
+EMP098,Rajiv Kumar,Supply Chain Management,High,Advanced,2024-08-12
+EMP098,Rajiv Kumar,Vendor Management,High,Advanced,2024-12-01
+EMP099,Dipti Nair,Corporate Strategy,Low,Expert,2024-03-20
+EMP099,Dipti Nair,Market Analysis,Low,Expert,2024-07-14
+EMP099,Dipti Nair,M&A Advisory,Low,Advanced,2024-10-28
+EMP100,Sameer Bhat,Talent Acquisition,High,Expert,2024-01-30
+EMP100,Sameer Bhat,Compensation Planning,High,Advanced,2024-05-25
+EMP100,Sameer Bhat,Organizational Development,High,Expert,2024-09-15
+EMP101,Akash Verma,Data Science,High,Expert,2024-03-15
+EMP101,Akash Verma,Machine Learning,High,Expert,2024-07-20
+EMP101,Akash Verma,Statistical Modeling,High,Advanced,2024-11-10
+EMP101,Akash Verma,Data Visualization,High,Advanced,2024-02-05
+EMP102,Leena Nair,Enterprise Sales Strategy,High,Expert,2024-04-10
+EMP102,Leena Nair,Client Relationship Management,High,Expert,2024-08-25
+EMP102,Leena Nair,Contract Negotiation,Medium,Advanced,2024-12-15
+EMP102,Leena Nair,Revenue Forecasting,High,Advanced,2024-01-30
+EMP103,Rohan Malhotra,System Architecture,High,Expert,2024-03-05
+EMP103,Rohan Malhotra,Cloud Infrastructure (AWS/Azure),High,Expert,2024-06-18
+EMP103,Rohan Malhotra,API Design,High,Advanced,2024-09-22
+EMP103,Rohan Malhotra,Technical Consulting,High,Advanced,2024-02-14
+EMP104,Deepa Shah,Brand Strategy,Low,Advanced,2024-05-12
+EMP104,Deepa Shah,Content Strategy,Low,Intermediate,2024-08-30
+EMP104,Deepa Shah,Digital Marketing,Low,Intermediate,2024-11-15
+EMP104,Deepa Shah,Marketing Analytics,Low,Beginner,2024-03-20
+EMP105,Kunal Saxena,Supply Chain Management,Low,Expert,2024-04-08
+EMP105,Kunal Saxena,Logistics Optimization,Low,Advanced,2024-07-16
+EMP105,Kunal Saxena,Inventory Management,Low,Intermediate,2024-10-25
+EMP105,Kunal Saxena,Vendor Management,Low,Intermediate,2024-02-28
+EMP106,Preeti Gupta,Employee Relations,High,Advanced,2024-06-10
+EMP106,Preeti Gupta,Talent Acquisition,High,Intermediate,2024-09-15
+EMP106,Preeti Gupta,Compensation Planning,High,Beginner,2024-12-20
+EMP106,Preeti Gupta,Performance Management,High,Intermediate,2024-03-05
+EMP107,Arvind Iyer,Financial Analysis,High,Advanced,2024-05-20
+EMP107,Arvind Iyer,Budgeting & Forecasting,High,Advanced,2024-08-12
+EMP107,Arvind Iyer,Risk Management,High,Intermediate,2024-11-30
+EMP107,Arvind Iyer,Excel Modeling,High,Expert,2024-02-15
+EMP108,Nandini Rao,Product Management,High,Intermediate,2024-04-22
+EMP108,Nandini Rao,User Research,High,Advanced,2024-07-10
+EMP108,Nandini Rao,Data Analytics,High,Intermediate,2024-10-05
+EMP108,Nandini Rao,Stakeholder Communication,High,Advanced,2024-01-18
+EMP109,Vijay More,Network Security,High,Advanced,2024-05-08
+EMP109,Vijay More,Cloud Infrastructure (AWS/Azure),High,Expert,2024-08-25
+EMP109,Vijay More,Monitoring & Observability,High,Advanced,2024-11-12
+EMP109,Vijay More,Incident Response,High,Intermediate,2024-03-30
+EMP110,Snehal Patil,Visual Design,Low,Expert,2024-03-18
+EMP110,Snehal Patil,Brand Identity,Low,Expert,2024-07-22
+EMP110,Snehal Patil,Design Strategy,Low,Expert,2024-10-10
+EMP110,Snehal Patil,Creative Direction,Low,Advanced,2024-02-28
+EMP110,Snehal Patil,Motion Design,Low,Advanced,2024-06-15
+EMP111,Manav Bhatia,Corporate Law,Low,Expert,2024-04-05
+EMP111,Manav Bhatia,Contract Law,Low,Expert,2024-08-20
+EMP111,Manav Bhatia,M&A Advisory,Low,Expert,2024-11-15
+EMP111,Manav Bhatia,Legal Compliance,Low,Advanced,2024-03-10
+EMP111,Manav Bhatia,Intellectual Property,Low,Expert,2024-07-25
+EMP112,Ruchi Agarwal,Market Research,High,Advanced,2024-05-15
+EMP112,Ruchi Agarwal,Data Analysis,High,Advanced,2024-09-01
+EMP112,Ruchi Agarwal,Competitive Intelligence,High,Intermediate,2024-12-10
+EMP112,Ruchi Agarwal,Presentation Skills,High,Expert,2024-02-20
+EMP113,Tarun Kulkarni,Customer Support,Low,Intermediate,2024-06-05
+EMP113,Tarun Kulkarni,Technical Troubleshooting,Low,Beginner,2024-09-18
+EMP113,Tarun Kulkarni,CRM Tools,Low,Beginner,2024-12-22
+EMP113,Tarun Kulkarni,Documentation,Low,Beginner,2024-03-15
+EMP114,Jyoti Deshmukh,Security Compliance,High,Advanced,2024-04-12
+EMP114,Jyoti Deshmukh,Risk Assessment,High,Advanced,2024-07-28
+EMP114,Jyoti Deshmukh,Audit Management,High,Intermediate,2024-10-15
+EMP114,Jyoti Deshmukh,Data Privacy (GDPR/CCPA),High,Advanced,2024-02-08
+EMP115,Prakash Menon,Data Engineering,High,Expert,2024-03-22
+EMP115,Prakash Menon,Business Intelligence,High,Expert,2024-07-05
+EMP115,Prakash Menon,Data Pipeline Architecture,High,Advanced,2024-10-18
+EMP115,Prakash Menon,Cloud Data Platforms,High,Expert,2024-01-12

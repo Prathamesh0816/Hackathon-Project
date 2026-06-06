@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Node
+node_modules/
+
+# Build output
+dist/
+.vite/
+
+# Database - generated
+*.db
+*.db.bak
+
+# ChromaDB vector store
+chroma_data/
+chroma_db/
+
+# User uploads (not source)
+uploaded_files/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

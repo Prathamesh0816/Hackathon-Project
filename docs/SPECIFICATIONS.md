@@ -1,0 +1,222 @@
+# TruPulse AI — API Specifications (Spec-Driven Development)
+
+All API contracts are formally defined using Pydantic models in `backend/models.py`.
+FastAPI auto-generates OpenAPI 3.0 documentation from these models.
+
+---
+
+## OpenAPI Documentation
+
+| Environment | URL |
+|-------------|-----|
+| Local | `http://localhost:8000/docs` |
+| Docker | `http://localhost:8000/docs` |
+
+Interactive Swagger UI with:
+- Request/response schemas for all endpoints
+- "Try it out" functionality
+- Model definitions
+
+---
+
+## Endpoint Specification Table
+
+| # | Method | Endpoint | Request Model | Response Model | Purpose |
+|--|--------|----------|---------------|----------------|---------|
+| 1 | GET | `/` | — | `HealthCheckResponse` | Health check + endpoint list |
+| 2 | GET | `/org-health` | — | `OrgHealthResponse` | 4-indicator composite score |
+| 3 | GET | `/employee/{name}` | — | `dict` (raw) | Employee profile with SPOF/upskilling |
+| 4 | POST | `/whatif` | `WhatIfRequest` | `WhatIfResponse` | Simulate attrition/workload/restructure |
+| 5 | POST | `/pipeline` | `PipelineRequest` | `dict` (raw) | Run 5-agent AI pipeline |
+| 6 | POST | `/feedback` | `FeedbackRequest` | `FeedbackResponse` | Record human accept/veto/modify |
+| 7 | GET | `/feedback` | — | `dict` | List past feedback overrides |
+| 8 | POST | `/feedback/suggestions` | — | `SuggestionResponse` | Generate AI suggestions for review |
+| 9 | POST | `/feedback/apply` | `ApplyDecisionsRequest` | `RecalculateResponse` | Apply human decisions + recalculate |
+| 10 | POST | `/text-input` | `TextInputRequest` | `TextInputResponse` | Parse employee data from plain text |
+| 11 | GET | `/text-input/list` | — | `dict` | List recent text inputs |
+| 12 | POST | `/upload-file` | `UploadFile` | `dict` | Upload CSV/TXT/XLSX |
+| 13 | GET | `/files` | — | `dict` | List uploaded files |
+| 14 | GET | `/employee-data/{id}` | — | `dict` | Structured data + text notes |
+| 15 | POST | `/analyze-employee/{id}` | — | `dict` | Per-employee AI analysis |
+| 16 | GET | `/spof-ranking` | — | `dict` | SPOFs ranked by severity |
+| 17 | GET | `/skill-gaps` | — | `dict` | Org-wide skill gaps |
+| 18 | GET | `/succession-planning` | — | `dict` | Succession readiness |
+| 19 | GET | `/workforce-readiness` | — | `dict` | Team capacity vs pipeline |
+| 20 | GET | `/knowledge-concentration` | — | `dict` | Knowledge at-risk areas |
+| 21 | GET | `/upskilling/{name}` | — | `dict` | Personalized upskilling paths |
+| 22 | POST | `/query` | `QueryRequest` | `dict` | Natural language multi-scenario query |
+| 23 | GET | `/report` | Query params | `HTMLResponse` / `PlainTextResponse` | Printable resilience report (4 formats) |
+| 24 | GET | `/demo-data` | — | `dict` | Pre-cached demo snapshot (10 scenarios) |
+| 25 | GET | `/scenarios` | — | `dict` | 20+ predefined scenario permutations catalog |
+| 26 | POST | `/scenario-run` | `ScenarioRunRequest` | `ScenarioRunResponse` | Scenario with reaction type |
+| 27 | GET | `/reactions` | — | `dict` | Available reaction types |
+| 28 | POST | `/dataset/upload` | `UploadFile` | `dict` | Upload + auto-activate dataset |
+| 29 | POST | `/dataset/activate` | query + optional mapping | `dict` | Activate specific dataset |
+| 30 | GET | `/dataset/info` | — | `dict` | Current dataset status |
+| 31 | GET | `/dataset/files` | — | `dict` | List all uploaded datasets |
+| 32 | POST | `/dataset/clear` | — | `dict` | Reset to default CSVs |
+| 33 | POST | `/dataset/preview` | `UploadFile` | `dict` | Preview file + suggested column mapping |
+| 34 | GET | `/dataset/employee-data/{name}` | — | `dict` | Employee from active dataset |
+| 35 | GET | `/dataset/employees` | — | `dict` | List all employees |
+
+---
+
+## Request Model Contracts
+
+### WhatIfRequest
+```json
+{
+  "scenario_type": "attrition | workload_increase | team_restructuring | baseline",
+  "removed_employees": ["Vikram", "Rahul"],
+  "workload_increase_pct": 20,
+  "restructure_team": "Engineering"
+}
+```
+
+### PipelineRequest
+```json
+{
+  "scenario_type": "attrition",
+  "removed_employees": ["Vikram"],
+  "workload_increase_pct": 0,
+  "restructure_team": null,
+  "use_fallback": false
+}
+```
+
+### FeedbackRequest
+```json
+{
+  "employee": "Vikram",
+  "action_title": "Cross-train Sales team backup",
+  "decision": "accept | veto | modify",
+  "reason": "Already in progress with new hire"
+}
+```
+
+### TextInputRequest
+```json
+{
+  "text": "Employee: Vikram, Team: Sales, Role: Sales Manager, Criticality: High, Backup: No\nEmployee: Anjali, Team: Sales, Role: Account Executive, Criticality: Medium, Backup: Yes",
+  "source": "manual"
+}
+```
+
+### ApplyDecisionsRequest
+```json
+{
+  "accepted_ids": ["sug_cross_train_Vikram", "sug_hire_security"],
+  "rejected_ids": ["sug_doc_Rahul"],
+  "modified": [{"id": "sug_mod", "title": "Modified action", "description": "...", "type": "cross_train"}],
+  "user_added": [{"title": "Monthly 1:1 reviews", "description": "...", "type": "custom"}]
+}
+```
+
+### ScenarioRunRequest
+```json
+{
+  "scenario_type": "attrition",
+  "removed_employees": ["Vikram"],
+  "workload_increase_pct": 0,
+  "restructure_team": null,
+  "reaction_type": "standard | pipeline | human_loop | agent_intervention | random",
+  "probability": null
+}
+```
+
+### QueryRequest
+```json
+{
+  "query": "What is our overall health?"
+}
+```
+
+---
+
+## Response Model Contracts
+
+### OrgHealthResponse
+```json
+{
+  "composite_score": 47.5,
+  "overall_risk": "HIGH",
+  "employee_count": 115,
+  "team_count": 14,
+  "project_count": 34,
+  "indicators": {
+    "resilience": {"score": 29.0, "risk_level": "HIGH", "details": {"spof_count": 56, ...}},
+    "trust": {"score": 47.5, "risk_level": "HIGH", "details": {...}},
+    "burnout": {"score": 38.1, "risk_level": "MEDIUM", "details": {...}},
+    "retention": {"score": 73.4, "risk_level": "LOW", "details": {...}}
+  }
+}
+```
+
+### WhatIfResponse
+```json
+{
+  "baseline": {"composite_score": 47.5, "overall_risk": "HIGH", "indicators": {...}},
+  "projected": {"composite_score": 51.2, ...},
+  "comparison": {
+    "baseline_composite": 47.5,
+    "projected_composite": 51.2,
+    "composite_delta": 3.7,
+    "indicator_deltas": {...},
+    "revenue_at_risk_usd": 2721856
+  }
+}
+```
+
+### RecalculateResponse
+```json
+{
+  "before_score": 47.5,
+  "after_score": 62.3,
+  "delta": 12.5,
+  "applied_actions": [...],
+  "projected_indicators": {...}
+}
+```
+
+---
+
+## Validation Rules
+
+| Field | Rule |
+|-------|------|
+| `scenario_type` | Must be one of: attrition, workload_increase, team_restructuring, baseline |
+| `decision` | Must be one of: accept, veto, modify |
+| `workload_increase_pct` | Integer, 0–100 |
+| `removed_employees` | Array of strings, max 40 |
+| `text` | Minimum 10 characters |
+| `file` | Only .csv, .txt, .xlsx allowed |
+
+---
+
+## Error Handling
+
+All endpoints return standard HTTP codes:
+
+| Code | Meaning |
+|------|---------|
+| 200 | Success |
+| 400 | Invalid request (validation error) |
+| 404 | Resource not found (employee, file) |
+| 500 | Server error (NaN/Inf handled by SafeJSONResponse) |
+
+Error response shape:
+```json
+{
+  "detail": "Error description"
+}
+```
+
+---
+
+## Spec-Driven Development Benefits
+
+1. **Type safety** — All inputs/outputs validated at runtime by Pydantic
+2. **Self-documenting** — OpenAPI docs at `/docs` and `/redoc`
+3. **Contract testing** — Response models ensure backward compatibility
+4. **Client generation** — OpenAPI spec can generate TypeScript/Python clients
+5. **Frontend-backend alignment** — Exact shapes prevent silent data mismatches

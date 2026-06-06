@@ -1,0 +1,306 @@
+[EMP001 - Sunita] Loss-making scenario. Salary $49,849 exceeds productivity contribution. Goals completion at 7/12. High burnout indicators. Knowledge areas undocumented. If Sunita leaves, recovery cost estimated at 2.5x salary.
+
+[EMP002 - Quasim, Marketing Designer] Exceptional performer. Quasim consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 8/10. Revenue contribution estimated at $773,313. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP003 - Farhan] Loss-making scenario. Salary $71,565 exceeds productivity contribution. Goals completion at 3/7. High burnout indicators. Knowledge areas undocumented. If Farhan leaves, recovery cost estimated at 2.5x salary.
+
+[EMP004 - Lalit, Junior Backend Engineer] Critical concern. Lalit is a single point of failure with no backup and undocumented processes. Engagement at 5/10 — lowest in team. Weekly hours at 61 with 1 overdue tasks. Revenue at risk estimated at $4,544,450. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP005 - Poonam] Profit center. High output-to-cost ratio. Salary $92,695 justified by 2,272,225 in managed portfolio. Zero overdue tasks. Full documentation compliance.
+
+[EMP006 - Ajay] Break-even contributor. Salary $92,233 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP007 - Aarti, Design Lead] Stable performer. Aarti meets expectations consistently but shows no exceptional initiative. Engagement at 6/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in API Design. Set stretch goals for next quarter.
+
+[EMP008 - Gauri, DesignOps] Exceptional performer. Gauri consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 10/10. Revenue contribution estimated at $853,536. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP009 - Manisha] Profit center. High output-to-cost ratio. Salary $106,683 justified by 853,536 in managed portfolio. Zero overdue tasks. Full documentation compliance.
+
+[EMP010 - Usha, UX Researcher] Stable performer. Usha meets expectations consistently but shows no exceptional initiative. Engagement at 7/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Risk Management. Set stretch goals for next quarter.
+
+[EMP011 - Lakshmi] Break-even contributor. Salary $99,819 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP012 - Neelam, Facilities Manager] Exceptional performer. Neelam consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 8/10. Revenue contribution estimated at $374,620. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP013 - Mohan, Legal Analyst] Critical concern. Mohan is a single point of failure with no backup and undocumented processes. Engagement at 2/10 — lowest in team. Weekly hours at 62 with 3 overdue tasks. Revenue at risk estimated at $918,610. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP014 - Vikram, Sales Manager] CRITICAL SPOF. Vikram is the highest-revenue-generating employee in the company. He owns 3 biggest accounts — GlobalBank ($4.2M), FinTechInc ($2.0M), and InsuranceGroup ($1.8M) — totalling $8M in annual contracts. He has NO backup. Knowledge documentation is LOW across all 6 critical areas. Engagement score is high at 9/10 but he hasn't taken PTO in 185 days. Weekly hours at 62 with 3 overdue tasks. Flight risk is MODERATE (happy but overworked). If Vikram leaves, revenue at risk is $4.2M+ in first 90 days. Complete account recovery estimated at 6-9 months.
+Action: IMMEDIATE — Assign junior account executive as backup within 14 days. Schedule knowledge documentation sprint — 60-day deadline. Implement retention bonus. Reduce weekly hours to 50 via delegation.
+
+[EMP015 - Nalini] Profit center. High output-to-cost ratio. Salary $81,394 justified by 459,305 in managed portfolio. Zero overdue tasks. Full documentation compliance.
+
+[EMP016 - Rashmi] Profit center. High output-to-cost ratio. Salary $108,763 justified by 369,867 in managed portfolio. Zero overdue tasks. Full documentation compliance.
+
+[EMP017 - Hemant, System Administrator] Stable performer. Hemant meets expectations consistently but shows no exceptional initiative. Engagement at 7/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Legal Compliance (SOC2/ISO27001). Set stretch goals for next quarter.
+
+[EMP018 - Sita, Auditor] Stable performer. Sita meets expectations consistently but shows no exceptional initiative. Engagement at 6/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Business Intelligence. Set stretch goals for next quarter.
+
+[EMP019 - Kirti, SRE Engineer] Stable performer. Kirti meets expectations consistently but shows no exceptional initiative. Engagement at 7/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Supply Chain Management. Set stretch goals for next quarter.
+
+[EMP020 - Deepak] Loss-making scenario. Salary $54,705 exceeds productivity contribution. Goals completion at 3/10. High burnout indicators. Knowledge areas undocumented. If Deepak leaves, recovery cost estimated at 2.5x salary.
+
+[EMP021 - Anjali, QA Lead] Exceptional performer. Anjali consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 9/10. Revenue contribution estimated at $269,482. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP022 - Sarita, IP Specialist] Exceptional performer. Sarita consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 8/10. Revenue contribution estimated at $1,089,502. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP023 - Jagdish, Growth Marketer] Stable performer. Jagdish meets expectations consistently but shows no exceptional initiative. Engagement at 5/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in SEO & SEM. Set stretch goals for next quarter.
+
+[EMP024 - Mahesh, Content Strategist] Critical concern. Mahesh is a single point of failure with no backup and undocumented processes. Engagement at 5/10 — lowest in team. Weekly hours at 47 with 5 overdue tasks. Revenue at risk estimated at $2,179,004. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP025 - Ojas] Loss-making scenario. Salary $100,531 exceeds productivity contribution. Goals completion at 4/7. High burnout indicators. Knowledge areas undocumented. If Ojas leaves, recovery cost estimated at 2.5x salary.
+
+[EMP026 - Meera] Loss-making scenario. Salary $84,557 exceeds productivity contribution. Goals completion at 3/6. High burnout indicators. Knowledge areas undocumented. If Meera leaves, recovery cost estimated at 2.5x salary.
+
+[EMP027 - Naresh] Profit center. High output-to-cost ratio. Salary $84,945 justified by 1,280,955 in managed portfolio. Zero overdue tasks. Full documentation compliance.
+
+[EMP028 - Neha] Break-even contributor. Salary $141,127 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP029 - Bhavna] Loss-making scenario. Salary $62,140 exceeds productivity contribution. Goals completion at 3/10. High burnout indicators. Knowledge areas undocumented. If Bhavna leaves, recovery cost estimated at 2.5x salary.
+
+[EMP030 - Amit] Break-even contributor. Salary $129,938 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP031 - Vivek] Loss-making scenario. Salary $63,915 exceeds productivity contribution. Goals completion at 1/6. High burnout indicators. Knowledge areas undocumented. If Vivek leaves, recovery cost estimated at 2.5x salary.
+
+[EMP032 - Vijay, Support Engineer] Stable performer. Vijay meets expectations consistently but shows no exceptional initiative. Engagement at 5/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Customer Success. Set stretch goals for next quarter.
+
+[EMP033 - Kavita, Business Analyst] Stable performer. Kavita meets expectations consistently but shows no exceptional initiative. Engagement at 7/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Vulnerability Management. Set stretch goals for next quarter.
+
+[EMP034 - Lalita, DesignOps] Stable performer. Lalita meets expectations consistently but shows no exceptional initiative. Engagement at 6/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Cloud Infrastructure (AWS/Azure). Set stretch goals for next quarter.
+
+[EMP035 - Rajan, Data Analyst] Exceptional performer. Rajan consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 10/10. Revenue contribution estimated at $171,658. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP036 - Anita, HR Business Partner] Critical concern. Anita is a single point of failure with no backup and undocumented processes. Engagement at 3/10 — lowest in team. Weekly hours at 66 with 4 overdue tasks. Revenue at risk estimated at $343,316. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP037 - Karan, Recruiter] Critical concern. Karan is a single point of failure with no backup and undocumented processes. Engagement at 3/10 — lowest in team. Weekly hours at 55 with 1 overdue tasks. Revenue at risk estimated at $725,658. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP038 - Tanvi] Loss-making scenario. Salary $71,482 exceeds productivity contribution. Goals completion at 4/8. High burnout indicators. Knowledge areas undocumented. If Tanvi leaves, recovery cost estimated at 2.5x salary.
+
+[EMP039 - Nikhil] Loss-making scenario. Salary $82,039 exceeds productivity contribution. Goals completion at 3/9. High burnout indicators. Knowledge areas undocumented. If Nikhil leaves, recovery cost estimated at 2.5x salary.
+
+[EMP040 - Rahul] Loss-making scenario. Salary $86,130 exceeds productivity contribution. Goals completion at 1/6. High burnout indicators. Knowledge areas undocumented. If Rahul leaves, recovery cost estimated at 2.5x salary.
+
+[EMP041 - Priya] Loss-making scenario. Salary $69,857 exceeds productivity contribution. Goals completion at 2/6. High burnout indicators. Knowledge areas undocumented. If Priya leaves, recovery cost estimated at 2.5x salary.
+
+[EMP042 - Padma, Security Architect] Exceptional performer. Padma consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 8/10. Revenue contribution estimated at $1,196,981. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP043 - Ganesh] Loss-making scenario. Salary $60,503 exceeds productivity contribution. Goals completion at 2/8. High burnout indicators. Knowledge areas undocumented. If Ganesh leaves, recovery cost estimated at 2.5x salary.
+
+[EMP044 - Prakash, Legal Counsel] Exceptional performer. Prakash consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 8/10. Revenue contribution estimated at $3,881,614. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP045 - Bela] Profit center. High output-to-cost ratio. Salary $122,304 justified by 3,881,614 in managed portfolio. Zero overdue tasks. Full documentation compliance.
+
+[EMP046 - Deepali] Break-even contributor. Salary $88,032 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP047 - Pooja] Loss-making scenario. Salary $72,351 exceeds productivity contribution. Goals completion at 6/12. High burnout indicators. Knowledge areas undocumented. If Pooja leaves, recovery cost estimated at 2.5x salary.
+
+[EMP048 - Jatin, Sales Analyst] Critical concern. Jatin is a single point of failure with no backup and undocumented processes. Engagement at 4/10 — lowest in team. Weekly hours at 65 with 1 overdue tasks. Revenue at risk estimated at $2,655,710. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP049 - Manoj, Product Owner] Exceptional performer. Manoj consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 8/10. Revenue contribution estimated at $557,198. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP050 - Kavya, DesignOps] Critical concern. Kavya is a single point of failure with no backup and undocumented processes. Engagement at 5/10 — lowest in team. Weekly hours at 67 with 1 overdue tasks. Revenue at risk estimated at $1,114,396. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP051 - Uday] Loss-making scenario. Salary $73,882 exceeds productivity contribution. Goals completion at 3/8. High burnout indicators. Knowledge areas undocumented. If Uday leaves, recovery cost estimated at 2.5x salary.
+
+[EMP052 - Ishita, Senior Frontend Engineer] Critical concern. Ishita is a single point of failure with no backup and undocumented processes. Engagement at 2/10 — lowest in team. Weekly hours at 65 with 1 overdue tasks. Revenue at risk estimated at $1,614,136. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP053 - Esha, Accountant] Critical concern. Esha is a single point of failure with no backup and undocumented processes. Engagement at 2/10 — lowest in team. Weekly hours at 48 with 2 overdue tasks. Revenue at risk estimated at $1,614,136. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP054 - Pallavi] Break-even contributor. Salary $95,370 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP055 - Dinesh, Brand Designer] Exceptional performer. Dinesh consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 8/10. Revenue contribution estimated at $107,528. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP056 - Harsh, Accountant] Critical concern. Harsh is a single point of failure with no backup and undocumented processes. Engagement at 5/10 — lowest in team. Weekly hours at 66 with 2 overdue tasks. Revenue at risk estimated at $215,056. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP057 - Rajesh, Customer Success Manager] Stable performer. Rajesh meets expectations consistently but shows no exceptional initiative. Engagement at 8/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Negotiation. Set stretch goals for next quarter.
+
+[EMP058 - Aditya] Loss-making scenario. Salary $58,836 exceeds productivity contribution. Goals completion at 3/12. High burnout indicators. Knowledge areas undocumented. If Aditya leaves, recovery cost estimated at 2.5x salary.
+
+[EMP059 - Hari] Loss-making scenario. Salary $85,088 exceeds productivity contribution. Goals completion at 6/10. High burnout indicators. Knowledge areas undocumented. If Hari leaves, recovery cost estimated at 2.5x salary.
+
+[EMP060 - Shivani, Enterprise Sales] Stable performer. Shivani meets expectations consistently but shows no exceptional initiative. Engagement at 8/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Supply Chain Management. Set stretch goals for next quarter.
+
+[EMP061 - Gopal] Loss-making scenario. Salary $83,168 exceeds productivity contribution. Goals completion at 5/10. High burnout indicators. Knowledge areas undocumented. If Gopal leaves, recovery cost estimated at 2.5x salary.
+
+[EMP062 - Rekha, Accountant] Stable performer. Rekha meets expectations consistently but shows no exceptional initiative. Engagement at 6/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Incident Management. Set stretch goals for next quarter.
+
+[EMP063 - Mukesh, Auditor] Exceptional performer. Mukesh consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 10/10. Revenue contribution estimated at $2,018,227. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP064 - Shyam] Loss-making scenario. Salary $85,034 exceeds productivity contribution. Goals completion at 1/6. High burnout indicators. Knowledge areas undocumented. If Shyam leaves, recovery cost estimated at 2.5x salary.
+
+[EMP065 - Rishi] Loss-making scenario. Salary $71,473 exceeds productivity contribution. Goals completion at 3/8. High burnout indicators. Knowledge areas undocumented. If Rishi leaves, recovery cost estimated at 2.5x salary.
+
+[EMP066 - Divya, Content Strategist] Stable performer. Divya meets expectations consistently but shows no exceptional initiative. Engagement at 8/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Data Analytics. Set stretch goals for next quarter.
+
+[EMP067 - Sanjay] Break-even contributor. Salary $80,126 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP068 - Arjun, Product Analyst] Stable performer. Arjun meets expectations consistently but shows no exceptional initiative. Engagement at 5/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in API Design. Set stretch goals for next quarter.
+
+[EMP069 - Isha, Security Analyst] Stable performer. Isha meets expectations consistently but shows no exceptional initiative. Engagement at 6/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in System Architecture. Set stretch goals for next quarter.
+
+[EMP070 - Kishore, Business Strategist] Stable performer. Kishore meets expectations consistently but shows no exceptional initiative. Engagement at 8/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in Product Roadmap Planning. Set stretch goals for next quarter.
+
+[EMP071 - Arun, Business Strategist] Critical concern. Arun is a single point of failure with no backup and undocumented processes. Engagement at 5/10 — lowest in team. Weekly hours at 60 with 4 overdue tasks. Revenue at risk estimated at $76,044. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP072 - Geeta, HR Business Partner] Exceptional performer. Geeta consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 10/10. Revenue contribution estimated at $38,022. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP073 - Omkar] Break-even contributor. Salary $101,752 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP074 - Chandan] Loss-making scenario. Salary $75,528 exceeds productivity contribution. Goals completion at 3/7. High burnout indicators. Knowledge areas undocumented. If Chandan leaves, recovery cost estimated at 2.5x salary.
+
+[EMP075 - Suresh, UI Designer] Critical concern. Suresh is a single point of failure with no backup and undocumented processes. Engagement at 5/10 — lowest in team. Weekly hours at 45 with 2 overdue tasks. Revenue at risk estimated at $948,946. Flight risk is HIGH. Manager reports disengagement in last 3 1-on-1s.
+Action: Immediate cross-training required. Consider performance improvement plan. Schedule skip-level meeting.
+
+[EMP076 - Tara] Break-even contributor. Salary $129,627 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP077 - Radha, Data Engineer] Exceptional performer. Radha consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 10/10. Revenue contribution estimated at $699,126. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP078 - Sneha, Supply Chain Coordinator] Exceptional performer. Sneha consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 9/10. Revenue contribution estimated at $699,126. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP079 - Venkat, Technical Writer] Stable performer. Venkat meets expectations consistently but shows no exceptional initiative. Engagement at 6/10 — adequate. Documentation is partial. Not a SPOF but cross-training recommended. Revenue contribution is break-even against cost.
+Action: Encourage upskilling in User Research. Set stretch goals for next quarter.
+
+[EMP080 - Vani] Break-even contributor. Salary $104,986 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP081 - Ravi, Brand Designer] Exceptional performer. Ravi consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 8/10. Revenue contribution estimated at $33,597. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP082 - Rohit] Break-even contributor. Salary $125,580 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP083 - Aakash, BI Developer] Exceptional performer. Aakash consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 8/10. Revenue contribution estimated at $132,047. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP084 - Indira] Break-even contributor. Salary $131,416 aligned with output. Performance at expected levels. No critical risks identified. Knowledge partially documented. Moderate retention risk — could improve with development opportunities.
+
+[EMP085 - Kamla, Facilities Manager] Exceptional performer. Kamla consistently exceeds targets and mentors junior team members. Knowledge is well-documented with zero SPOF risk. Engagement score at 9/10. Revenue contribution estimated at $500,000. Low attrition risk — strong retention candidate. Recommend accelerated promotion track.
+Action: Fast-track to senior role. Assign as mentor to 2 junior employees.
+
+[EMP086 - Vikram Sharma, Sales Director] ULTRA-CRITICAL SPOF. Vikram Sharma is the senior Sales Director overseeing the entire sales organization including Vikram (Sales Manager) and 3 other senior reps. He manages $9M+ in total contract value. NO backup exists. ALL knowledge areas are LOW documentation. Engagement is high (9/10) but hours are 60/week with zero PTO planned and 200 days since last break. Revenue at risk if he AND his key reports leave simultaneously: $6.5M+. Two key dependents (Tanvi and Shivani) have overlapping knowledge gaps creating a cascade failure scenario.
+Action: IMMEDIATE — Hire Senior Sales Operations Manager as backup within 30 days. Document all account strategies in 45-day sprint. Cross-train Deepak Joshi on Sharma's strategic accounts. Implement 4-day work week trial for 3 months.
+
+[EMP087 - Neha Kapoor, Chief Architect] CRITICAL SPOF — Design Authority. Neha is the sole decision-maker on all system architecture for Engineering. Her knowledge of the monolithic-to-microservices migration roadmap is completely undocumented. She has 4 high-criticality dependents (Lalit, Ishita, Vani, Sanjay) who all depend on her architectural decisions. NO backup. ALL 5 knowledge areas documented at LOW level. Engagement 8/10. Working 58hrs/week with 165 days since last PTO. If Neha leaves, Project Phoenix, API Gateway, and System Modernization all face minimum 4-month delays. Revenue at risk: $3.2M.
+Action: URGENT — Assign Sanjay as architecture apprentice within 14 days. Mandate architecture decision records (ADRs) for every major decision going forward. Hire Senior Architect as redundancy within 90 days.
+
+[EMP088 - Ravi Deshmukh, DevOps Lead] EXTREME BURNOUT CASE. Ravi is the most overworked employee in the organization at 72 hours/week with 5 overdue tasks and 210 days since last PTO. He is a High-criticality employee with advanced/Expert knowledge in DevOps, Containers, and Cloud Infrastructure. However, he DOES have a backup (Ojas and Hemant). Performance is strong but unsustainable. Burnout score projected to reach critical within 4-6 weeks. If Ravi burns out, the Infra Migration and SRE Playbook projects lose their lead engineer. Mitigation exists (backups) but Ojas also shows burnout indicators (51hrs, 4 overdue).
+Action: URGENT — Mandatory 2-week PTO starting immediately. Temporarily redistribute workload across Infrastructure team. Document CI/CD pipeline runbooks in 30-day sprint. Hire contract DevOps engineer for 6-month period.
+
+[EMP089 - Ananya Patel, ML Engineer] HIDDEN SPOF. Ananya is classified as Low criticality but holds UNIQUE expertise in Machine Learning, Deep Learning, NLP, and AI Architecture that NO OTHER employee in the organization possesses. ALL her knowledge areas are undocumented (Low documentation level). She has no backup. She works on the AI Chatbot (high-criticality, at-risk $1.1M) and AI Research Lab ($1.5M) projects. Engagement is moderate (6/10). If Ananya leaves, the entire AI/ML capability of the organization collapses — not replaceable in under 6 months. The org chart underestimates her criticality because her role is categorized as "junior/individual contributor."
+Action: URGENT — Reclassify Ananya's criticality to High. Assign 2 team members (Rajan and Bela) for ML knowledge transfer within 30 days. Document all model architectures and training pipelines. Offer retention package. Create ML Guild to distribute knowledge.
+
+[EMP090 - Deepak Joshi, Sales Director] SUCCESSION PARADOX. Deepak is designated as the backup for Vikram Sharma — but Deepak himself is a flight risk. Engagement 8/10, hours 55/week, but his own backup (Jatin) has Below Expectations performance rating and low engagement (4/10). This creates a succession chain failure: if Vikram Sharma leaves, Deepak steps up — but who backs up Deepak? The succession pipeline has a false sense of security. Deepak manages 3 accounts worth $1.5M and has strong documentation. Salary $175K with 12 years experience.
+Action: HIGH — Implement two-deep backup plan for Sales leadership. Performance improvement plan for Jatin (or replace). Cross-train Shivani on Deepak's accounts within 60 days. Accelerate growth plan for 2 junior Sales reps.
+
+[EMP091 - Kiran Rao, Compliance Officer] CRITICAL RETENTION RISK. Kiran has the LOWEST engagement score in the organization at 2/10. She meets expectations but shows no initiative. Weekly hours 48 with 1 overdue task. Has backup (Prakash and Sarita) and good documentation. Her knowledge of SOC2/ISO27001 compliance, GDPR/CCPA, and Risk Management is well-documented. Not a SPOF but EXTREME flight risk due to low engagement. Exit interview predictors: frustration with growth opportunities, salary compression ($95K vs market $110-120K). If she leaves quietly, compliance audits face delays but no critical failure.
+Action: MEDIUM — Schedule skip-level engagement meeting within 7 days. Market adjustment salary review (target $115K). Assign stretch project: lead SOC2 recertification. Set clear 6-month promotion gate.
+
+[EMP092 - Meera Iyer, Product Director] HIGH-PERFORMER SPOF. Meera is the visionary behind the product strategy. She manages 3 product teams (Kavita, Manoj, Arjun) and owns the Product Suite v3 project ($2.5M). NO backup. Knowledge is well-documented (High documentation level across all areas). Engagement 9/10. Hours 56/week. Has 3 dependents who rely on her for product direction. If she leaves, product roadmap clarity disappears but documentation enables faster recovery. Risk is HIGH but recovery is faster than other SPOFs due to documentation quality. Revenue at risk: $2.5M.
+Action: MEDIUM-HIGH — Cross-train Kavita as product strategy backup within 60 days. Maintain documentation discipline. Implement product leadership forum (bi-weekly) to distribute decision-making.
+
+[EMP093 - Rohan Gupta, Junior Backend Engineer] HIGH-POTENTIAL SUCCESSION CANDIDATE. Rohan is a junior engineer with only 2 years experience but exceeds expectations. Engagement 10/10 — highest in Engineering. Hours moderate at 42/week. Has strong backup and good documentation. Low risk employee. Key insight: Rohan is the ideal succession candidate for senior backend roles in 12-18 months. His rapid growth could fill future gaps created by departing senior engineers. Currently assigned as backup for Sanjay and Radha.
+Action: LOW — Accelerated mentorship track. Pair with Neha Kapoor for architecture exposure. Target: Senior Backend Engineer within 18 months.
+
+[EMP094 - Anita Verma, Security Lead] CRITICAL SECURITY SPOF. Anita is the most senior Security architect with Expert-level knowledge in Security Architecture, Threat Modeling, and Incident Response — ALL undocumented at Low level. NO backup exists. She manages the Security Operations Center project ($2.8M, at-risk) and Zero Trust Architecture. Has 3 dependents (Meera, Isha, Rohit). Working 60hrs/week with 175 days since last PTO, 4 overdue tasks. If Anita leaves, Security posture degrades critically within 2 weeks. SOC2 compliance and government contracts ($3.9M) are at direct risk. Cascade effect: 3 security team members lose technical leadership.
+Action: URGENT — Hire Security Architect as backup within 45 days. Document all security architecture decisions in 30-day sprint. Implement on-call rotation to distribute incident response load. Retention bonus with 12-month cliff.
+
+[EMP095 - Shikha Dubey, Marketing Director] POACHING RISK. Shikha is a high-performing Marketing Director with Expert knowledge in Brand Strategy and Content Strategy (all Low documentation). NO backup. Working 65hrs/week with 3 overdue and 190 days since last PTO. Engagement is declining (6/10, down from 8/10 last quarter). Rumored competitor interest (RetailMax is a known poacher). Manages Brand Refresh, Global Marketing Campaign ($1.8M), and oversees 4 marketing team members. Revenue at risk if she leaves during campaign: $1.8M + brand equity damage.
+Action: HIGH — Engagement intervention within 7 days. Counter-offer package prepared (target $175K + equity). Document campaign playbook in 30-day sprint. Appoint Hari as deputy marketing lead with accelerated development.
+
+[EMP096 - Akash Mehta, Customer Success Lead] PROFIT CENTER. Akash manages $2.8M in customer accounts with a salary of $98K — a 28x revenue-to-cost ratio. Zero overdue tasks, full documentation compliance. Engagement at 8/10. He has a backup (Gopal and Nikhil). Low attrition risk. Akash consistently exceeds targets and proactively identifies upsell opportunities. Revenue contribution estimated at $2.8M.
+Action: Fast-track to senior role. Assign as mentor to 2 junior CS team members.
+
+[EMP097 - Pallavi Joshi, Finance Director] PROFIT CENTER. Pallavi oversees $18M in annual budget with a salary of $175K. Outstanding performance with 10/11 goals completed. Engagement at 9/10. Zero overdue tasks. Has backup (Amit and Rahul). Full documentation compliance. She identified $2.3M in cost savings in the last fiscal year. Low attrition risk — strong retention candidate.
+Action: Fast-track to executive role. Assign as Finance transformation lead.
+
+[EMP098 - Rajiv Kumar, Operations Director] BREAK-EVEN CONTRIBUTOR. Salary $142K aligned with operational output. Performance exceeds expectations. Engagement at 8/10. Good documentation. Has backup (Neelam and Kamla). No critical risks identified. Manages 3 major operational processes. Moderate retention risk — could improve with strategic project ownership.
+Action: Assign as lead for Partnership Portal expansion. Set stretch goals for Q3.
+
+[EMP099 - Dipti Nair, Strategy Director] CRITICAL SPOF. Dipti is the sole strategy architect for the organization. NO backup. ALL knowledge areas at LOW documentation. Engagement at 7/10. Hours 55/week with 145 days since last PTO. She owns the OKR Platform ($132K) and guides all strategic initiatives. If Dipti leaves, strategic direction loses institutional memory. Revenue at risk: indirect impact on $2.5M+ in strategy-aligned projects.
+Action: URGENT — Document all strategic frameworks within 30 days. Appoint Kishore or Rishi as deputy strategy lead. Cross-train on OKR governance.
+
+[EMP100 - Sameer Bhat, HR Director] PROFIT CENTER. Sameer manages the entire HR function serving 100 employees with a salary of $148K. Outstanding performance (10/11 goals, engagement 9/10). Full documentation compliance. Has backup (Anita and Tara). Reduced voluntary turnover by 15% year-over-year. Low attrition risk — strong retention candidate.
+Action: Fast-track to CHRO path. Assign as DEI program lead.
+
+[EMP101 - Akash Verma, Senior Data Scientist] PROFIT CENTER. Akash is a high-output data scientist generating $1.5M+ in analytics-driven revenue insights on a $138K salary. Expert knowledge in Data Science and Machine Learning, well-documented. Engagement at 9/10. Has backup (Rajan and Bela). Zero overdue tasks. 8 years experience with 5 at current company. Low attrition risk.
+Action: Fast-track to Principal Data Scientist. Assign as ML Guild lead to mentor juniors.
+
+[EMP102 - Leena Nair, Enterprise Sales Manager] PROFIT CENTER. Leena manages $3.2M in enterprise accounts on a $120K salary — 26x revenue-to-cost ratio. Exceeds expectations with 11/12 goals completed. Engagement at 8/10. Well-documented processes. Has backup (Vikram and Shivani). Managed portfolio growth of 22% YoY. Zero overdue tasks. Low attrition risk.
+Action: Accelerate to Senior Sales Director track. Assign as mentor to 2 junior sales reps.
+
+[EMP103 - Rohan Malhotra, Solutions Architect] PROFIT CENTER. Rohan is a billable consultant generating $900K+ in client revenue on a $110K salary. Expert knowledge in System Architecture and Cloud Infrastructure, well-documented. Engagement at 8/10. Has backup (Sanjay). Client satisfaction score of 4.8/5. Zero overdue tasks. Low attrition risk but moderate flight risk due to competitive market demand.
+Action: Retention package with certification budget. Assign as pre-sales technical lead.
+
+[EMP104 - Deepa Shah, Brand Manager] LOSS-MAKING SCENARIO. Salary $140K significantly exceeds productivity contribution. Goals completion at 5/10. Engagement at 4/10 — lowest in Marketing team. Low documentation across all knowledge areas. NO backup. Weekly hours at 42 with 2 overdue tasks. Brand refresh project is at risk. If Deepa leaves, recovery cost estimated at 2.5x salary ($350K). Performance improvement plan recommended.
+Action: IMMEDIATE — Performance improvement plan with 60-day review. Reduce scope or replace. Cross-train Divya on brand management.
+
+[EMP105 - Kunal Saxena, Logistics Manager] LOSS-MAKING SCENARIO. Salary $125K exceeds productivity contribution. Goals completion at 4/9. Engagement at 3/10. NO backup. Low documentation everywhere. Weekly hours only 40 with 1 overdue task — underperforming even with low workload. Supply chain optimization metrics declined 12% under his management. If Kunal leaves, minimal revenue impact ($166K at risk). Recovery cost estimated at 2.5x salary.
+Action: Performance improvement plan with 30-day measurable targets. Consider role restructuring or replacement.
+
+[EMP106 - Preeti Gupta, HR Business Partner] BREAK-EVEN CONTRIBUTOR. New hire (1 year) with salary $95K. Performance meets expectations. Engagement at 6/10. Has backup (Geeta and Tara). Knowledge partially documented. Still ramping up — expected to reach full productivity in 6-9 months. Moderate retention risk — new hires are always at flight risk in first 18 months.
+Action: Assign mentor (Sameer Bhat) for accelerated onboarding. Set clear 6-month milestones.
+
+[EMP107 - Arvind Iyer, Financial Analyst] BREAK-EVEN CONTRIBUTOR. Salary $90K aligned with output. Performance meets expectations. Engagement at 7/10. Has backup. Good documentation. Reliable performer on budgeting and forecasting. No critical risks identified. Moderate retention risk — could be poached for $10-15K salary increase elsewhere.
+Action: Market adjustment salary review. Assign as lead on Expense Tool project to build ownership.
+
+[EMP108 - Nandini Rao, Associate Product Manager] PROFIT CENTER. New talent (2 years) with salary $85K but performing at senior PM level. Exceeds expectations with 8/10 goals. Engagement at 8/10. Has backup. Well-documented. Managed Product Suite v3 feature requirements with zero missed deadlines. Low attrition risk — strong growth trajectory. Revenue contribution estimated at $500K+ through feature optimization.
+Action: Fast-track promotion to Product Manager within 6 months. Assign mentor (Meera Iyer).
+
+[EMP109 - Vijay More, Network Engineer] BREAK-EVEN CONTRIBUTOR. Salary $88K aligned with output. Performance exceeds expectations. Engagement at 7/10. Has backup (Hemant). Good documentation. Reliable network infrastructure support. Expert in Cloud Infrastructure. No critical risks identified. Low attrition risk.
+Action: Encourage upskilling in Security Compliance. Assign as backup for Ravi on DevOps tasks.
+
+[EMP110 - Snehal Patil, Creative Director] PROFIT CENTER / HIDDEN SPOF. Snehal generates exceptional brand value with $165K salary. Outstanding performance (10/11 goals, engagement 9/10). Her creative work directly contributed to 35% improvement in brand recall metrics. However, NO backup exists and ALL knowledge areas are LOW documentation. She is the sole keeper of brand identity guidelines. If Snehal leaves, brand consistency collapses across 4 major campaigns. Revenue at risk: $1.8M+ in brand-dependent contracts.
+Action: URGENT — Document all brand guidelines and design systems within 30 days. Cross-train Dinesh and Ravi on brand stewardship. Implement design review board to distribute decision-making.
+
+[EMP111 - Manav Bhatia, Corporate Counsel] PROFIT CENTER. Manav handles $5M+ in M&A and litigation exposure on a $200K salary — the highest in Legal but justified. Handled 3 major acquisitions and 2 litigations successfully in past 2 years. Exceeds expectations (10/12 goals). Engagement at 7/10. However, NO backup — his knowledge of ongoing litigation and contract law is LOW documentation. Hours 58/week with 160 days since last PTO, 3 overdue tasks. If Manav leaves, ongoing M&A deals face 6-month delay. Revenue at risk: $2M+ in deal value.
+Action: HIGH — Document all active litigation and deal status within 14 days. Assign Prakash as legal backup with accelerated M&A training. Reduce hours to 50 via paralegal delegation.
+
+[EMP112 - Ruchi Agarwal, M&A Analyst] PROFIT CENTER. New talent (1 year) with salary $72K but outstanding performance (9/10 goals, engagement 9/10). Advanced knowledge in Market Research and Data Analysis. Has backup (Kishore). Well-documented. Exceeds expectations in competitive intelligence and deal modeling. Low attrition risk. Projected to be a future strategy lead within 3-4 years. Revenue contribution: $300K+ in deal support.
+Action: Fast-track promotion to Senior Analyst within 12 months. Assign mentor (Dipti Nair).
+
+[EMP113 - Tarun Kulkarni, Support Engineer] LOSS-MAKING SCENARIO. Salary $55K but below expectations performance (3/9 goals). Engagement at 2/10 — critical flight risk. NO backup. Weekly hours at only 38 despite 3 overdue tasks. Low documentation everywhere. Beginner-level in all knowledge areas. Customer satisfaction scores declined 20% under his watch. If Tarun leaves, minimal impact. Recovery cost estimated at 2.5x salary ($137K). Not recommended for retention.
+Action: LOW — Consider replacement during next hiring cycle. Performance improvement plan unlikely to succeed.
+
+[EMP114 - Jyoti Deshmukh, GRC Analyst] BREAK-EVEN CONTRIBUTOR. Salary $92K aligned with output. Performance meets expectations. Engagement at 7/10. Has backup (Padma). Good documentation. Solid contributor on compliance audits and risk assessments. No critical risks identified. Low attrition risk.
+Action: Encourage upskilling in Incident Management. Assign as support for Anita on SOC2 recertification.
+
+[EMP115 - Prakash Menon, Data Engineer] PROFIT CENTER. Salary $145K but generates $2M+ in data infrastructure value. Exceeds expectations (9/11 goals). Engagement at 8/10. Has backup (Aakash). Expert knowledge in Data Engineering and BI, well-documented. Built the Data Lake Platform and Analytics Suite from scratch. Zero overdue tasks. Low attrition risk.
+Action: Fast-track to Principal Data Engineer. Assign as mentor to Shyam and Deepak. Lead AI Research Lab data architecture.

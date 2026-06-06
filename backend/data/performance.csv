@@ -1,0 +1,116 @@
+EmployeeID,Employee,Team,PerformanceRating,GoalsCompleted,GoalsTotal,LastReviewDate,EngagementScore,TenureAtCompany
+EMP001,Sunita,Sales,Needs Improvement,7,12,2024-05-01,5,2
+EMP002,Quasim,Marketing,Exceeds Expectations,6,11,2024-08-08,8,7
+EMP003,Farhan,Support,Below Expectations,3,7,2024-05-13,3,1
+EMP004,Lalit,Engineering,Below Expectations,2,8,2024-09-16,5,2
+EMP005,Poonam,Security,Exceeds Expectations,11,12,2024-08-25,9,4
+EMP006,Ajay,Legal,Meets Expectations,5,8,2024-01-19,7,3
+EMP007,Aarti,Design,Meets Expectations,3,6,2024-10-19,6,2
+EMP008,Gauri,Design,Outstanding,4,8,2024-06-08,10,2
+EMP009,Manisha,Engineering,Exceeds Expectations,6,9,2024-11-11,9,3
+EMP010,Usha,Product,Exceeds Expectations,9,11,2024-08-15,7,3
+EMP011,Lakshmi,Design,Exceeds Expectations,3,7,2024-09-16,6,5
+EMP012,Neelam,Operations,Exceeds Expectations,5,10,2024-02-27,8,3
+EMP013,Mohan,Legal,Needs Improvement,2,9,2024-11-08,2,1
+EMP014,Vikram,Sales,Exceeds Expectations,10,12,2024-08-12,9,8
+EMP015,Nalini,Marketing,Outstanding,8,11,2024-01-18,8,3
+EMP016,Rashmi,Operations,Outstanding,3,6,2024-12-09,10,2
+EMP017,Hemant,Infrastructure,Meets Expectations,9,10,2024-11-14,7,7
+EMP018,Sita,Finance,Meets Expectations,4,6,2024-04-07,6,1
+EMP019,Kirti,Infrastructure,Exceeds Expectations,7,8,2024-02-12,7,5
+EMP020,Deepak,Data,Below Expectations,3,10,2024-12-08,5,4
+EMP021,Anjali,Engineering,Exceeds Expectations,10,11,2024-11-25,9,2
+EMP022,Sarita,Legal,Exceeds Expectations,6,9,2024-09-16,8,2
+EMP023,Jagdish,Marketing,Meets Expectations,6,11,2024-08-28,5,5
+EMP024,Mahesh,Marketing,Below Expectations,6,10,2024-02-17,5,3
+EMP025,Ojas,Infrastructure,Needs Improvement,4,7,2024-12-19,2,12
+EMP026,Meera,Security,Below Expectations,3,6,2024-11-09,5,1
+EMP027,Naresh,Operations,Exceeds Expectations,6,7,2024-06-01,10,3
+EMP028,Neha,Strategy,Meets Expectations,10,12,2024-07-03,6,3
+EMP029,Bhavna,Product,Needs Improvement,3,10,2024-07-22,4,4
+EMP030,Amit,Finance,Exceeds Expectations,10,12,2024-12-24,7,5
+EMP031,Vivek,Support,Below Expectations,1,6,2024-04-27,2,2
+EMP032,Vijay,Support,Exceeds Expectations,8,10,2024-10-13,5,11
+EMP033,Kavita,Product,Meets Expectations,7,11,2024-08-16,7,9
+EMP034,Lalita,Design,Exceeds Expectations,9,10,2024-07-06,6,1
+EMP035,Rajan,Data,Outstanding,5,6,2024-05-26,10,6
+EMP036,Anita,HR,Needs Improvement,2,6,2024-07-23,3,1
+EMP037,Karan,HR,Below Expectations,3,8,2024-02-01,3,6
+EMP038,Tanvi,Sales,Below Expectations,4,8,2024-02-05,4,11
+EMP039,Nikhil,Support,Needs Improvement,3,9,2024-09-17,2,6
+EMP040,Rahul,Finance,Needs Improvement,1,6,2024-09-03,5,4
+EMP041,Priya,Marketing,Below Expectations,2,6,2024-07-25,4,7
+EMP042,Padma,Security,Exceeds Expectations,7,10,2024-11-13,8,3
+EMP043,Ganesh,Data,Needs Improvement,2,8,2024-08-05,3,5
+EMP044,Prakash,Legal,Exceeds Expectations,5,9,2024-05-16,8,4
+EMP045,Bela,Data,Outstanding,7,8,2024-12-21,8,4
+EMP046,Deepali,Infrastructure,Meets Expectations,4,9,2024-05-01,8,5
+EMP047,Pooja,Legal,Below Expectations,6,12,2024-06-15,5,6
+EMP048,Jatin,Sales,Below Expectations,7,12,2024-11-20,4,2
+EMP049,Manoj,Product,Outstanding,6,8,2024-12-07,8,3
+EMP050,Kavya,Design,Below Expectations,4,7,2024-06-10,5,7
+EMP051,Uday,Sales,Needs Improvement,3,8,2024-07-12,5,7
+EMP052,Ishita,Engineering,Needs Improvement,6,10,2024-03-22,2,4
+EMP053,Esha,Finance,Below Expectations,3,11,2024-05-27,2,1
+EMP054,Pallavi,Operations,Exceeds Expectations,8,11,2024-11-10,5,6
+EMP055,Dinesh,Design,Outstanding,6,11,2024-07-26,8,10
+EMP056,Harsh,Finance,Needs Improvement,6,9,2024-08-19,5,9
+EMP057,Rajesh,Support,Exceeds Expectations,5,10,2024-06-23,8,6
+EMP058,Aditya,Infrastructure,Needs Improvement,3,12,2024-11-12,2,4
+EMP059,Hari,Marketing,Needs Improvement,6,10,2024-11-21,3,5
+EMP060,Shivani,Sales,Exceeds Expectations,8,12,2024-01-04,8,5
+EMP061,Gopal,Support,Needs Improvement,5,10,2024-09-19,4,10
+EMP062,Rekha,Finance,Exceeds Expectations,5,8,2024-11-19,6,8
+EMP063,Mukesh,Finance,Exceeds Expectations,7,8,2024-08-04,10,8
+EMP064,Shyam,Data,Below Expectations,1,6,2024-12-05,4,2
+EMP065,Rishi,Strategy,Below Expectations,3,8,2024-04-17,4,4
+EMP066,Divya,Marketing,Exceeds Expectations,4,9,2024-12-23,8,1
+EMP067,Sanjay,Engineering,Exceeds Expectations,3,6,2024-12-04,8,8
+EMP068,Arjun,Product,Exceeds Expectations,6,11,2024-03-24,5,4
+EMP069,Isha,Security,Meets Expectations,5,10,2024-09-14,6,2
+EMP070,Kishore,Strategy,Meets Expectations,8,12,2024-03-06,8,3
+EMP071,Arun,Strategy,Below Expectations,3,6,2024-04-15,5,8
+EMP072,Geeta,HR,Outstanding,4,9,2024-04-07,10,11
+EMP073,Omkar,Operations,Meets Expectations,5,10,2024-09-06,7,8
+EMP074,Chandan,Operations,Below Expectations,3,7,2024-05-22,4,7
+EMP075,Suresh,Design,Below Expectations,3,10,2024-07-19,5,8
+EMP076,Tara,HR,Exceeds Expectations,7,8,2024-10-06,5,11
+EMP077,Radha,Engineering,Outstanding,7,10,2024-11-05,10,5
+EMP078,Sneha,Operations,Exceeds Expectations,4,7,2024-03-12,9,4
+EMP079,Venkat,Support,Exceeds Expectations,7,9,2024-10-13,6,2
+EMP080,Vani,Engineering,Meets Expectations,7,9,2024-12-21,8,2
+EMP081,Ravi,Design,Exceeds Expectations,5,9,2024-03-11,8,7
+EMP082,Rohit,Security,Meets Expectations,8,12,2024-01-16,8,7
+EMP083,Aakash,Data,Exceeds Expectations,8,12,2024-09-17,8,1
+EMP084,Indira,Product,Exceeds Expectations,8,11,2024-12-27,8,7
+EMP085,Kamla,Operations,Outstanding,3,7,2024-01-26,9,4
+EMP086,Vikram Sharma,Sales,Exceeds Expectations,12,12,2024-10-15,9,12
+EMP087,Neha Kapoor,Engineering,Outstanding,11,12,2024-09-30,8,9
+EMP088,Ravi Deshmukh,Infrastructure,Exceeds Expectations,8,10,2024-11-20,7,5
+EMP089,Ananya Patel,Data,Outstanding,9,10,2024-08-05,6,3
+EMP090,Deepak Joshi,Sales,Exceeds Expectations,11,12,2024-07-18,8,7
+EMP091,Kiran Rao,Legal,Meets Expectations,6,10,2024-10-12,2,2
+EMP092,Meera Iyer,Product,Outstanding,10,11,2024-06-25,9,9
+EMP093,Rohan Gupta,Engineering,Exceeds Expectations,5,7,2024-12-10,10,1
+EMP094,Anita Verma,Security,Exceeds Expectations,9,10,2024-05-30,7,6
+EMP095,Shikha Dubey,Marketing,Exceeds Expectations,11,12,2024-04-22,6,8
+EMP096,Akash Mehta,Support,Exceeds Expectations,9,10,2024-11-15,8,5
+EMP097,Pallavi Joshi,Finance,Outstanding,10,11,2024-08-20,9,10
+EMP098,Rajiv Kumar,Operations,Exceeds Expectations,8,10,2024-06-12,8,8
+EMP099,Dipti Nair,Strategy,Exceeds Expectations,9,11,2024-09-28,7,7
+EMP100,Sameer Bhat,HR,Outstanding,10,11,2024-07-05,9,9
+EMP101,Akash Verma,Data,Exceeds Expectations,10,11,2024-10-15,9,5
+EMP102,Leena Nair,Sales,Exceeds Expectations,11,12,2024-08-22,8,6
+EMP103,Rohan Malhotra,Engineering,Exceeds Expectations,9,10,2024-06-12,8,4
+EMP104,Deepa Shah,Marketing,Meets Expectations,5,10,2024-09-05,4,3
+EMP105,Kunal Saxena,Operations,Needs Improvement,4,9,2024-11-18,3,5
+EMP106,Preeti Gupta,HR,Meets Expectations,6,10,2024-12-10,6,1
+EMP107,Arvind Iyer,Finance,Meets Expectations,7,10,2024-07-25,7,3
+EMP108,Nandini Rao,Product,Exceeds Expectations,8,10,2024-05-30,8,2
+EMP109,Vijay More,Infrastructure,Exceeds Expectations,8,10,2024-09-14,7,4
+EMP110,Snehal Patil,Design,Outstanding,10,11,2024-04-08,9,8
+EMP111,Manav Bhatia,Legal,Exceeds Expectations,10,12,2024-08-20,7,10
+EMP112,Ruchi Agarwal,Strategy,Outstanding,9,10,2024-06-15,9,1
+EMP113,Tarun Kulkarni,Support,Below Expectations,3,9,2024-10-12,2,2
+EMP114,Jyoti Deshmukh,Security,Meets Expectations,7,10,2024-07-30,7,3
+EMP115,Prakash Menon,Data,Exceeds Expectations,9,11,2024-05-18,8,6

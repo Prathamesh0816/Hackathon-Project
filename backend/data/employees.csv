@@ -1,0 +1,116 @@
+EmployeeID,Employee,Team,Role,Criticality,BackupAvailable,ExperienceYears,AnnualSalaryUSD,TenureYears
+EMP001,Sunita,Sales,Enterprise Sales,Low,No,4,49849,2
+EMP002,Quasim,Marketing,Marketing Designer,Medium,No,7,117859,7
+EMP003,Farhan,Support,Support Lead,High,No,11,71565,1
+EMP004,Lalit,Engineering,Junior Backend Engineer,High,No,12,68307,2
+EMP005,Poonam,Security,Security Analyst,Low,Yes,4,92695,4
+EMP006,Ajay,Legal,Paralegal,Low,Yes,3,92233,3
+EMP007,Aarti,Design,Design Lead,Medium,Yes,8,127753,2
+EMP008,Gauri,Design,DesignOps,Medium,No,14,135402,2
+EMP009,Manisha,Engineering,DevOps Engineer,Low,Yes,3,106683,3
+EMP010,Usha,Product,UX Researcher,Medium,Yes,15,108978,3
+EMP011,Lakshmi,Design,Motion Designer,Medium,Yes,5,99819,5
+EMP012,Neelam,Operations,Facilities Manager,Medium,Yes,11,142690,3
+EMP013,Mohan,Legal,Legal Analyst,Low,Yes,1,65830,1
+EMP014,Vikram,Sales,Sales Manager,High,No,10,150000,8
+EMP015,Nalini,Marketing,Growth Marketer,Low,Yes,3,81394,3
+EMP016,Rashmi,Operations,Operations Analyst,Low,No,2,108763,2
+EMP017,Hemant,Infrastructure,System Administrator,Medium,Yes,7,73284,7
+EMP018,Sita,Finance,Auditor,Low,No,1,76752,1
+EMP019,Kirti,Infrastructure,SRE Engineer,Medium,Yes,9,112210,5
+EMP020,Deepak,Data,Analytics Engineer,Low,Yes,4,54705,4
+EMP021,Anjali,Engineering,QA Lead,Medium,Yes,8,143431,2
+EMP022,Sarita,Legal,IP Specialist,Medium,Yes,10,115994,2
+EMP023,Jagdish,Marketing,Growth Marketer,Medium,No,5,78680,5
+EMP024,Mahesh,Marketing,Content Strategist,High,No,6,60188,3
+EMP025,Ojas,Infrastructure,Junior Sysadmin,High,No,14,100531,12
+EMP026,Meera,Security,Security Engineer,High,No,10,84557,1
+EMP027,Naresh,Operations,Facilities Manager,Medium,Yes,5,84945,3
+EMP028,Neha,Strategy,Strategy Lead,Medium,Yes,12,141127,3
+EMP029,Bhavna,Product,Product Analyst,Low,No,4,62140,4
+EMP030,Amit,Finance,Accountant,Medium,No,9,129938,5
+EMP031,Vivek,Support,Support Lead,Low,Yes,2,63915,2
+EMP032,Vijay,Support,Support Engineer,Medium,No,13,101076,11
+EMP033,Kavita,Product,Business Analyst,Medium,No,12,124103,9
+EMP034,Lalita,Design,DesignOps,Low,No,1,75038,1
+EMP035,Rajan,Data,Data Analyst,Medium,Yes,9,109078,6
+EMP036,Anita,HR,HR Business Partner,High,No,7,53186,1
+EMP037,Karan,HR,Recruiter,High,No,6,61598,6
+EMP038,Tanvi,Sales,Account Executive,High,No,11,71482,11
+EMP039,Nikhil,Support,Support Lead,High,No,6,82039,6
+EMP040,Rahul,Finance,Auditor,High,No,12,86130,4
+EMP041,Priya,Marketing,Content Strategist,High,No,13,69857,7
+EMP042,Padma,Security,Security Architect,Low,No,3,94690,3
+EMP043,Ganesh,Data,Data Analyst,Medium,Yes,5,60503,5
+EMP044,Prakash,Legal,Legal Counsel,Medium,Yes,14,171110,4
+EMP045,Bela,Data,ML Engineer,Medium,Yes,6,122304,4
+EMP046,Deepali,Infrastructure,System Administrator,Medium,No,7,88032,5
+EMP047,Pooja,Legal,Contracts Manager,High,No,6,72351,6
+EMP048,Jatin,Sales,Sales Analyst,High,No,6,55188,2
+EMP049,Manoj,Product,Product Owner,Low,Yes,3,123702,3
+EMP050,Kavya,Design,DesignOps,High,No,7,79118,7
+EMP051,Uday,Sales,Sales Development Rep,High,No,7,73882,7
+EMP052,Ishita,Engineering,Senior Frontend Engineer,High,No,7,67878,4
+EMP053,Esha,Finance,Accountant,Low,Yes,1,63843,1
+EMP054,Pallavi,Operations,Facilities Manager,Medium,Yes,11,95370,6
+EMP055,Dinesh,Design,Brand Designer,Medium,No,10,133303,10
+EMP056,Harsh,Finance,Accountant,High,No,9,81418,9
+EMP057,Rajesh,Support,Customer Success Manager,Medium,Yes,6,81505,6
+EMP058,Aditya,Infrastructure,System Administrator,Low,No,4,58836,4
+EMP059,Hari,Marketing,Content Strategist,High,No,10,85088,5
+EMP060,Shivani,Sales,Enterprise Sales,Medium,Yes,9,78910,5
+EMP061,Gopal,Support,Customer Success Manager,High,No,13,83168,10
+EMP062,Rekha,Finance,Accountant,Medium,No,8,122026,8
+EMP063,Mukesh,Finance,Auditor,Medium,Yes,8,130529,8
+EMP064,Shyam,Data,BI Developer,High,No,11,85034,2
+EMP065,Rishi,Strategy,Business Strategist,High,No,11,71473,4
+EMP066,Divya,Marketing,Content Strategist,Low,Yes,3,60352,1
+EMP067,Sanjay,Engineering,Full Stack Engineer,Medium,Yes,10,80126,8
+EMP068,Arjun,Product,Product Analyst,Low,Yes,4,91357,4
+EMP069,Isha,Security,Security Analyst,Medium,No,11,84770,2
+EMP070,Kishore,Strategy,Business Strategist,Low,Yes,3,88268,3
+EMP071,Arun,Strategy,Business Strategist,High,No,15,68553,8
+EMP072,Geeta,HR,HR Business Partner,Medium,Yes,13,146440,11
+EMP073,Omkar,Operations,Facilities Manager,Medium,No,10,101752,8
+EMP074,Chandan,Operations,Facilities Manager,High,No,7,75528,7
+EMP075,Suresh,Design,UI Designer,High,No,12,97760,8
+EMP076,Tara,HR,Recruiter,Medium,Yes,13,129627,11
+EMP077,Radha,Engineering,Data Engineer,Medium,Yes,8,120528,5
+EMP078,Sneha,Operations,Supply Chain Coordinator,Low,Yes,4,80417,4
+EMP079,Venkat,Support,Technical Writer,Low,Yes,2,67819,2
+EMP080,Vani,Engineering,Backend Engineer,Medium,Yes,12,104986,2
+EMP081,Ravi,Design,Brand Designer,Medium,Yes,9,142727,7
+EMP082,Rohit,Security,SOC Analyst,Medium,Yes,7,125580,7
+EMP083,Aakash,Data,BI Developer,Medium,No,7,139007,1
+EMP084,Indira,Product,Product Owner,Medium,Yes,13,131416,7
+EMP085,Kamla,Operations,Facilities Manager,Medium,Yes,13,163997,4
+EMP086,Vikram Sharma,Sales,Sales Director,High,No,15,192000,12
+EMP087,Neha Kapoor,Engineering,Chief Architect,High,No,14,185000,9
+EMP088,Ravi Deshmukh,Infrastructure,DevOps Lead,High,Yes,8,140000,5
+EMP089,Ananya Patel,Data,ML Engineer,Low,No,6,135000,3
+EMP090,Deepak Joshi,Sales,Sales Director,High,Yes,12,175000,7
+EMP091,Kiran Rao,Legal,Compliance Officer,Medium,Yes,5,95000,2
+EMP092,Meera Iyer,Product,Product Director,High,No,14,165000,9
+EMP093,Rohan Gupta,Engineering,Junior Backend Engineer,Low,Yes,2,65000,1
+EMP094,Anita Verma,Security,Security Lead,High,No,11,145000,6
+EMP095,Shikha Dubey,Marketing,Marketing Director,High,No,13,155000,8
+EMP096,Akash Mehta,Support,Customer Success Lead,High,Yes,9,98000,5
+EMP097,Pallavi Joshi,Finance,Finance Director,High,Yes,14,175000,10
+EMP098,Rajiv Kumar,Operations,Operations Director,Medium,Yes,11,142000,8
+EMP099,Dipti Nair,Strategy,Strategy Director,High,No,13,160000,7
+EMP100,Sameer Bhat,HR,HR Director,High,Yes,14,148000,9
+EMP101,Akash Verma,Data,Senior Data Scientist,Medium,Yes,8,138000,5
+EMP102,Leena Nair,Sales,Enterprise Sales Manager,High,Yes,10,120000,6
+EMP103,Rohan Malhotra,Engineering,Solutions Architect,Medium,Yes,7,110000,4
+EMP104,Deepa Shah,Marketing,Brand Manager,Medium,No,6,140000,3
+EMP105,Kunal Saxena,Operations,Logistics Manager,Low,No,9,125000,5
+EMP106,Preeti Gupta,HR,HR Business Partner,Medium,Yes,2,95000,1
+EMP107,Arvind Iyer,Finance,Financial Analyst,Low,Yes,4,90000,3
+EMP108,Nandini Rao,Product,Associate Product Manager,Low,Yes,3,85000,2
+EMP109,Vijay More,Infrastructure,Network Engineer,Medium,Yes,6,88000,4
+EMP110,Snehal Patil,Design,Creative Director,High,No,12,165000,8
+EMP111,Manav Bhatia,Legal,Corporate Counsel,High,No,14,200000,10
+EMP112,Ruchi Agarwal,Strategy,M&A Analyst,Low,Yes,2,72000,1
+EMP113,Tarun Kulkarni,Support,Support Engineer,Low,No,3,55000,2
+EMP114,Jyoti Deshmukh,Security,GRC Analyst,Medium,Yes,5,92000,3
+EMP115,Prakash Menon,Data,Data Engineer,High,Yes,9,145000,6

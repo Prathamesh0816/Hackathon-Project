@@ -1,6 +1,0 @@
-EmployeeID,Employee,Team,Project,Client,Criticality,BackupAvailable
-101,Rahul,Engineering,ProjectA,ClientX,High,No
-102,Priya,Engineering,ProjectA,ClientX,High,Yes
-103,Amit,QA,ProjectA,ClientX,Medium,Yes
-104,Neha,Sales,ProjectB,ClientY,High,No
-105,Ravi,Support,ProjectB,ClientY,Low,Yes

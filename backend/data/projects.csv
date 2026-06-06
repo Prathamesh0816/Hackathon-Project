@@ -1,0 +1,35 @@
+ProjectID,Project,Team,Criticality,DeadlineDays,Client,AnnualContractValueUSD,Status
+PRJ0001,Project Phoenix,Engineering,Medium,85,Global Bank,773313,Active
+PRJ0002,Salesforce Migration,Sales,High,26,TechCorp,2272225,Completed
+PRJ0003,Cloud Security Audit,Security,High,79,FinSecure,853536,Active
+PRJ0004,Product Redesign,Design,Medium,40,ConsumerApp,374620,Completed
+PRJ0005,Data Lake Platform,Data,Medium,70,RetailMax,459305,Active
+PRJ0006,Employee Portal,Engineering,Medium,68,Internal,369867,Active
+PRJ0007,Compliance Dashboard,Legal,Medium,16,Regulatory,269482,At Risk
+PRJ0008,AI Chatbot,Data,High,33,ServicePro,1089502,At Risk
+PRJ0009,Mobile App v3,Mobile,High,51,SocialNet,1280955,Active
+PRJ0010,Infra Migration,Infrastructure,High,20,CloudCo,1043037,Completed
+PRJ0011,Analytics Suite,Data,Medium,25,AdPlatform,607682,Active
+PRJ0012,Brand Refresh,Marketing,Medium,60,Internal,171658,Completed
+PRJ0013,Training Platform,HR,Medium,80,EduCorp,362829,Active
+PRJ0014,Lead Scoring Engine,Sales,High,66,SaaSPro,1196981,Completed
+PRJ0015,Security Operations Center,Security,High,71,GovtAgency,3881614,At Risk
+PRJ0016,API Gateway,Engineering,High,13,FinTech,1327855,Active
+PRJ0017,Customer Portal,Support,Medium,43,Telco,557198,At Risk
+PRJ0018,BI Migration,Data,High,53,HealthCare,807068,Active
+PRJ0019,CRM Integration,Sales,Medium,78,RetailChain,107528,Completed
+PRJ0020,Zero Trust Architecture,Security,High,64,BankCorp,2397535,Completed
+PRJ0021,Payment Gateway,Engineering,High,22,EComPlus,2018227,Completed
+PRJ0022,Design System,Design,Medium,78,Internal,32634,Active
+PRJ0023,Expense Tool,Finance,Medium,58,Internal,71622,Completed
+PRJ0024,SRE Playbook,Infrastructure,Medium,67,Internal,38022,Active
+PRJ0025,Partnership Portal,Operations,Medium,48,PartnerCo,474473,Active
+PRJ0026,Research Lab,Data,Medium,45,University,699126,Completed
+PRJ0027,Brand Guidelines,Design,Medium,79,Internal,33597,At Risk
+PRJ0028,OKR Platform,Strategy,Medium,60,Internal,132047,Active
+PRJ0029,Enterprise Client Expansion,Sales,High,35,GlobalBank,4200000,Active
+PRJ0030,System Modernization,Engineering,High,45,FinTech,3200000,Active
+PRJ0031,Security Operations,Infrastructure,High,30,GovtAgency,2800000,Active
+PRJ0032,AI Research Lab,Data,High,50,TechCorp,1500000,Active
+PRJ0033,Product Suite v3,Product,High,60,ConsumerApp,2500000,Active
+PRJ0034,Global Marketing Campaign,Marketing,High,40,RetailMax,1800000,Active
