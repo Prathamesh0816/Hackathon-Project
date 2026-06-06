@@ -1,50 +1,105 @@
 from fastapi import FastAPI, UploadFile, File
-from pydantic import BaseModel
+import os
 import pandas as pd
-from simulator import simulate_employee_loss
-from ai_analyser import analyze_risk
+from io import StringIO
+
+from storage import (
+    CSV_DIR,
+    TEXT_DIR,
+    get_employee_structured_data,
+    get_employee_text_notes,
+    load_metadata
+)
+
+from analyzer import analyze_employee_context
 
 app = FastAPI()
 
-class SimulationRequest(BaseModel):
-    employee: str
-
+os.makedirs(CSV_DIR, exist_ok=True)
+os.makedirs(TEXT_DIR, exist_ok=True)
 
 
 @app.get("/")
 def home():
-    return {"message": "TruPulse AI"}
+    return {"message": "TruPulse AI is running"}
 
-@app.post("/upload-csv")
-async def upload_csv(file: UploadFile = File(...)):
 
-    contents = await file.read()
+@app.post("/upload-file")
+async def upload_file(file: UploadFile = File(...)):
+    try:
+        content = await file.read()
+        filename = file.filename.lower()
 
-    with open("employees.csv", "wb") as f:
-        f.write(contents)
+        if filename.endswith(".csv"):
+            csv_text = content.decode("utf-8")
+            df = pd.read_csv(StringIO(csv_text))
 
-    return {"message": "CSV uploaded successfully"}
+            file_path = os.path.join(CSV_DIR, file.filename)
 
-@app.post("/simulate")
-def simulate(request: SimulationRequest):
+            with open(file_path, "wb") as f:
+                f.write(content)
 
-    result = simulate_employee_loss(
-        request.employee
-    )
+            return {
+                "message": "CSV uploaded successfully",
+                "filename": file.filename,
+                "stored_path": file_path,
+                "rows": len(df),
+                "columns": list(df.columns)
+            }
 
-    return result
-@app.post("/analyze")
-def analyze(request: SimulationRequest):
+        elif filename.endswith(".txt"):
+            file_path = os.path.join(TEXT_DIR, file.filename)
 
-    simulation_result = simulate_employee_loss(
-        request.employee
-    )
+            with open(file_path, "wb") as f:
+                f.write(content)
 
-    analysis = analyze_risk(
-        simulation_result
+            return {
+                "message": "Text file uploaded successfully",
+                "filename": file.filename,
+                "stored_path": file_path
+            }
+
+        else:
+            return {"error": "Only CSV and TXT files are supported"}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.get("/files")
+def get_files():
+    return {"files": load_metadata()}
+
+
+@app.get("/employee-data/{employee_id}")
+def employee_data(employee_id: str):
+    return {
+        "employee_id": employee_id,
+        "structured_data": get_employee_structured_data(employee_id),
+        "text_notes": get_employee_text_notes(employee_id)
+    }
+
+
+@app.post("/analyze-employee/{employee_id}")
+def analyze_employee(employee_id: str):
+    structured_data = get_employee_structured_data(employee_id)
+    text_notes = get_employee_text_notes(employee_id)
+
+    if not structured_data and not text_notes:
+        return {
+            "employee_id": employee_id,
+            "error": "No data found for this employee ID"
+        }
+
+    analysis = analyze_employee_context(
+        employee_id,
+        structured_data,
+        text_notes
     )
 
     return {
-        "simulation": simulation_result,
+        "employee_id": employee_id,
+        "structured_data": structured_data,
+        "text_notes": text_notes,
         "analysis": analysis
     }

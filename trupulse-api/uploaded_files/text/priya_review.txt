@@ -1,0 +1,11 @@
+EmployeeID: 102
+
+Priya is a senior frontend engineer working on Project Phoenix.
+
+She demonstrates strong expertise in React, TypeScript, and user interface development. Her recent performance reviews have consistently highlighted strong collaboration, delivery quality, and ownership.
+
+Priya has expressed interest in moving toward frontend architecture and technical leadership responsibilities.
+
+Current observations suggest that she could benefit from additional exposure to micro-frontend architecture, system design, cloud fundamentals, and mentoring responsibilities.
+
+Management is interested in identifying growth opportunities and potential leadership development paths.
