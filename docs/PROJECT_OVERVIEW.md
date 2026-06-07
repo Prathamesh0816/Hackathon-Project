@@ -39,8 +39,10 @@ TruPulse AI provides **real-time, forward-looking** workforce analytics:
 |-------|-----------|-----|
 | **Frontend** | React 18 + Vite + TailwindCSS + Recharts | Fast dev, responsive UI, rich charts |
 | **Backend** | FastAPI (Python 3.12) | High performance, async, auto-docs |
+| **AI Framework** | LangChain (RunnableSequence, PydanticOutputParser) + LangGraph (StateGraph) | Structured agent I/O, graph-based orchestration, revision loops |
+| **Agent Tools** | 9 LangChain tools wrapping scoring + analytics | Tool-augmented agents with grounded data |
 | **Vector DB** | ChromaDB (sentence-transformers ONNX) | Semantic knowledge retrieval, no external infra |
-| **AI/LLM** | Ollama (Qwen2.5:3b) with rule-based fallback | Zero API cost, fully offline demo |
+| **AI/LLM** | Ollama (Qwen2.5:3b) via ChatOllama, 4-level fallback chain | Zero API cost, fully offline demo |
 | **Database** | ChromaDB (persistent) + Pydantic models | Vector search + spec-driven validation |
 | **Container** | Docker Compose | One-command deploy |
 | **CSV Data** | 115 employees, 14 teams, realistic profiles | Demo-ready synthetic data |
@@ -62,10 +64,11 @@ TruPulse AI provides **real-time, forward-looking** workforce analytics:
                       │  │  6 Analytics Modules   │  │
                       │  │  SPOF · Gaps · Succession│ │
                       │  ├───────────────────────┤  │
-                      │  │  5-Agent AI Pipeline   │  │
-                      │  │  Insight · Risk         │  │
-                      │  │  Simulation · Coaching  │  │
-                      │  │  Governance             │  │
+                      │  │  LangChain + LangGraph  │  │
+                       │  │  5-Agent Pipeline       │  │
+                       │  │  RunnableSequence        │  │
+                       │  │  StateGraph + Revision   │  │
+                       │  │  9 LangChain Tools       │  │
                       │  ├───────────────────────┤  │
                       │  │  Spec-Driven Models    │  │
                       │  │  15+ Pydantic Schemas  │  │
@@ -80,7 +83,7 @@ TruPulse AI provides **real-time, forward-looking** workforce analytics:
 
 ## What Is Unique
 
-1. **Collective Agent Intelligence** — 5 specialized AI agents (Insight, Risk, Simulation, Coaching, Governance) collaborate in a pipeline, not a single prompt. Each agent has a role-specific system prompt and the output is synthesized. Includes latency logging.
+1. **LangChain + LangGraph Agent Orchestration** — 5 specialized AI agents run as LangChain `RunnableSequence` chains (ChatPromptTemplate → ChatOllama → PydanticOutputParser) on a LangGraph `StateGraph` with a conditional revision loop. Each agent output is Pydantic-validated. Includes 9 LangChain tool wrappers for the Coaching agent.
 
 2. **Vector-Powered Knowledge Retrieval** — Employee knowledge areas are embedded using sentence-transformers and stored in ChromaDB. The AI agents query the vector store for semantic context, enabling "find similar skills" and "knowledge gap analysis" without hardcoded rules.
 

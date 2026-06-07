@@ -98,15 +98,41 @@ Each module asks a specific question and answers it with deterministic logic:
 
 ---
 
-## 5. AI Pipeline: 5-Agent Collective Intelligence
+## 5. AI Pipeline: LangChain + LangGraph Orchestration
 
 ### What we used
-5 specialized AI agents that run sequentially in a pipeline. Each agent has a role-specific system prompt. The pipeline:
-1. **Insight Agent** — Reads org health data, identifies top 3 patterns
-2. **Risk Agent** — Identifies single points of failure and cascade risk
-3. **Simulation Agent** — Projects what happens under a given scenario
-4. **Coaching Agent** — Generates mitigation actions and upskilling plan
-5. **Governance Agent** — Validates every output for confidence, bias, counter-argument
+5 specialized AI agents orchestrated by **LangChain** (`RunnableSequence` + `PydanticOutputParser`) and **LangGraph** (`StateGraph`). The agents run inside a state-graph pipeline with a conditional revision loop:
+
+```
+StateGraph(AgentState)
+  vector_context → insight → risk → simulation → coaching → governance → should_revise?
+    ├── yes, < 2 revisions → coaching (revised with governance feedback)
+    └── no → end (return full trace)
+```
+
+Each agent is a `RunnableSequence`:
+1. **Insight Agent** — `ChatPromptTemplate` → `ChatOllama(qwen2.5:3b)` → `PydanticOutputParser(InsightOutput)`
+2. **Risk Agent** — Same pattern with `RiskOutput` schema
+3. **Simulation Agent** — Same pattern with `SimulationOutput` schema
+4. **Coaching Agent** — Same pattern with `CoachingOutput` schema + 9 LangChain tool wrappers (knowledge search, simulation, analytics)
+5. **Governance Agent** — Same pattern with `GovernanceOutput` schema + determines if coaching needs revision
+
+### Why LangChain + LangGraph (not raw HTTP calls)?
+- **Pydantic-validated outputs:** Each agent's JSON output is type-checked via Pydantic schemas (InsightOutput, RiskOutput, etc.). Malformed LLM responses are caught before reaching the frontend — the old raw HTTP approach could silently pass invalid JSON.
+- **Structured prompt templates:** `ChatPromptTemplate` with format instructions auto-generated from Pydantic models. The LLM always knows the exact JSON shape to return.
+- **StateGraph orchestration:** LangGraph's `StateGraph` manages the pipeline state (org_health, scenario, vector_context, agent outputs, trace). Each node is a pure function that reads/writes state. The graph supports conditional edges (revision loop) and is fully serializable.
+- **Conditional revision loop:** If the Governance agent's confidence score is <40, the pipeline automatically re-runs the Coaching agent with governance feedback appended — up to 2 revision passes. This mimics real-world "review and revise" cycles.
+- **Tool-augmented agents:** The Coaching agent gets 9 LangChain tools (wrapping `scoring.py`, `analytics_enhanced.py`, vector DB) injected as context. It can reference real computed data rather than relying solely on LLM knowledge.
+- **Provider abstraction:** Swap Ollama for OpenAI/Anthropic by changing one import. The `ChatOllama` class implements LangChain's `BaseChatModel` interface, making provider migration trivial.
+- **Graceful degradation:** If `langchain-ollama` is not installed → falls back to sequential agents (no graph) → if LLM unavailable → error dicts → if all fails → `run_pipeline_fallback()` deterministic templates.
+
+### Fallback Chain (4 levels)
+```
+1. LangGraph graph → `ChatOllama` → PydanticOutputParser
+2. Sequential agents (LangGraph unavailable) → `ChatOllama` → PydanticOutputParser
+3. Original agents.py (langchain-core unavailable) → raw HTTP → manual JSON parse
+4. run_pipeline_fallback() (all LLM paths fail) → deterministic templates
+```
 
 ### Why 5 agents instead of 1 prompt?
 - **Role specialization:** Each agent focuses on one aspect. The Insight agent doesn't try to write an action plan. The Governance agent doesn't analyze data.
@@ -118,13 +144,12 @@ Each module asks a specific question and answers it with deterministic logic:
 - **Zero cost:** No API key, no cloud bill, no rate limits.
 - **Offline:** Entire demo runs without internet.
 - **Privacy:** Data never leaves the laptop.
-- **Fallback:** If Ollama is unavailable, `run_pipeline_fallback()` produces coherent rule-based output with the same JSON structure.
-
-### Why it works
-The pipeline architecture mimics how a real consulting team works: Analyst → Strategy → HR → PM → Presenter. Each agent builds on the previous output. The fallback ensures the demo never breaks.
+- **Fallback:** If Ollama is unavailable, 4-level fallback chain ensures the demo never breaks.
 
 ### Key files
-- `backend/agents.py` — `run_pipeline()`, `run_pipeline_fallback()`, all 5 agent prompts
+- `backend/agents_langchain.py` — `run_pipeline()` with LangGraph, all 5 Pydantic schemas, prompt templates
+- `backend/agent_tools.py` — 9 LangChain tools (search_employees, get_org_health_snapshot, simulate_employee_loss, etc.)
+- `backend/agents.py` — Legacy pipeline (fallback if langchain-core is not installed)
 
 ---
 
@@ -284,6 +309,7 @@ This gives the LLM concrete facts to work with — not just generic advice.
 ### Key files
 - `backend/agents.py` — `_get_vector_context()` function, prompt injection
 - `database/vectordb.py` — Search interfaces
+- `backend/agent_tools.py` — `search_knowledge` exposed as a LangChain tool for the Coaching agent
 
 ---
 
@@ -317,7 +343,7 @@ The `depends_on` directive ensures Ollama starts before the API. The frontend Ng
 | FastAPI | Need fast, validated API | Async Python with Pydantic | Auto-docs, auto-validation, auto-serialization |
 | Pydantic | API contract drift | Spec-driven models | Single source of truth for 35+ endpoints |
 | Heuristic scoring | Black-box AI distrust | Transparent formulas | Explainable, deterministic, XGBoost-ready |
-| 5-agent pipeline | Single prompt is chaotic | Role-specialized agents | Modular, efficient, traceable |
+| 5-agent pipeline | Single prompt is chaotic | LangChain + LangGraph orchestration | Pydantic-validated, graph-based, revision loop, tool-augmented |
 | ChromaDB | Keyword search limitations | Semantic vector retrieval | Finds related knowledge without exact matches |
 | React + Vite | Need fast UI iteration | Component library + HMR | 500ms startup, 50ms updates |
 | CSS reports | JS charts don't print | Server-generated HTML | Print-ready, zero dependencies |

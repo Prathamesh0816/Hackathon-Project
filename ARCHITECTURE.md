@@ -15,17 +15,20 @@ graph TB
         SCORING[Scoring Engine<br/>scoring.py]
         ANALYTICS[Enhanced Analytics<br/>analytics_enhanced.py]
         AGENTS[5-Agent Pipeline<br/>agents.py]
+        LANGCHAIN[LangChain + LangGraph<br/>agents_langchain.py]
+        TOOLS[LangChain Tools<br/>agent_tools.py]
         STORAGE[Data Layer<br/>storage.py + CSVs]
         CLASSIFIER[File Classifier<br/>file_classifier.py]
     end
 
-    subgraph AI ["AI Layer"]
+    subgraph AI ["AI Layer (LangChain)"]
         OLLAMA[Ollama<br/>qwen2.5:3b]
-        INSIGHT[Insight Agent]
-        RISK[Risk Agent]
-        SIM[Simulation Agent]
-        COACH[Coaching Agent]
-        GOV[Governance Agent]
+        INSIGHT[Insight Agent<br/>RunnableSequence]
+        RISK[Risk Agent<br/>RunnableSequence]
+        SIM[Simulation Agent<br/>RunnableSequence]
+        COACH[Coaching Agent<br/>RunnableSequence + Tools]
+        GOV[Governance Agent<br/>RunnableSequence]
+        GRAPH[LangGraph<br/>StateGraph]
     end
 
     subgraph Data ["Data Layer"]
@@ -44,9 +47,19 @@ graph TB
     API --> SCORING
     API --> ANALYTICS
     API --> AGENTS
+    API --> LANGCHAIN
     API --> STORAGE
     API --> CLASSIFIER
     STORAGE --> Data
+    LANGCHAIN --> GRAPH
+    GRAPH --> INSIGHT
+    GRAPH --> RISK
+    GRAPH --> SIM
+    GRAPH --> COACH
+    GRAPH --> GOV
+    COACH --> TOOLS
+    TOOLS --> SCORING
+    TOOLS --> ANALYTICS
     AGENTS --> OLLAMA
     OLLAMA --> INSIGHT
     OLLAMA --> RISK
@@ -81,14 +94,26 @@ sequenceDiagram
 
     User->>UI: Run AI Pipeline
     UI->>API: POST /pipeline
-    API->>Agents: run_pipeline()
-    Agents->>LLM: Insight Agent
-    Agents->>LLM: Risk Agent
-    Agents->>LLM: Simulation Agent
-    Agents->>LLM: Coaching Agent
-    Agents->>LLM: Governance Agent
-    LLM-->>Agents: Structured JSON
-    Agents-->>API: Full trace + summary
+    API->>LANGCHAIN: run_pipeline()
+    LANGCHAIN->>GRAPH: LangGraph StateGraph
+    GRAPH->>INSIGHT: Insight Agent
+    GRAPH->>RISK: Risk Agent
+    GRAPH->>SIM: Simulation Agent
+    GRAPH->>COACH: Coaching Agent
+    GRAPH->>GOV: Governance Agent
+    COACH->>TOOLS: search_knowledge, simulate, etc.
+    INSIGHT->>LLM: ChatOllama (RunnableSequence)
+    RISK->>LLM: ChatOllama (RunnableSequence)
+    SIM->>LLM: ChatOllama (RunnableSequence)
+    COACH->>LLM: ChatOllama (RunnableSequence)
+    GOV->>LLM: ChatOllama (RunnableSequence)
+    LLM-->>INSIGHT: Pydantic-validated output
+    LLM-->>RISK: Pydantic-validated output
+    LLM-->>SIM: Pydantic-validated output
+    LLM-->>COACH: Pydantic-validated output
+    LLM-->>GOV: Pydantic-validated output
+    GRAPH-->>LANGCHAIN: Full trace + summary
+    LANGCHAIN-->>API: Full trace + summary
     API-->>UI: AI recommendations
 
     User->>UI: View Employee Profile
@@ -137,29 +162,50 @@ sequenceDiagram
 | GET | `/dataset/employee-data/{name}` | Employee from active dataset |
 | GET | `/dataset/employees` | List all employees |
 
-## Innovation Differentiators (for Judges)
+## Supporting Documents
+
+| Document | Purpose |
+|----------|---------|
+| `BUSINESS_IMPACT.md` | ROI methodology, pricing tiers, TCO comparison, payback period |
+| `docs/CLIENT_PITCH.md` | 1-page client proposal — implementation, investment, expected outcomes |
+| `docs/ROADMAP.md` | 5-phase product roadmap (24 months) |
+| `QNA_PREP.md` | All judge & client questions with practiced answers (30+ Q&A pairs) |
+| `WHATS_UNIQUE.md` | 10 things no other project or competitor does |
+| `docs/RUNBOOK.md` | Pre-demo server checklist + test commands |
+
+---
+
+## Innovation Differentiators
 
 | # | Differentiator | What It Means | Where It Lives |
 |---|---------------|---------------|----------------|
 | 1 | 🔮 **Predictive Simulation** | "We don't just report current state — we predict future state" | `POST /whatif` + TimeMachine UI |
 | 2 | 🧠 **Collective Agent Intelligence** | "5 specialized agents collaborate, not 1 generalist" | Pipeline trace in WhatIf page — each agent's output visible |
-| 3 | 👥 **Human-in-the-Loop by Design** | "Every recommendation is reviewable, overridable, and improves over time" | FeedbackModal on each coaching action + `POST /feedback` |
-| 4 | 🛡️ **Governance-First AI** | "Every output comes with confidence, reasoning, and counter-argument" | GovernancePanel with bias check, reasoning trace, confidence gauge |
-| 5 | 🔒 **Privacy-Preserving** | "Local LLM via Ollama — your data never leaves your infrastructure" | Entire stack runs on localhost, no external API calls |
-| 6 | ⚡ **Zero-to-Insight** | "Upload CSV → see org health — no configuration needed" | `POST /upload-file` → Dashboard refresh |
+| 3 | ⚙️ **LangChain + LangGraph Orchestration** | "Agents use RunnableSequence for structured I/O, LangGraph StateGraph for pipeline flow with conditional revision loops" | `agents_langchain.py` + `agent_tools.py` |
+| 4 | 🛠️ **Tool-Augmented Agents** | "Coaching agent calls real backend tools (knowledge search, simulation, analytics) to ground its recommendations" | `agent_tools.py` — 9 LangChain tools wrapping scoring/analytics |
+| 5 | ✅ **Pydantic-Validated Agent Outputs** | "Every agent's output is type-checked via Pydantic schemas — malformed LLM responses are caught before reaching the frontend" | `InsightOutput`, `RiskOutput`, etc. in `agents_langchain.py` |
+| 6 | 🔄 **Revision Loop** | "Governance agent can flag low-confidence coaching → triggers automatic revision pass (up to 2)" | LangGraph conditional edge in `agents_langchain.py` |
+| 7 | 👥 **Human-in-the-Loop by Design** | "Every recommendation is reviewable, overridable, and improves over time" | FeedbackModal on each coaching action + `POST /feedback` |
+| 8 | 🛡️ **Governance-First AI** | "Every output comes with confidence, reasoning, and counter-argument" | GovernancePanel with bias check, reasoning trace, confidence gauge |
+| 9 | 🔒 **Privacy-Preserving** | "Local LLM via Ollama — your data never leaves your infrastructure" | Entire stack runs on localhost, no external API calls |
+| 10 | ⚡ **Zero-to-Insight** | "Upload CSV → see org health — no configuration needed" | `POST /upload-file` → Dashboard refresh |
 
 ## Key Design Decisions
 
 1. **CSV as data store** — Zero setup. Swap to PostgreSQL via one env var.
 2. **Deterministic scoring** — All 4 indicators use interpretable formulas. `# production: replace with XGBoost` comment in scoring.py.
-3. **AI fallback** — If Ollama is down, deterministic templates ensure demo never breaks (agents.py:313).
+3. **AI fallback** — If LangChain or Ollama is down, deterministic templates ensure demo never breaks (agents.py:313).
 4. **Local LLM** — Ollama with qwen2.5:3b runs on any laptop. No API keys, no internet needed.
-5. **Human-in-the-loop** — Governance agent flags when human review is required. Feedback is persisted and influences future recommendations.
+5. **LangChain as default pipeline** — `agents_langchain.py` is preferred over `agents.py`. Falls back gracefully.
+6. **Environment-agnostic Ollama URL** — `agents_langchain.py` strips `/api/generate` suffix for ChatOllama compatibility; works with or without it.
+7. **Human-in-the-loop** — Governance agent flags when human review is required. Feedback is persisted and influences future recommendations.
 
 ## Tech Stack
 
 - **Frontend:** React 18 + Vite + Tailwind CSS + Recharts
 - **Backend:** FastAPI (Python 3.12)
-- **AI:** Ollama (qwen2.5:3b) + 5-agent sequential pipeline
+- **AI Framework:** LangChain (RunnableSequence, PydanticOutputParser) + LangGraph (StateGraph)
+- **AI Backend:** Ollama (qwen2.5:3b) with ChatOllama integration
+- **Agent Tools:** 9 LangChain tools wrapping scoring engine, analytics, and vector DB
 - **Data:** CSV files (SQLite/PostgreSQL ready via SQLAlchemy)
 - **Deployment:** Docker Compose (one command)

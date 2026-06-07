@@ -11,6 +11,7 @@
 - Python 3.12+
 - Node.js 20+
 - (Optional) [Ollama](https://ollama.com) with `qwen2.5:3b` — for AI pipeline. Fallback mode works without it.
+- LangChain + LangGraph (auto-installed via `requirements.txt`) — powers agent orchestration
 
 ### 1. Backend
 
@@ -98,7 +99,9 @@ Hackathon-Project/
 │   ├── models.py           # Pydantic spec contracts
 │   ├── scoring.py          # 4-indicator scoring engine
 │   ├── analytics_enhanced.py # 6 advanced analytics modules
-│   ├── agents.py           # 5-agent sequential AI pipeline
+│   ├── agents.py           # 5-agent sequential AI pipeline (legacy)
+│   ├── agents_langchain.py # LangChain + LangGraph agent pipeline (default)
+│   ├── agent_tools.py      # 9 LangChain tools wrapping backend functions
 │   ├── storage.py          # File upload + data retrieval
 │   ├── file_classifier.py  # CSV/Excel/TXT classification
 │   ├── data_manager.py     # Dynamic dataset management
@@ -119,15 +122,18 @@ Hackathon-Project/
 │   ├── schema.sql          # 7 tables (SQLite + PostgreSQL compatible)
 │   ├── scripts/seed_from_csv.py
 │   └── README.md
-├── docs/                   # Documentation (7 files)
+├── docs/                   # Documentation (9+ files)
 ├── docker-compose.yml      # One-command full stack
 ├── Dockerfile.api
 ├── Dockerfile.web
 ├── ARCHITECTURE.md         # Mermaid diagrams for PPT
-├── BUSINESS_IMPACT.md      # $54.6M revenue at risk, 28:1 ROI
-├── DEMO_SCRIPT.md          # Word-for-word 5-min script
+├── BUSINESS_IMPACT.md      # $54.6M revenue at risk, 65:1 ROI, pricing, TCO
+├── DEMO_SCRIPT.md          # Word-for-word 5-min script with positioning
 ├── DAY_PLAN.md             # Day-wise workload distribution
-└── QNA_PREP.md             # Every judge question + answer
+├── QNA_PREP.md             # Every judge + client question + answer
+├── **WHATS_UNIQUE.md**     # **10 things no other project/competitor does — print for judges**
+├── docs/CLIENT_PITCH.md    # 1-page proposal for client conversations
+└── docs/ROADMAP.md         # 5-phase product roadmap (24 months)
 ```
 
 ---
@@ -191,9 +197,9 @@ Hackathon-Project/
 
 | Criteria (Weight) | Score | How We Deliver |
 |-------------------|-------|----------------|
-| Innovation (25%) | 22-24/25 | 6 differentiators: Predictive Simulation, Collective Agent AI, Human-in-the-Loop, Governance-First AI, Privacy-Preserving, Zero-to-Insight |
-| Business Value (25%) | 20-22/25 | $54.6M revenue at risk, 28:1 ROI, $400K-$1.2M annual risk per 200-person company |
-| Technical (20%) | 18-20/20 | 35+ endpoints, 11 UI pages, 5 AI agents, 20+ multi-scenario permutations, canvas physics simulation, Excel/CSV/TXT upload, Docker |
+| Innovation (25%) | 22-24/25 | 10 differentiators: LangChain + LangGraph orchestration, tool-augmented agents, Pydantic-validated outputs, revision loop + Predictive Simulation, Collective Agent AI, Human-in-the-Loop, Governance-First AI, Privacy-Preserving, Zero-to-Insight |
+| Business Value (25%) | 20-22/25 | $54.6M revenue at risk, 65:1 ROI, $1.2M-$2.2M annual prevented loss per 200-person company |
+| Technical (20%) | 18-20/20 | 35+ endpoints, 11 UI pages, 5 AI agents on LangGraph StateGraph with revision loop, 9 LangChain tools, 20+ multi-scenario permutations, canvas physics simulation, Excel/CSV/TXT upload, Docker |
 | Scalability (15%) | 12-14/15 | XGBoost-ready scaffold, SQLAlchemy (SQLite ↔ Postgres in 1 line), Docker orchestration |
 | UI/UX (10%) | 8-9/10 | Force-directed dependency graph, stress test animation, Time Machine, chat interface, governance panel |
 | Presentation (5%) | 3-5/5 | Named hero (Vikram), 5-min script with stopwatch timing, Q&A prep for every likely question |
@@ -205,8 +211,12 @@ Hackathon-Project/
 
 | File | Use |
 |------|-----|
-| `BUSINESS_IMPACT.md` | Business value slide content + ROI math |
+| `WHATS_UNIQUE.md` | **10 things no other project or competitor does** — print as handout for judges |
+| `BUSINESS_IMPACT.md` | Business value slide content + ROI methodology + pricing + TCO comparison |
 | `ARCHITECTURE.md` | Architecture diagram + innovation differentiators |
-| `QNA_PREP.md` | Every judge question + practiced answer |
-| `DEMO_SCRIPT.md` | Word-for-word 5-minute script |
+| `QNA_PREP.md` | Every judge & client question + practiced answer (technical, business, commercial) |
+| `DEMO_SCRIPT.md` | Word-for-word 5-minute script with competitive positioning |
 | `DAY_PLAN.md` | Day-wise workload for all 6 team members |
+| `docs/CLIENT_PITCH.md` | 1-page proposal: implementation, pricing, ROI guarantee — for client conversations |
+| `docs/ROADMAP.md` | 5-phase product roadmap answering "what next?" over 24 months |
+| `docs/RUNBOOK.md` | Pre-demo server checklist + pipeline test commands |

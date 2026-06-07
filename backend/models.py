@@ -148,4 +148,6 @@ class TextInputResponse(BaseModel):
 class HealthCheckResponse(BaseModel):
     message: str
     version: str
+    pipeline_backend: str = "raw"
+    langchain_available: bool = False
     endpoints: list[str]

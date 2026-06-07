@@ -57,10 +57,10 @@ Total estimated effort: **2 days × 6 people = 96 person-hours**
 
 | Task | Who | Time | Details |
 |------|-----|------|---------|
-| Add configurable LLM provider | Santosh | 2h | Abstraction layer: Ollama / OpenAI / Anthropic — pick via env var |
-| Add prompt caching for repeated queries | Santosh | 1h | Cache agent outputs by query hash, TTL configurable |
-| Add rate limiting and cost tracking | Santosh | 1h | Token usage tracking, cost estimation, per-tenant rate limits |
-| Test with GPT-4-mini + Ollama fallback | Santosh | 1h | Verify both providers produce consistent JSON structure |
+| Add configurable LLM provider | Santosh | 2h | LangChain abstraction: Ollama / OpenAI / Anthropic — pick via env var |
+| Add prompt caching for repeated queries | Santosh | 1h | LangChain cache (SQLite or Redis), cache agent outputs by query hash |
+| Add rate limiting and cost tracking | Santosh | 1h | LangChain callbacks for token usage tracking, cost estimation |
+| Test with GPT-4-mini + Ollama fallback | Santosh | 1h | Verify both providers produce consistent Pydantic-validated output |
 
 **Dependency:** None — can work in parallel.
 

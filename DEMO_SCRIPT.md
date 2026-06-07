@@ -1,159 +1,187 @@
-# TruPulse AI — Demo Script (5 min)
+# TruPulse AI — Demo Script (5 min) v3.0
 
 ## Setup (before judges arrive)
 1. Backend running on :8000 — `uvicorn main:app --reload`
 2. Frontend running on :3000 — `npm run dev`
-3. Ollama running with `qwen2.5:3b` pulled
-4. Browser open to http://localhost:3000
-5. Pre-run `/demo-data` so everything is cached
+3. Ollama running with `qwen2.5:3b` pulled — **keep terminal open, confirm it's hot**
+4. **Browser Tab 1:** http://localhost:3000 — **Dashboard page ready**
+5. **Browser Tab 2:** `backend/agents_langchain.py` scrolled to Pydantic schema definitions (~line 30-120)
+6. **Browser Tab 3:** same file, scrolled to `create_graph()` / StateGraph definition (~line 400-550)
+7. Pre-run `/demo-data` so everything is cached
+8. **3 one-pagers printed** on judges' seats: `WHATS_UNIQUE.md` (10 differentiators), `BUSINESS_IMPACT.md` (ROI), `CLIENT_PITCH.md` (implementation)
+9. Prathamesh is the **sole presenter**. Everyone else supports. No speaker handoffs.
 
 ---
 
-## Script
+## Script (One Presenter, 6 Segments, 300 Seconds)
 
-### 0:00 — Opening (Lokesh)
-> "Most companies measure financial performance. They don't measure workforce health.
-> TruPulse AI is an organizational resilience simulator. We find your single points of failure before they find you."
+**Judging criteria each segment targets — Prathamesh knows these so he emphasizes the right thing naturally:**
 
-### 0:20 — The Dashboard (Prathamesh — click nothing yet)
-> "This is Vikram's company. 115 employees, 14 teams, $55M in annual commitments.
-> Our composite health score: **47.5 out of 100**. That's HIGH risk.
-> 4 indicators: Resilience, Trust, Burnout, Retention — all in the danger zone."
+| Seg | Time | Primary Criterion | Secondary |
+|-----|------|------------------|-----------|
+| 1 | 0:00-0:40 | **Business Value** | UX |
+| 2 | 0:40-1:20 | **UX** | Business Value |
+| 3 | 1:20-2:15 | **Innovation** | Technical Excellence |
+| 4 | 2:15-2:55 | **Technical Excellence** | UX |
+| 5 | 2:55-3:30 | **UX** | Business Value |
+| 6 | 3:30-5:00 | **Demo & Presentation** | All |
 
-**[Pause 2 seconds. Let the number sink in.]**
+---
 
-### 0:50 — The Story (Varad — click Vikram's profile)
-> "Let me introduce you to Vikram. Sales Manager. 8 years. Top performer.
-> He owns our 3 biggest accounts — Global Bank, FinTech Inc, Insurance Group — that's $2.7M in annual contracts.
-> He has **no backup**. His documentation level is **Low**.
-> And he hasn't taken PTO in 18 months."
-
-**[Show the SPOF warning badge]**
-
-> "Vikram is one Slack message away from being poached by a competitor.
-> If he leaves on Friday, here's what happens."
-
-### 1:30 — The What-If (Prathamesh — select Vikram, Run Simulation)
-> **[Click Vikram. Click "Run Simulation". Time Machine loads.]**
-
-> "Our Time Machine shows the Before and After:
-> - Composite health: **72 → 41** (a 31-point drop)
-> - Trust: **78 → 51**
-> - Resilience: **72 → 39**
-> - Revenue at risk: **$2.7 million**"
-
-**[Point at the red banner. Pause 2 seconds.]**
-
-> "That's $2.7M in contracts that go into jeopardy within 90 days of Vikram leaving."
-
-### 2:30 — The AI Pipeline (Prathamesh — click "Run AI Pipeline Analysis")
-> "Our AI doesn't stop at the diagnosis. It prescribes the cure.
-> 5 specialized agents work together — Insight, Risk, Simulation, Coaching, and Governance."
-
-**[Show the pipeline trace with the 5 agent boxes]**
-
-> "The **Coaching Agent** recommends:
-> 1. Cross-train Anjali on strategic accounts within 30 days
-> 2. Document all client relationships within 60 days
-> 3. Hire a senior Account Executive before Q4
-
-> The **Governance Agent** validates every output with:
-> - Confidence score: 82/100
-> - Full reasoning trace — you can see exactly why each recommendation was made
-> - Bias check — flagging that we may overweight tenure"
+### 0:00-0:40 — Segment 1: Meet Vikram (40s) → **Business Value**
+> **[Dashboard is already loaded. Point at the screen.]**
 >
-> "And the **Governance Agent** says: *Human review required.*
-> We don't make decisions. We support them."
-
-### 3:30 — SPOF Ranking with Dependency Graph (Prathamesh — navigate to SPOF page)
-> "Vikram isn't alone. We found **56 single points of failure** across the organization."
-
-**[Show the dependency graph — nodes pulsing, lines connecting]**
-
-> "This is our dependency network. Each node is an employee. Purple means SPOF.
-> Look at the cluster — Rahul in Engineering, Sneha in DevOps, Sanjay in Security.
-> If any one of them leaves, entire projects stall."
-
-### 4:00 — The Stress Test (Prathamesh — press "Run Stress Test")
-> **[Click "Run Stress Test". Watch SPOFs fall one by one. Score drops.]**
-
-> "Watch what happens when we don't act. One by one, our SPOFs fail.
-> The resilience score drops from 100 to 22.
-> **56 people put $55M organization at risk.**"
-
-### 4:30 — The AI Chat (Prathamesh — click a suggestion in the ChatPanel)
-> "And because this is the future, you can just ask:"
-
-> **[Click: "What happens if our top 3 engineers leave?"]**
-
-> "The AI runs the simulation and gives you a plain-English answer, with actions.
-> No training required. Type a question, get a decision."
-
-### 4:45 — The Report (Prathamesh — download the report)
-> "Everything — the analysis, the recommendations, the governance trace — goes into a downloadable report.
-> One click, executive-ready."
-
-### 4:30 — AI Chat: Multi-Scenario Explorer (Prathamesh)
-> "Vikram isn't the only story. We've built 10+ scenario cases — permutations and combinations."
-
-> **[Click: "What if our top 3 engineers leave?"]**
-> **[Click: "What if the entire Sales team SPOFs leave?"]**
-> **[Click: "What if workload increases 35% org-wide?"]**
-
-> "Each query runs a real simulation — different employees, different combinations, different outputs.
-> The AI shows you the composite delta, revenue at risk, and affected teams for EVERY permutation."
-
-### 4:45 — The Report (Prathamesh — download the report)
-> "Everything — the analysis, the recommendations, the governance trace — goes into a downloadable report.
-> One click, executive-ready."
-
-### 4:55 — Closing (Lokesh)
-> "TruPulse AI: Predict. Simulate. Strengthen.
-> We don't just report problems. We simulate solutions.
-> Thank you."
+> "Every organization has a Vikram. A senior employee who's the only person who knows how something critical works.
+>
+> Meet Vikram. Sales Manager. 8 years. Top performer. He owns our 3 biggest accounts — $2.7M in contracts. He has **no backup**. His documentation is **Low**. He hasn't taken PTO in 18 months.
+>
+> Our composite health score: **47.5 out of 100**. That's HIGH risk. 56 employees in this company are single points of failure — putting **$54.6 million** at risk."
+>
+> **[Click: Vikram profile. Show the SPOF badge.]**
+>
+> *"30 seconds from uploading a CSV to this dashboard. That's the business value — instant visibility into hidden risk."*
 
 ---
 
-## Bonus: Multi-Scenario Catalog
+### 0:40-1:20 — Segment 2: What-If (40s) → **User Experience**
+> **[Pre-select Vikram. Click "Run Simulation". Time Machine loads.]**
+>
+> "If Vikram leaves on Friday, here's what Monday looks like."
+>
+> **[Point at the before/after comparison.]**
+>
+> "Composite health drops from 72 to 41 — a 31-point collapse. Trust drops from 78 to 51. Resilience from 72 to 39.
+>
+> Workday tells you someone quit. We tell you **before they do** — and we tell you what it costs."
+>
+> **[Point at the revenue at risk banner.]**
+>
+> "**$2.7 million** in contracts go into jeopardy within 90 days."
+>
+> *"Before and after in one click — the user experience makes complex simulation instantly understandable."*
 
-The `/scenarios` endpoint exposes **20+ predefined scenario permutations** across 4 categories:
+---
 
-| Category | Count | Examples |
-|----------|-------|---------|
-| Single SPOF Departures | 7 | Vikram, Neha Kapoor, Anita Verma, Shikha Dubey, Meera Iyer, Kiran Rao, Vikram Sharma |
-| Multi-SPOF Combinations | 5 | Sales trio, Engineering trio, Security trio, Marketing trio, Data trio |
-| Cross-Team Cascades | 5 | Revenue triple-hit, Tech leadership exodus, Governance collapse, Top 5 SPOFs, Complete sales failure |
-| Workload Scenarios | 4 | 20% increase, 35% burnout cascade, Engineering restructure, Sales restructure |
+### 1:20-2:15 — Segment 3: AI Pipeline (55s) → **Innovation + Technical Excellence**
+> **[Click "Run Pipeline Analysis". IT WILL TAKE 10-20 SECONDS — KEEP TALKING.]**
+>
+> "The diagnosis is just the start. Our AI prescribes the cure.
+>
+> 5 specialized agents on a **LangGraph StateGraph** — each one is a LangChain RunnableSequence. Insight finds patterns. Risk identifies cascades. Simulation models the future. Coaching recommends actions. **Governance validates everything**.
+>
+> Every agent output is **Pydantic-validated** — if the LLM returns malformed JSON, it's caught before it reaches the UI. And if Governance scores Coaching below 40%, it triggers a **revision loop** — the graph routes back and Coaching revises its output."
+>
+> **[Pipeline has loaded by now. Show the 5 agent trace + governance panel. Then flip to the PRE-OPENED browser tab showing the code.]**
+>
+> "Here's the output. Coaching recommends: cross-train Anjali, document all accounts, hire a senior AE before Q4. Governance gives it 82/100 confidence — with a full reasoning trace, bias check, and counter-argument.
+>
+> **We don't make decisions. We support them.**
+>
+> And here's what's running under the hood — because technical excellence means showing our work."
+>
+> **[Flip to Tab 2: agents_langchain.py — Pydantic schemas section. Point at the code.]**
+>
+> "Each agent output is a Pydantic model. Every node in the LangGraph StateGraph validates its output against this schema — if the LLM produces malformed JSON, it's caught before it reaches the UI, not silently passed through."
+>
+> **[Scroll down to the StateGraph definition. Point at the conditional edge.]**
+>
+> "This is the LangGraph StateGraph — **our core innovation**. Five nodes. Conditional edge from Governance back to Coaching — if confidence is below 40%, it triggers a revision loop, up to two times. The entire pipeline is a directed graph, not a linear chain. That's what `pipeline_type: langchain_langgraph` means in every response."
+>
+> **[Flip back to the main tab.]**
 
-### Key Scenario Outputs (pre-computed):
-| Scenario | Composite Delta | Revenue at Risk |
-|----------|:--------------:|:---------------:|
-| Vikram (Sales Manager) alone | ~+0.5 | $2.7M |
-| Neha Kapoor (Chief Architect) alone | ~+0.5 | $2.7M |
-| Engineering trio (Neha + Lalit + Ishita) | ~+1.6 | $8.1M |
-| Sales trio (Vikram + Sharma + Tanvi) | ~+1.4 | $8.2M |
-| Cross-team triple (Vikram + Neha + Shikha) | ~+1.5 | $6.1M |
-| +25% workload org-wide | ~-3.8 | N/A (burnout cascade) |
-| Marketing restructured | ~-0.4 | Team disruption |
+---
 
-> **Note:** Composite scores may increase when SPOFs leave because removing an un-backed-up employee reduces organizational risk. The real impact is in the **revenue at risk** and **knowledge loss** metrics.
+### 2:15-2:55 — Segment 4: SPOF Map + Stress Test (40s) → **Technical Excellence + UX**
+> **[Navigate to the SPOF/dependency graph page.]**
+>
+> "Vikram isn't alone. We found 56 single points of failure — each one a person who can leave and take critical knowledge with them."
+>
+> **[Point at the purple nodes in the graph.]**
+>
+> "Purple means SPOF. Look at the cluster — Rahul in Engineering, Sneha in DevOps, Sanjay in Security. If any one of them leaves, entire projects stall.
+>
+> The cost to de-risk all 56: **$840K** in cross-training and targeted hiring. The cost if we don't: **$54.6 million**."
+>
+> **[Click "Run Stress Test". Watch SPOFs fall. Score drops 100 to 22.]**
+>
+> "Watch what happens when we don't act. One by one, our SPOFs fail. Resilience drops from 100 to 22. **56 people put a $55 million organization at risk.**"
+>
+> *"A force-directed graph powered by a real dependency engine — that's technical excellence delivering an intuitive UX."*
+
+---
+
+### 2:55-3:30 — Segment 5: Report (35s) → **UX + Business Value**
+> **[Click "Generate Report". Show the report output.]**
+>
+> "Everything — the analysis, the recommendations, the governance trace — goes into a downloadable report. One click, executive-ready. HTML, PDF, and plain text.
+>
+> This is what you put in front of your board next Monday."
+
+---
+
+### 3:30-5:00 — Segment 6: Closing + Pitch (90s) → **Demo & Presentation + All Criteria**
+> **[Final slide. Team stands. Confident.]**
+>
+> "Here's what matters — by every criterion you're judging us on:
+>
+> **Innovation:** LangChain + LangGraph multi-agent AI with Pydantic validation, 9 tool-augmented agents, and a live revision loop. **No competitor does all 5.**
+>
+> **Business Value:** 56 SPOFs identified. $54.6 million at risk. $840,000 to fix. 65-to-1 ROI. Payback in under 6 days.
+>
+> **Technical Excellence:** LangGraph StateGraph with conditional edges. Pydantic schemas on every agent. 4-level fallback chain. 9 tools wrapping real analytics. Docker Compose deployment.
+>
+> **User Experience:** One-click simulation. Time Machine before/after. Dependency graph. Stress test animation. Governance panel. Executive report in 4 formats.
+>
+> **Demo & Presentation:** 6 segments. 5 minutes. One presenter. Three dry runs. Backup video ready. 30+ Q&A answers prepared. **3 one-pagers on your seat: WHATS_UNIQUE.md, BUSINESS_IMPACT.md, CLIENT_PITCH.md.**
+>
+> We'll run TruPulse on your data in **5 business days** — free, no obligation. You get your org health report, your SPOF rankings, and 3 scenario simulations. If the output doesn't sell itself, we don't deserve the business.
+>
+> We're ready for your questions."
+>
+> **[Nod to Varad. Varad steps forward for Q&A.]**
+
+---
+
+## What Prathamesh Must Rehearse (Non-Negotiable)
+
+1. **The AI Pipeline load time.** From clicking "Run Pipeline" to seeing results is 10-20 seconds. You MUST have 20 seconds of smooth narration ready. Practice this. If you finish talking before it loads, don't say "still loading" — just repeat the key point about Pydantic validation or the revision loop.
+2. **The closing numbers.** 56, $54.6M, $840K, 65:1, 6 days, 4 weeks, $18K. Say them without looking at the screen. Know them cold.
+3. **The 5-minute mark.** If you hit 4:30 and haven't started the closing, **skip to the closing**. The ROI numbers are what judges remember. Everything else is supporting evidence.
+
+## What Everyone Else Does During Demo
+
+| Person | Role During Demo |
+|--------|-----------------|
+| **Prathamesh** | Presents. Clicks. Talks. Does not look at teammates. |
+| **Varad** | Stands with the team. First to answer Q&A. Holds QNA_PREP.md cheat sheet. |
+| **Santosh** | Stands ready for AI questions. Nods confidently during pipeline segment. |
+| **Aradhana** | Stands ready for backend/architecture questions. |
+| **Sopan** | Quietly watches the clock. Gives Prathamesh a 1-minute warning signal. |
+| **Lokesh** | Has backup video on phone, ready to play. Does nothing unless everything breaks. |
 
 ## Backup Plan (if Ollama is down)
 
-The `/pipeline` endpoint auto-falls back to deterministic templates (`agents.py:385 — run_pipeline_fallback()`). The demo will:
-- Show the same UI
-- Display all 5 agent boxes
-- Show "fallback mode — Ollama unavailable" in the trace
+The `/pipeline` endpoint has a **4-level fallback chain**:
+1. LangGraph graph → ChatOllama → Pydantic-validated output
+2. Sequential agents (LangGraph unavailable) → same ChatOllama
+3. Raw agents.py (langchain-core missing) → HTTP calls to Ollama
+4. Deterministic templates (`agents_langchain.run_pipeline_fallback()`)
+
+The demo will:
+- Show the same UI regardless of which level is active
+- Display `pipeline_type` in the response
 - Still produce real scores and recommendations
 
 **No demo will break on stage.**
 
-## Key Talking Points for Q&A
+---
 
-| Likely Question | Answer |
-|----------------|--------|
-| "How is this different from Workday/HR analytics?" | "Those are historical. We're predictive. We simulate events that haven't happened yet." |
-| "Is this ML or heuristics?" | "The scoring engine uses interpretable heuristics — formulas any actuary would recognize. The architecture is XGBoost-ready — swap line 1 of scoring.py." |
-| "Are the AI agents real?" | "5 sequential LLM calls with role-specific prompts, logged with latencies. You can see the full trace in the UI." |
-| "What data do you need?" | "Three CSVs: employees, projects, and dependencies. Most HR systems export these." |
-| "Is this production-ready?" | "The Docker setup is production-deployable. The DB is SQLite locally, swap to PostgreSQL via one env var. The CSV import is real." |
+## Competitive Positioning Reference
+
+If a judge asks "what makes you different" during Q&A — Varad references `WHATS_UNIQUE.md`. The 10 points are printed and on their seat. Key differentiators to emphasize:
+
+1. **LangGraph StateGraph with revision loop** — no other hackathon project has a conditional edge between agents
+2. **Pydantic-validated agent outputs** — malformed LLM JSON is caught before it reaches the UI
+3. **9 tool-augmented agents** — coaching recommendations are grounded in real computation, not just prompts
+4. **4-level fallback chain** — demo never breaks regardless of which layer fails
+5. **Local LLM** — no competitor runs completely offline with zero data exfiltration

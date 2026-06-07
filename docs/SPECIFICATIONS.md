@@ -23,7 +23,7 @@ Interactive Swagger UI with:
 
 | # | Method | Endpoint | Request Model | Response Model | Purpose |
 |--|--------|----------|---------------|----------------|---------|
-| 1 | GET | `/` | — | `HealthCheckResponse` | Health check + endpoint list |
+| 1 | GET | `/` | — | `HealthCheckResponse` | Health check + endpoint list + LangChain availability |
 | 2 | GET | `/org-health` | — | `OrgHealthResponse` | 4-indicator composite score |
 | 3 | GET | `/employee/{name}` | — | `dict` (raw) | Employee profile with SPOF/upskilling |
 | 4 | POST | `/whatif` | `WhatIfRequest` | `WhatIfResponse` | Simulate attrition/workload/restructure |
@@ -80,9 +80,21 @@ Interactive Swagger UI with:
   "removed_employees": ["Vikram"],
   "workload_increase_pct": 0,
   "restructure_team": null,
-  "use_fallback": false
+  "use_fallback": false,
+  "use_langchain": true
 }
 ```
+**New fields:**
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `use_langchain` | bool | `true` | Use LangChain + LangGraph pipeline (v2.1). Falls back to raw agents if LangChain unavailable. |
+| `use_fallback` | bool | `false` | Skip LLM entirely, use deterministic rule-based templates. |
+
+**Response additions (v2.1):**
+| Field | Type | Description |
+|-------|------|-------------|
+| `pipeline_type` | string | `"langchain_langgraph"`, `"langchain_sequential"`, `"raw"`, or `"deterministic_fallback"` |
+| `revision_count` | int | How many times the pipeline revised coaching (0–2) |
 
 ### FeedbackRequest
 ```json

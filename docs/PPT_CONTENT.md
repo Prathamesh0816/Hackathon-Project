@@ -1,5 +1,7 @@
 # TruPulse AI — Presentation Content (10 Slides + 5 Backup)
 
+> **Presentation note:** The live demo (Prathamesh, 5 min, 6 segments) is the primary deliverable. This PPT deck supports the demo — judges can refer to it during Q&A and Varad can walk through it in detail if separate presentation time is given. The 6 segments of the live demo map to slides as follows: Seg 1→Slides 1-2, Seg 2→Slide 5, Seg 3→Slide 7, Seg 4→Slides 4+6, Seg 5→Slide 8, Seg 6→Slide 10.
+
 ---
 
 ## Slide 1: Title Slide
@@ -36,17 +38,20 @@ Team: Prathamesh, Sopan, Aradhana, Santosh, Varad, Lokesh
 **Architecture**
 
 ```
-React 18 + Vite     FastAPI (Python 3.12)     ChromaDB Vector Store    Ollama LLM
-┌────────────┐      ┌──────────────────┐      ┌────────────────┐      ┌────────┐
-│  Dashboard │─────▶│  Scoring Engine  │─────▶│  Knowledge     │──────│ Qwen   │
-│  What-If   │◀────▶│  15+ Endpoints   │◀────▶│  Embeddings    │      │2.5:3b  │
-│  Reports   │      │  AI Pipeline     │      │  Profiles      │      │Fallback│
-│  TextInput │      │  File Ingest     │      └────────────────┘      └────────┘
-│  Feedback  │      │  Spec Models     │
+React 18 + Vite     FastAPI (Python 3.12)     LangChain + LangGraph    Ollama LLM
+┌────────────┐      ┌──────────────────┐      ┌──────────────────┐      ┌────────┐
+│  Dashboard │─────▶│  Scoring Engine  │─────▶│  RunnableSequence │──────│ Qwen   │
+│  What-If   │◀────▶│  15+ Endpoints   │◀────▶│  StateGraph       │      │2.5:3b  │
+│  Reports   │      │  LangChain Tools  │      │  Pydantic Output  │      │Fallback│
+│  TextInput │      │  File Ingest     │      │  9 Tool Wrappers  │      └────────┘
+│  Feedback  │      │  Spec Models     │      └──────────────────┘
 └────────────┘      └──────────────────┘
 ```
 
 **New in this build:**
+- LangChain + LangGraph orchestration with Pydantic-validated agent outputs
+- LangGraph revision loop (Governance can trigger coaching re-run)
+- 9 LangChain tools for Coaching agent (knowledge search, simulation, analytics)
 - Chat/text input for employee data entry
 - Human-in-the-loop feedback panel (accept/reject/edit AI)
 - 4-format management report (HTML / Text / PDF / Print)
@@ -109,32 +114,54 @@ React 18 + Vite     FastAPI (Python 3.12)     ChromaDB Vector Store    Ollama LL
 
 ## Slide 7: AI Pipeline + Human Feedback (Innovation)
 
-**5 Specialized Agents + Feedback Loop**
+**LangChain + LangGraph Pipeline**
 
 ```
-User Input
-    │
-    ▼
-┌─────────────────────────────────────────────┐
-│  Agent 1: INSIGHT — "Top 3 patterns"        │
-├─────────────────────────────────────────────┤
-│  Agent 2: RISK — "SPOFs & cascade risks"    │
-├─────────────────────────────────────────────┤
-│  Agent 3: SIMULATION — "Before vs after"    │
-├─────────────────────────────────────────────┤
-│  Agent 4: COACHING — "30-60-90 day plan"    │
-├─────────────────────────────────────────────┤
-│  Agent 5: GOVERNANCE — "Confidence & bias"  │
-└──────────────┬──────────────────────────────┘
-               │
-               ▼
-    ┌─────────────────────┐
-    │ Human Review Panel  │──→ Accept / Reject / Modify
-    │ (Accept/Reject/Edit)│──→ Score Recalculation
-    └─────────────────────┘
+                    LangGraph StateGraph
+                    ┌──────────────────────────┐
+                    │  Vector Context Node     │
+                    │  (ChromaDB knowledge)     │
+                    └──────────┬───────────────┘
+                               │
+                    ┌──────────▼───────────────┐
+                    │  INSIGHT Agent           │
+                    │  RunnableSequence         │
+                    │  ChatPrompt→ChatOllama    │
+                    │  →PydanticOutputParser    │
+                    └──────────┬───────────────┘
+                               │
+                    ┌──────────▼───────────────┐
+                    │  RISK Agent              │
+                    │  (same pattern)           │
+                    └──────────┬───────────────┘
+                               │
+                    ┌──────────▼───────────────┐
+                    │  SIMULATION Agent         │
+                    │  (same pattern)           │
+                    └──────────┬───────────────┘
+                               │
+                    ┌──────────▼───────────────┐
+                    │  COACHING Agent          │
+                    │  +9 LangChain Tools      │←── scoring.py
+                    │  (search, simulate,       │←── analytics_enhanced.py
+                    │   analytics, employee)    │←── vectordb.py
+                    └──────────┬───────────────┘
+                               │
+                    ┌──────────▼───────────────┐
+                    │  GOVERNANCE Agent        │
+                    │  Confidence, bias,        │
+                    │  counter-argument         │
+                    └──────────┬───────────────┘
+                               │
+                    ┌──────────▼───────────────┐
+                    │  should_revise?          │
+                    │  if confidence < 40%     │──→ Coaching (revised)
+                    │  and revisions < 2        │
+                    │  else → Human Review     │
+                    └──────────────────────────┘
 ```
 
-**Fallback:** If Ollama is unavailable, rule-based templates provide instant, coherent responses.
+**4-Level Fallback Chain:** LangGraph → Sequential agents → Raw agents.py → Deterministic templates
 
 ---
 
@@ -176,19 +203,21 @@ Report includes: Executive Summary, 4 KPI charts (CSS bar graphs), SPOF ranking 
 
 ## Slide 10: What's Next + Ask (Presentation — 5%)
 
-**Roadmap**
+**Roadmap (See `docs/ROADMAP.md` for full 5-phase, 24-month plan)**
 
-| Phase | Timeline | Feature |
-|-------|----------|---------|
-| Phase 1 | Now | TruPulse prototype with 115-employee demo, 4-format reports, human-in-the-loop |
-| Phase 2 | 3 months | XGBoost training on real HR data, PostgreSQL, RBAC |
-| Phase 3 | 6 months | Real-time Slack/Teams integration, HRIS sync |
-| Phase 4 | 12 months | Predictive attrition modeling, org network graph |
+| Phase | Timeline | Key Milestones |
+|-------|----------|----------------|
+| Phase 1 | Months 0–3 | PostgreSQL, auth/RBAC, CI/CD, structured logging, 80% test coverage |
+| Phase 2 | Months 3–6 | XGBoost scoring model, OpenAI/Claude provider support, knowledge graph, prompt A/B testing |
+| Phase 3 | Months 6–12 | Workday/BambooHR/Okta integrations, Slack/Teams alerts, 100K-employee benchmark, SOC2 tooling |
+| Phase 4 | Months 12–18 | Industry verticals: Healthcare, Manufacturing, Financial Services, Gov/Defense |
+| Phase 5 | Months 18–24 | Public API, marketplace, mobile app, white-label, TruPulse Benchmark |
 
 **Why Bet on TruPulse?**
-- $54.6M average revenue at risk → 15% reduction = $8.2M saved/year
-- Zero cloud cost, runs on any laptop
-- Ready for enterprise data today
+- **$1.2M–$2.2M** annual prevented loss per 200-person company (defensible methodology in `BUSINESS_IMPACT.md`)
+- **65:1 ROI** — payback in under 6 days
+- **$18K/year** for mid-market — 10x cheaper than building, 5x cheaper than Workday add-ons
+- Zero cloud cost (Ollama local), runs on any laptop, no data leaves your infra
 
 **"Resilience isn't reactive. It's real-time. It's TruPulse."**
 
@@ -214,11 +243,12 @@ Report includes: Executive Summary, 4 KPI charts (CSS bar graphs), SPOF ranking 
 - CSV in / out with schema validation
 - Production: SSO, RBAC, encrypted storage
 
-### B4: Competitive Landscape
+### B4: Competitive Landscape (see `WHATS_UNIQUE.md` for full 10-point analysis)
 - **BambooHR:** Retrospective, no AI, no what-if
 - **CultureAmp:** Survey-based, no real-time
 - **Visier:** Enterprise cost, complex setup
-- **TruPulse:** Lightweight, real-time, AI-powered, zero cost, human-in-the-loop
+- **Typical hackathon AI:** Single prompt, no fallback, cloud-dependent
+- **TruPulse:** LangGraph StateGraph + Pydantic validation + 9 tool-augmented agents + revision loop + 4-level fallback + governance + local LLM + SPOF detection + dependency graph + 30s setup — **no one else does all 10**
 
 ### B5: Team Background
 - 6 members across frontend, backend, AI, QA, business, coordination

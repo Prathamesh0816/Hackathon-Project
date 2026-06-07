@@ -101,7 +101,7 @@ ollama pull qwen2.5:3b
 
 ```bash
 curl http://127.0.0.1:8000/
-# Expected: {"message":"TruPulse AI is running","version":"2.0","endpoints":[...]}
+# Expected: {"message":"TruPulse AI is running","version":"2.1","pipeline_backend":"langchain","langchain_available":true,"endpoints":[...]}
 ```
 
 ### 4b. Test Core Endpoints
@@ -121,10 +121,21 @@ curl -X POST http://127.0.0.1:8000/whatif \
 curl http://127.0.0.1:8000/spof-ranking
 # Expected: {"total_spofs": 56, "critical_spofs": 34}
 
-# AI Pipeline (requires Ollama)
+# AI Pipeline (uses LangChain + LangGraph by default, requires Ollama)
 curl -X POST http://127.0.0.1:8000/pipeline \
   -H "Content-Type: application/json" \
   -d '{"scenario_type":"attrition","removed_employees":["Vikram"]}'
+# Response includes: pipeline_type, revision_count, trace with 6 steps
+
+# Force legacy raw agents (skip LangChain)
+curl -X POST http://127.0.0.1:8000/pipeline \
+  -H "Content-Type: application/json" \
+  -d '{"scenario_type":"attrition","removed_employees":["Vikram"],"use_langchain":false}'
+
+# Force deterministic fallback (skip LLM entirely)
+curl -X POST http://127.0.0.1:8000/pipeline \
+  -H "Content-Type: application/json" \
+  -d '{"scenario_type":"attrition","removed_employees":["Vikram"],"use_fallback":true}'
 ```
 
 ### 4c. Test Report Formats
@@ -267,18 +278,21 @@ cd database
 pip install chromadb
 python seed_vectordb.py
 
-# 3. Test pipeline 3x
+# 3. Test pipeline 3x (LangChain version)
 cd ../backend
 python -c "
-from agents import run_pipeline, run_pipeline_fallback
+from agents_langchain import run_pipeline, run_pipeline_fallback
 from scoring import compute_org_health
 h = compute_org_health()
-# Test with Ollama
+# Test with LangGraph (requires Ollama)
 r = run_pipeline(h)
-print(f'Pipeline (Ollama): {r[\"total_latency_seconds\"]}s')
-# Test fallback
+print(f'LangGraph pipeline: {r[\"pipeline_type\"]} — {r[\"total_latency_seconds\"]}s')
+# Test deterministic fallback
 r = run_pipeline_fallback(h)
-print(f'Pipeline (Fallback): {r[\"summary\"][\"insight\"][\"headline\"]}')
+print(f'Fallback: {r[\"summary\"][\"insight\"][\"headline\"]}')
+# Verify LangChain is active
+from agents_langchain import LANGCHAIN_AVAILABLE
+print(f'LangChain available: {LANGCHAIN_AVAILABLE}')
 "
 ```
 
@@ -328,7 +342,9 @@ hackathon-project/
 │   ├── models.py        # Pydantic spec contracts
 │   ├── scoring.py       # Heuristic scoring engine
 │   ├── analytics_enhanced.py  # 6 analytics modules
-│   ├── agents.py        # 5-agent pipeline with vector DB
+│   ├── agents.py        # 5-agent pipeline (legacy, raw HTTP)
+│   ├── agents_langchain.py # LangChain + LangGraph pipeline (default)
+│   ├── agent_tools.py   # 9 LangChain tools wrapping backend
 │   ├── storage.py       # File upload handling
 │   ├── file_classifier.py
 │   ├── analyzer.py

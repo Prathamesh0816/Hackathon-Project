@@ -72,7 +72,17 @@ from analytics_enhanced import (
     compute_spof_ranking,
     compute_upskilling,
 )
-from agents import run_pipeline, run_pipeline_fallback, record_feedback, get_feedback_overrides
+# Agent pipeline — try LangChain first, fall back to raw agents
+try:
+    from agents_langchain import run_pipeline, record_feedback, get_feedback_overrides, LANGCHAIN_AVAILABLE as _LC_AVAILABLE
+    _LANGCHAIN_AVAILABLE = _LC_AVAILABLE
+    _PIPELINE_BACKEND = "langchain"
+except ImportError:
+    from agents import run_pipeline, record_feedback, get_feedback_overrides
+    _LANGCHAIN_AVAILABLE = False
+    _PIPELINE_BACKEND = "raw"
+
+from agents import run_pipeline_fallback
 from analytics_enhanced import (
     compute_skill_gaps,
     compute_succession_planning,
@@ -101,7 +111,9 @@ app.add_middleware(
 def home():
     return {
         "message": "TruPulse AI is running",
-        "version": "2.0",
+        "version": "2.1",
+        "pipeline_backend": _PIPELINE_BACKEND,
+        "langchain_available": _LANGCHAIN_AVAILABLE,
         "endpoints": [
             "/org-health", "/employee/{name}", "/whatif",
             "/pipeline", "/feedback", "/report",
@@ -494,7 +506,7 @@ def scenario_run(req: ScenarioRunRequest):
 
 
 # ---------------------------------------------------------------------------
-# NEW: 5-agent pipeline
+# NEW: 5-agent pipeline (LangChain + LangGraph with raw fallback)
 # ---------------------------------------------------------------------------
 class PipelineRequest(BaseModel):
     scenario_type: str = "attrition"
@@ -502,6 +514,7 @@ class PipelineRequest(BaseModel):
     workload_increase_pct: int = 0
     restructure_team: Optional[str] = None
     use_fallback: bool = False
+    use_langchain: bool = True  # new: use LangChain pipeline
 
 
 @app.post("/pipeline")
@@ -519,18 +532,40 @@ def pipeline(req: PipelineRequest):
     start = time.time()
     if req.use_fallback:
         result = run_pipeline_fallback(health, scenario_payload)
-    else:
+    elif req.use_langchain and _LANGCHAIN_AVAILABLE:
         try:
             result = run_pipeline(
                 health,
                 scenario_payload,
                 feedback_overrides=get_feedback_overrides()[-10:],
             )
+            result["pipeline_type"] = result.get("pipeline_type", "langchain")
+        except Exception:
+            # LangChain failed — fall back to raw agents
+            from agents import run_pipeline as _raw_pipeline
+            result = _raw_pipeline(
+                health,
+                scenario_payload,
+                feedback_overrides=get_feedback_overrides()[-10:],
+            )
+            result["pipeline_type"] = "raw_fallback"
+    else:
+        try:
+            from agents import run_pipeline as _raw_pipeline
+            result = _raw_pipeline(
+                health,
+                scenario_payload,
+                feedback_overrides=get_feedback_overrides()[-10:],
+            )
+            result["pipeline_type"] = "raw"
         except Exception:
             result = run_pipeline_fallback(health, scenario_payload)
+            result["pipeline_type"] = "deterministic_fallback"
+
     result["elapsed_seconds"] = round(time.time() - start, 2)
     result["org_health"] = health
     result["scenario"] = scenario_payload
+    result["pipeline_backend"] = _PIPELINE_BACKEND
     return result
 
 
