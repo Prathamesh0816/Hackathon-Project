@@ -180,6 +180,30 @@ Hackathon-Project/
 
 ---
 
+---
+
+## Why This Stack Works Together
+
+| Component | Problem | Solution | Why It Works |
+|-----------|---------|----------|--------------|
+| **FastAPI** | Need fast, validated API | Async Python with Pydantic | Auto-docs (`/docs`), auto-validation, auto-serialization, ~50K req/s |
+| **Pydantic v2** | API contract drift | Spec-driven models in `models.py` | Single source of truth for 35+ endpoints; mismatched types caught instantly |
+| **Heuristic scoring** | Black-box AI distrust | Transparent 4-indicator formulas | Explainable, deterministic, <10ms; XGBoost-swap-ready (same contract) |
+| **Rule-based analytics** | 115-employee data too small for ML | 6 explainable modules | Each produces clear JSON with reasoning; <100ms combined |
+| **LangChain + LangGraph** | Single mega-prompt is chaotic | 5-agent StateGraph + revision loop | Pydantic-validated outputs, tool-augmented, conditional edge governance |
+| **Ollama (Qwen2.5:3b)** | Cloud LLM = cost, latency, privacy risk | Local LLM | Zero cost, offline, private; 4-level fallback chain keeps demo alive |
+| **ChromaDB** | Keyword search misses "AWS" ≠ "Cloud" | ONNX MiniLM vector embeddings | Semantic match, persistent, Python-native, ~50ms per query |
+| **React 18 + Vite** | Slow UI iteration burns hackathon time | Component lib + HMR | 500ms startup, 50ms HMR updates, no SSR overhead |
+| **TailwindCSS** | CSS files slow down prototyping | Utility classes in JSX | Zero runtime, consistent `tru-*` palette, no context switching |
+| **Server-rendered HTML reports** | JS charts break in print | CSS bar charts in `/report` | Print-ready, no JS deps, 4 formats (HTML/Text/Print/PDF-via-Ctrl+P) |
+| **Regex text parser** | NLP is overengineered for template input | Pattern-based parsing | <1ms, predictable, fails gracefully with 400 |
+| **In-memory feedback store** | DB setup overhead for ephemeral data | Python list | <5ms apply, SQLAlchemy-ready for production |
+| **Docker Compose** | Environment mismatch between laptops | 3-service containerized stack | One command (`up --build`), `depends_on` ordering, port isolation |
+
+> Full per-component rationale with code references: see [`docs/TECHNICAL_EXPLANATION.md`](docs/TECHNICAL_EXPLANATION.md).
+
+---
+
 ## Team
 
 | Person | Role |
