@@ -47,7 +47,7 @@
 |--------|------|------------------------|
 | **Prathamesh** | Walk all 11 pages. Fix loading states, error boundaries, mobile breakpoints. **No new components.** | ✅ |
 | **Sopan** | Run **Critical Path Checklist** (16 items from DAY_PLAN.md). Report failures immediately. | ✅ |
-| **Aradhana** | Fix every endpoint failure Sopan reports. Cache `/demo-data`. Verify report in all 4 formats. | ✅ |
+| **Aradhana** | Fix every endpoint failure Sopan reports. Cache `/demo-data`. Verify report in both formats (HTML + Text). | ✅ |
 | **Santosh** | Run LangChain pipeline 3x with Ollama. Run fallback 3x. Verify `pipeline_type` in every response. | ✅ |
 | **Varad** | Final PPT polish. Align slides to 6-segment demo. Print handouts. | ✅ |
 | **Lokesh** | Verify backup video plays on phone + laptop. Test HDMI cable. Test phone hotspot (venue WiFi may fail). | ✅ |

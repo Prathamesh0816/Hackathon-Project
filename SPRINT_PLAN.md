@@ -279,7 +279,7 @@ Based on 6.5 productive hours/day (excluding standup, lunch, breaks):
 |----|-----------|-----------|------|--------|------------|--------|
 | IMP-1 | Ollama 3B model takes 10-20s per inference | Santosh | D1 | Pipeline latency | Add 4-level fallback chain + narrate during wait | Resolved |
 | IMP-2 | No stable Wi-Fi in hall | Lokesh | D1 | Backup video may not stream | Download backup video to 3 devices offline | Resolved |
-| IMP-3 | C++ build tools required for some Python packages | Aradhana | Pre-D1 | Python 3.14 + pandas 3.0.3 has pre-built wheels — no install issue | Verified using Python 3.14.5 | Resolved |
+| IMP-3 | C++ build tools required for some Python packages | Aradhana | Pre-D1 | Python 3.14 + pandas 2.2.2 has pre-built wheels — no install issue | Verified using Python 3.14.5 | Resolved |
 | IMP-4 | Frontend components using hardcoded data | Prathamesh | D1 | Demo shows fake data | Replaced all hardcoded arrays with API calls | Resolved |
 
 ---

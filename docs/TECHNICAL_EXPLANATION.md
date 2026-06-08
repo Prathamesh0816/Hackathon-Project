@@ -246,7 +246,7 @@ The score recalculation is a heuristic: each accepted cross-train action adds +2
 
 ---
 
-## 10. Report System: 4 Formats (HTML/Text/PDF/Print)
+## 10. Report System: 2 Formats (HTML + Text; PDF/Print via Browser)
 
 ### What we used
 A single `/report` endpoint with a `format` query parameter:

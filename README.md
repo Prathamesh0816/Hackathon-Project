@@ -80,7 +80,7 @@ python scripts/seed_from_csv.py
 
 # (Optional) Seed ChromaDB vector store for enhanced AI
 cd ../database
-pip install -r requirements.txt
+pip install chromadb sentence-transformers
 python seed_vectordb.py
 ```
 
@@ -233,7 +233,7 @@ Hackathon-Project/
 | **ChromaDB** | Keyword search misses "AWS" ≠ "Cloud" | ONNX MiniLM vector embeddings | Semantic match, persistent, Python-native, ~50ms per query |
 | **React 18 + Vite** | Slow UI iteration burns hackathon time | Component lib + HMR | 500ms startup, 50ms HMR updates, no SSR overhead |
 | **TailwindCSS** | CSS files slow down prototyping | Utility classes in JSX | Zero runtime, consistent `tru-*` palette, no context switching |
-| **Server-rendered HTML reports** | JS charts break in print | CSS bar charts in `/report` | Print-ready, no JS deps, 4 formats (HTML/Text/Print/PDF-via-Ctrl+P) |
+| **Server-rendered HTML reports** | JS charts break in print | CSS bar charts in `/report` | Print-ready, no JS deps, 2 formats (HTML + Text; PDF/Print via browser Ctrl+P) |
 | **Regex text parser** | NLP is overengineered for template input | Pattern-based parsing | <1ms, predictable, fails gracefully with 400 |
 | **In-memory feedback store** | DB setup overhead for ephemeral data | Python list | <5ms apply, SQLAlchemy-ready for production |
 | **Docker Compose** | Environment mismatch between laptops | 3-service containerized stack | One command (`up --build`), `depends_on` ordering, port isolation |

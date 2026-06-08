@@ -65,7 +65,7 @@ React 18 + Vite     FastAPI (Python 3.12+)    LangChain + LangGraph    Ollama LL
 - 9 LangChain tools for Coaching agent (knowledge search, simulation, analytics)
 - Chat/text input for employee data entry
 - Human-in-the-loop feedback panel (accept/reject/edit AI)
-- 4-format management report (HTML / Text / PDF / Print)
+- 2-format management report (HTML + Text; PDF/Print via browser Ctrl+P)
 
 ---
 
@@ -187,14 +187,14 @@ React 18 + Vite     FastAPI (Python 3.12+)    LangChain + LangGraph    Ollama LL
 | Successor matching | Rule-based scoring | Semantic + rule-based hybrid |
 | Pipeline context | Static data | Vector-retrieved relevant context |
 
-**New: 4-Format Management Reports**
+**New: 2-Format Management Reports**
 
 | Format | URL | Best For |
 |--------|-----|----------|
 | **HTML** | `/report` | In-browser viewing, includes CSS charts |
 | **Plain Text** | `?format=text` | Word documents, email bodies |
-| **PDF** | HTML + Ctrl+P | Formal PDF reports with print CSS |
-| **Auto-Print** | `?print=1` | Direct printout, auto-opens dialog |
+| **PDF** | Browser Ctrl+P | Print CSS produces paper-ready PDF |
+| **Auto-Print** | `?print=1` | Auto-opens print dialog on load |
 
 Report includes: Executive Summary, 4 KPI charts (CSS bar graphs), SPOF ranking table, skill gaps per team, succession planning, knowledge concentration risk, workforce readiness, AI recommendations with upskilling plan, human feedback log, governance validation, at-a-glance summary.
 
@@ -245,7 +245,7 @@ Report includes: Executive Summary, 4 KPI charts (CSS bar graphs), SPOF ranking 
 
 ### B1: Technical Architecture Detail
 - FastAPI with CORS middleware, 35+ endpoints, Pydantic models for validation
-- 4-format report system: HTML (CSS charts), Text (plain), PDF (browser), Print (auto-dialog)
+- 2-format report system: HTML (CSS charts) + Text (plain); PDF via browser Ctrl+P, auto-print via `?print=1`
 - Docker Compose: 3 services (api, web, ollama)
 - One-command deploy: `docker-compose up --build`
 

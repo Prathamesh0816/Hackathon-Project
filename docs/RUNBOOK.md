@@ -259,7 +259,7 @@ npm run dev
 ```bash
 # 1. Start backend + frontend
 # 2. Verify all 35+ API endpoints (section 4e above — now covers 22 endpoints)
-# 3. Test all 4 report formats (HTML, Text, Print, PDF-via-Ctrl+P)
+# 3. Test both report formats (HTML, Text; PDF/Print via browser Ctrl+P)
 # 4. Test text input with various formats
 # 5. Test feedback loop (suggestions → apply → score change)
 # 6. Test frontend pages load without console errors
@@ -321,7 +321,7 @@ print(f'LangChain available: {LANGCHAIN_AVAILABLE}')
 1. Record backup demo video on phone (5 min)
 2. Time the live demo portion (<90s)
 3. Ensure laptop + projector setup works
-4. Test report generation (all 4 formats)
+4. Test report generation (HTML + Text; PDF/Print via browser)
 5. Coordinate team during Q&A
 6. Submit deliverables after presentation
 ```
@@ -339,7 +339,7 @@ print(f'LangChain available: {LANGCHAIN_AVAILABLE}')
 | CORS error in browser | Wrong port | Frontend must use proxy (port 3000 → 8000) |
 | Slow first API call | ChromaDB downloading model | Wait for download, subsequent calls are fast |
 | `Port 8000 already in use` | Another process | Kill it: `netstat -ano | findstr :8000` then `taskkill /PID <pid> /F` |
-| `pip install` fails on pandas/pydantic (no wheel) | Python 3.14 + no C++ build tools | Use pre-built wheels: `pip install pandas==3.0.3 pydantic==2.13.4` or downgrade to Python 3.12 |
+| `pip install` fails on pandas/pydantic (no wheel) | Python 3.14 + no C++ build tools | Use pre-built wheels: `pip install pandas==2.2.2 pydantic==2.13.4` or downgrade to Python 3.12 |
 | `Vite proxy not working` / API calls fail | Vite not proxying `/api` correctly | Check `vite.config.js` — proxy must target `http://localhost:8000` with `changeOrigin: true` |
 | `Node version too old` | Node < 18 | Install Node 20+ from https://nodejs.org |
 | `'ollama' is not recognized` | Ollama not installed or not in PATH | Download from https://ollama.com or run via Docker: `docker run -d -p 11434:11434 ollama/ollama` |
@@ -402,7 +402,7 @@ hackathon-project/
 - [ ] Text input endpoint parses employee data
 - [ ] Feedback/suggestions generates 20+ suggestions
 - [ ] Feedback/apply recalculates score (shows before/after)
-- [ ] Report generates all 4 formats (HTML/Text/PDF/Print)
+- [ ] Report generates correctly (HTML + Text; PDF/Print via browser)
 - [ ] Vector DB seeded: `python seed_vectordb.py` → "Done!"
 - [ ] Ollama warmed up and pipeline tested
 - [ ] PPT slides ready (10 slides)

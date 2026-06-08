@@ -31,7 +31,7 @@ TruPulse AI provides **real-time, forward-looking** workforce analytics:
 | **Workforce Readiness** | Measure team capacity against project pipeline |
 | **AI Pipeline** | 5-agent collective intelligence for strategic recommendations |
 | **Upskilling Recommendations** | Personalized development paths per employee |
-| **Comprehensive Reports** | 4 formats: HTML (printable), Plain Text (Word), PDF (Ctrl+P), Direct Printout |
+| **Comprehensive Reports** | 2 formats: HTML (printable via browser), Plain Text (Word-compatible) |
 
 ## Tech Stack
 
@@ -95,7 +95,7 @@ TruPulse AI provides **real-time, forward-looking** workforce analytics:
 
 6. **Zero External API Dependencies** — Entire demo runs offline with Ollama + ChromaDB. No API keys, no cloud costs.
 
-7. **4-Format Reports** — Management reports in HTML (print-ready), Plain Text (Word-compatible), PDF (browser save-as-PDF), and direct printout with auto-print CSS support.
+7. **2-Format Reports** — Management reports in HTML (print-ready via browser) and Plain Text (Word-compatible); PDF/Print via browser Ctrl+P.
 
 ## API Endpoints (35+)
 
@@ -134,7 +134,7 @@ TruPulse AI provides **real-time, forward-looking** workforce analytics:
 | GET | `/dataset/employees` | List all employees |
 | GET | `/employee-data/{id}` | Employee data by ID |
 | POST | `/analyze-employee/{id}` | Per-employee AI analysis |
-| GET | `/report` | Comprehensive management report (4 formats) |
+| GET | `/report` | Comprehensive management report (HTML + Text; PDF/Print via browser) |
 
 ## Spec-Driven Development
 
@@ -205,6 +205,6 @@ cd database && pip install chromadb sentence-transformers && python seed_vectord
 | **Innovation** | 25% | 5-agent collective pipeline, vector-knowledge retrieval, what-if time machine, human-in-the-loop |
 | **Business Impact** | 25% | Real revenue-at-risk calculations, succession planning, SPOF mitigation, management reports |
 | **Technical** | 20% | Clean FastAPI architecture, ChromaDB integration, Docker, spec-driven Pydantic models |
-| **Scalability** | 15% | SQLAlchemy-ready, XGBoost-ready scoring, modular architecture, 4-format reports |
+| **Scalability** | 15% | SQLAlchemy-ready, XGBoost-ready scoring, modular architecture, 2-format reports |
 | **UI/UX** | 10% | 11 pages, 15 components, responsive Tailwind, real-time gauges, text input, feedback panel |
 | **Presentation** | 5% | Vikram narrative demo, clear slides, Q&A prep, comprehensive documentation |

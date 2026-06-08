@@ -195,7 +195,7 @@ sequenceDiagram
 
 1. **CSV as data store** — Zero setup. Swap to PostgreSQL via one env var.
 2. **Deterministic scoring** — All 4 indicators use interpretable formulas. `# production: replace with XGBoost` comment in scoring.py.
-3. **AI fallback** — If LangChain or Ollama is down, deterministic templates ensure demo never breaks (agents.py:313).
+3. **AI fallback** — If LangChain or Ollama is down, deterministic templates ensure demo never breaks (agents.py:389).
 4. **Local LLM** — Ollama with qwen2.5:3b runs on any laptop. No API keys, no internet needed.
 5. **LangChain as default pipeline** — `agents_langchain.py` is preferred over `agents.py`. Falls back gracefully.
 6. **Environment-agnostic Ollama URL** — `agents_langchain.py` strips `/api/generate` suffix for ChatOllama compatibility; works with or without it.

@@ -137,7 +137,7 @@
 >
 > **Technical Excellence:** LangGraph StateGraph with conditional edges. Pydantic schemas on every agent. 4-level fallback chain. 9 tools wrapping real analytics. Docker Compose deployment.
 >
-> **User Experience:** One-click simulation. Time Machine before/after. Dependency graph. Stress test animation. Governance panel. Executive report in 4 formats.
+> **User Experience:** One-click simulation. Time Machine before/after. Dependency graph. Stress test animation. Governance panel. Executive report in 2 formats (HTML + Text) with one-click print.
 >
 > **Demo & Presentation:** 6 segments. 5 minutes. One presenter. Three dry runs. Backup video ready. 30+ Q&A answers prepared. **4 one-pagers on your seat: WHATS_UNIQUE.md, BUSINESS_IMPACT.md, docs/CLIENT_PITCH.md, docs/ROADMAP.md.**
 >
