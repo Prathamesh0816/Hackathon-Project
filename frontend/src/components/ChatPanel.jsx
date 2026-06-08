@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 const SUGGESTIONS = [
   'What happens if our top 3 engineers leave?',
   'Who are our biggest single points of failure?',
-  'Which team has the most skill gaps?',
+  'Who is the most valuable employee?',
   'Simulate a 30% workload increase across all teams',
   'What is our overall organizational health?',
   'Who should we cross-train first?',
@@ -37,23 +37,77 @@ export default function ChatPanel({ onResult }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query, messages }),
       })
+      if (!res.ok) {
+        const detail = await res.text().catch(() => '')
+        throw new Error(detail || `Analysis request failed with status ${res.status}`)
+      }
+
       const data = await res.json()
 
       setMessages((prev) => [...prev, {
         role: 'assistant',
         text: data.answer || data.summary?.insight?.headline || 'Analysis complete. Check the dashboard for details.',
-        data: data,
+        data,
       }])
 
       onResult?.(data)
-    } catch {
+    } catch (err) {
+      console.error('Chat query failed:', err)
       setMessages((prev) => [...prev, {
         role: 'assistant',
-        text: '⚠️ Sorry, I had trouble connecting to the analysis engine. Please try again.',
+        text: 'Sorry, I had trouble running that analysis. Please make sure the backend is running and try again.',
       }])
     } finally {
       setLoading(false)
     }
+  }
+
+  const renderData = (msg) => {
+    if (msg.data?.summary?.coaching?.actions?.length > 0) {
+      return (
+        <div className="mt-2 pt-2 border-t border-gray-200">
+          <p className="text-xs font-medium text-tru-600 mb-1">Recommended Actions:</p>
+          {msg.data.summary.coaching.actions.slice(0, 3).map((a, j) => (
+            <p key={j} className="text-xs text-gray-600">- {a.title}</p>
+          ))}
+        </div>
+      )
+    }
+
+    if (msg.data?.actions?.length > 0) {
+      return (
+        <div className="mt-2 pt-2 border-t border-gray-200">
+          <p className="text-xs font-medium text-tru-600 mb-1">Recommended Actions:</p>
+          {msg.data.actions.slice(0, 3).map((a, j) => (
+            <p key={j} className="text-xs text-gray-600">- {a.title || a}</p>
+          ))}
+        </div>
+      )
+    }
+
+    if (msg.data?.valuable_employees?.length > 0) {
+      return (
+        <div className="mt-2 pt-2 border-t border-gray-200">
+          <p className="text-xs font-medium text-tru-600 mb-1">Top Valuable Employees:</p>
+          {msg.data.valuable_employees.slice(0, 3).map((e, j) => (
+            <p key={j} className="text-xs text-gray-600">- {e.employee} ({e.team})</p>
+          ))}
+        </div>
+      )
+    }
+
+    if (msg.data?.spofs?.length > 0) {
+      return (
+        <div className="mt-2 pt-2 border-t border-gray-200">
+          <p className="text-xs font-medium text-tru-600 mb-1">Top SPOFs:</p>
+          {msg.data.spofs.slice(0, 3).map((s, j) => (
+            <p key={j} className="text-xs text-gray-600">- {s.employee} ({s.team})</p>
+          ))}
+        </div>
+      )
+    }
+
+    return null
   }
 
   return (
@@ -86,33 +140,12 @@ export default function ChatPanel({ onResult }) {
                 msg.role === 'user'
                   ? 'bg-tru-600 text-white'
                   : msg.role === 'system'
-                  ? 'bg-gray-100 text-gray-600 italic'
-                  : 'bg-gray-100 text-gray-800'
+                    ? 'bg-gray-100 text-gray-600 italic'
+                    : 'bg-gray-100 text-gray-800'
               }`}
             >
               {msg.text}
-              {msg.data?.summary?.coaching?.actions?.length > 0 ? (
-                <div className="mt-2 pt-2 border-t border-gray-200">
-                  <p className="text-xs font-medium text-tru-600 mb-1">Recommended Actions:</p>
-                  {msg.data.summary.coaching.actions.slice(0, 3).map((a, j) => (
-                    <p key={j} className="text-xs text-gray-600">→ {a.title}</p>
-                  ))}
-                </div>
-              ) : msg.data?.actions?.length > 0 ? (
-                <div className="mt-2 pt-2 border-t border-gray-200">
-                  <p className="text-xs font-medium text-tru-600 mb-1">Recommended Actions:</p>
-                  {msg.data.actions.slice(0, 3).map((a, j) => (
-                    <p key={j} className="text-xs text-gray-600">→ {a.title || a}</p>
-                  ))}
-                </div>
-              ) : msg.data?.spofs?.length > 0 ? (
-                <div className="mt-2 pt-2 border-t border-gray-200">
-                  <p className="text-xs font-medium text-tru-600 mb-1">Top SPOFs:</p>
-                  {msg.data.spofs.slice(0, 3).map((s, j) => (
-                    <p key={j} className="text-xs text-gray-600">→ {s.employee} ({s.team})</p>
-                  ))}
-                </div>
-              ) : null}
+              {renderData(msg)}
             </div>
           </div>
         ))}

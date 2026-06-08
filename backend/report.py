@@ -125,7 +125,26 @@ def render_html_report(
         f'<td style="font-size:11px;color:#6b7280">{f.get("reason","")}</td></tr>'
         for f in feedback[-10:]
     ) or "<tr><td colspan=4 style='text-align:center;color:#9ca3af'>No human feedback recorded</td></tr>"
+    scenario_html = ""
 
+    if scenario_type != "baseline" and scenario:
+        before_score = health["composite_score"]
+        after_score = scenario["composite_score"]
+        delta_score = after_score - before_score
+        scenario_color = "#dc2626" if after_score < before_score else "#16a34a"
+
+        scenario_html = f"""
+    <div class="section">
+      <h2>2. What-If Scenario Impact</h2>
+      <p>Scenario: <b>{', '.join(removed_list)}</b> leaving the organization</p>
+      <div class="kpi-row">
+        <div class="kpi"><div class="val">{before_score}</div><div class="lbl">Before</div></div>
+        <div class="kpi"><div class="val" style="color:{scenario_color}">{after_score}</div><div class="lbl">After</div></div>
+        <div class="kpi"><div class="val" style="color:{scenario_color}">{delta_score}</div><div class="lbl">Delta</div></div>
+        <div class="kpi"><div class="val">${scenario.get('revenue_at_risk_usd', 0):,}</div><div class="lbl">Revenue at Risk</div></div>
+      </div>
+    </div>
+    """
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <title>{title}</title>
@@ -189,7 +208,6 @@ def render_html_report(
   <p style="margin-top:6px">{health["employee_count"]} employees across {health["team_count"]} teams &middot; {health["project_count"]} active projects &middot; <b>${revenue_total:,} annual revenue at risk</b></p>
   <p style="margin-top:6px">{insight.get("headline","")}</p>
 </div>
-
 <!-- INDICATOR SCORES -->
 <div class="section">
   <h2>1. Organizational Health Indicators</h2>
@@ -208,18 +226,8 @@ def render_html_report(
   </div>
 </div>
 
-{ f"""
-<div class="section">
-  <h2>2. What-If Scenario Impact</h2>
-  <p>Scenario: <b>{', '.join(removed_list)}</b> leaving the organization</p>
-  <div class="kpi-row">
-    <div class="kpi"><div class="val">{health['composite_score']}</div><div class="lbl">Before</div></div>
-    <div class="kpi"><div class="val" style="color:{'#dc2626' if scenario and scenario['composite_score']<health['composite_score'] else '#16a34a'}">{scenario['composite_score'] if scenario else health['composite_score']}</div><div class="lbl">After</div></div>
-    <div class="kpi"><div class="val" style="color:{'#dc2626' if scenario and scenario['composite_score']<health['composite_score'] else '#16a34a'}">{scenario['composite_score']-health['composite_score'] if scenario else 0}</div><div class="lbl">Delta</div></div>
-    <div class="kpi"><div class="val">${scenario.get('revenue_at_risk_usd',0):,}</div><div class="lbl">Revenue at Risk</div></div>
-  </div>
-</div>
-""" if scenario_type != "baseline" and scenario else "" }
+{scenario_html}
+
 
 <!-- SPOF RANKING -->
 <div class="section">

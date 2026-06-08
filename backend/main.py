@@ -915,6 +915,10 @@ def _run_llm_pipeline(health, scenario=None):
 def _llm_chat(query: str, health: dict, messages: list | None = None) -> str | None:
     try:
         from agents import _llm_call
+        from rag import build_company_rag_context, format_rag_context_for_prompt
+
+        rag_context = build_company_rag_context(query, health)
+        rag_context_text = format_rag_context_for_prompt(rag_context)
         context = (
             f"Org health composite: {health['composite_score']}/100 ({health['overall_risk']} risk). "
             f"Resilience: {health['indicators']['resilience']['score']}, "
@@ -930,15 +934,25 @@ def _llm_chat(query: str, health: dict, messages: list | None = None) -> str | N
                 role = "User" if m.get("role") == "user" else "Assistant"
                 history += f"{role}: {m['text']}\n"
         prompt = (
-            "You are TruPulse AI, a workforce resilience analyst. Answer concisely in 2-3 sentences "
-            "using the org data provided. Use conversation history for context. "
-            "If you cannot answer from the data, suggest what the user "
-            "can ask about (risks, teams, scenarios, SPOFs, skills, burnout).\n\n"
+            "You are TruPulse AI, a workforce resilience analyst. Answer using ONLY the company context below "
+            "plus the conversation history. Be specific: cite employee names, teams, file/source names, scores, "
+            "and metrics when present. If the context does not contain enough evidence, say exactly what data is missing "
+            "instead of inventing facts. Keep the answer concise, normally 2-5 sentences.\n\n"
             f"Org Data: {context}\n\n"
+            f"Retrieved Company Context:\n{rag_context_text}\n\n"
             f"{history}User: {query}\n\nResponse:"
         )
         text, _ = _llm_call(prompt, json_mode=False)
-        return text.strip()
+        text = text.strip()
+        try:
+            parsed = json.loads(text)
+            if isinstance(parsed, dict) and parsed.get("fallback"):
+                return None
+        except Exception:
+            pass
+        if not text or "LLM unavailable" in text:
+            return None
+        return text
     except Exception:
         return None
 
@@ -954,6 +968,365 @@ def _team_spofs(team_name: str, limit: int = 3) -> list[str]:
         return []
 
 
+def _mentioned_employees(query: str) -> list[str]:
+    """Find employee names mentioned in a query, preferring full-name matches."""
+    from scoring import load_all
+
+    data = load_all()
+    emp_df = data.get("employees", None)
+    if emp_df is None or emp_df.empty or "Employee" not in emp_df.columns:
+        return []
+
+    query_norm = re.sub(r"[^a-z0-9]+", " ", query.lower()).strip()
+    matches: list[str] = []
+    matched_ranges: list[tuple[int, int]] = []
+    for name in sorted(emp_df["Employee"].dropna().astype(str).unique(), key=len, reverse=True):
+        name_norm = re.sub(r"[^a-z0-9]+", " ", name.lower()).strip()
+        for match in re.finditer(rf"\b{re.escape(name_norm)}\b", query_norm):
+            start, end = match.span()
+            overlaps_existing = any(start < existing_end and end > existing_start for existing_start, existing_end in matched_ranges)
+            if not overlaps_existing:
+                matches.append(name)
+                matched_ranges.append((start, end))
+                break
+    return matches
+
+
+def _workload_increase_pct(query: str) -> int | None:
+    pct_match = re.search(r"(\d{1,3})\s*%", query)
+    if pct_match:
+        return max(1, min(100, int(pct_match.group(1))))
+
+    word_match = re.search(r"(\d{1,3})\s*(?:percent|pct)", query)
+    if word_match:
+        return max(1, min(100, int(word_match.group(1))))
+
+    if "workload" in query and ("increase" in query or "spike" in query or "stress" in query):
+        return 20
+    return None
+
+
+def _format_workload_scenario_answer(health: dict[str, Any], pct: int) -> dict[str, Any]:
+    scenario = simulate_scenario("workload_increase", workload_increase_pct=pct)
+    comparison = compare_scenarios(health, scenario)
+    result = _run_llm_pipeline(health, scenario)
+    burnout_delta = comparison["indicator_deltas"]["burnout"]["delta"]
+    composite_delta = comparison["composite_delta"]
+    return {
+        "answer": (
+            f"A {pct}% workload increase changes composite health from {health['composite_score']} "
+            f"to {scenario['composite_score']} ({composite_delta:+.1f}). "
+            f"Burnout moves from {comparison['indicator_deltas']['burnout']['baseline']} "
+            f"to {comparison['indicator_deltas']['burnout']['projected']} ({burnout_delta:+.1f}). "
+            "Recommended actions are attached below."
+        ),
+        "scenario": scenario,
+        "comparison": comparison,
+        "summary": result["summary"],
+    }
+
+
+def _format_data_source_answer() -> dict[str, Any]:
+    from data_manager import get_active_info
+    from scoring import DB_PATH
+
+    info = get_active_info()
+    default_files = [
+        "employees.csv",
+        "projects.csv",
+        "dependencies.csv",
+        "knowledge.csv",
+        "performance.csv",
+        "workload.csv",
+    ]
+
+    if info.get("filename") and info.get("filename") != "employees.csv":
+        answer = (
+            f"I am using your active uploaded dataset: {info['filename']}. "
+            "It is mapped into the scoring tables for employees, knowledge, workload, performance, projects, and dependencies where available."
+        )
+        return {"answer": answer, "data_source": info}
+
+    if DB_PATH.exists():
+        answer = (
+            "I am using the local SQLite data source `trupulse-db/trupulse.db`. "
+            "That database is seeded from the structured TruPulse files: "
+            f"{', '.join(default_files)}. "
+            "`review_notes.txt` is available as narrative context, but the resilience/org-health score is calculated from the structured tables."
+        )
+        return {
+            "answer": answer,
+            "data_source": {
+                "type": "sqlite",
+                "path": "trupulse-db/trupulse.db",
+                "source_files": default_files,
+                "notes_file": "review_notes.txt",
+            },
+        }
+
+    answer = (
+        "I am using the default CSV files from `backend/data`: "
+        f"{', '.join(default_files)}. "
+        "`review_notes.txt` is available as narrative context, but the resilience/org-health score is calculated from the structured CSVs."
+    )
+    return {
+        "answer": answer,
+        "data_source": {
+            "type": "csv",
+            "directory": "backend/data",
+            "source_files": default_files,
+            "notes_file": "review_notes.txt",
+        },
+    }
+
+
+def _format_top_spof_answer(spof_data: dict[str, Any]) -> dict[str, Any]:
+    spofs = spof_data.get("spofs", [])
+    if not spofs:
+        return {"answer": "I could not find any single points of failure in the current dataset."}
+
+    top = spofs[0]
+    low_doc_areas = top.get("low_doc_areas", 0)
+    documentation_level = "Low" if low_doc_areas else "Adequate"
+    next_spofs = [s["employee"] for s in spofs[1:3]]
+    answer = (
+        f"The most critical employee is {top['employee']} ({top['team']}, {top['role']}). "
+        f"Risk Score: {top.get('severity_score', 0)}/100 ({top.get('severity_level', 'Unknown')}). "
+        f"They have {top.get('dependents_count', 0)} people depending on their knowledge/decisions. "
+        f"Documentation Level: {documentation_level}; {low_doc_areas} low-documentation knowledge areas. "
+        f"Estimated revenue at risk: ${top.get('revenue_at_risk_usd', 0):,}. "
+        "Backup Available: No."
+    )
+    if next_spofs:
+        answer += f" Next in line: {', '.join(next_spofs)}."
+
+    return {"answer": answer, "most_critical": top, "spofs": spofs[:5]}
+
+
+def _format_spof_reason(spof_data: dict[str, Any], employee_name: str | None = None) -> dict[str, Any]:
+    spofs = spof_data.get("spofs", [])
+    if not spofs:
+        return {"answer": "I could not find any current single-point-of-failure records to explain."}
+
+    selected = None
+    if employee_name:
+        selected = next((s for s in spofs if s["employee"].lower() == employee_name.lower()), None)
+    top = selected or spofs[0]
+
+    criticality_score = {"High": 40, "Medium": 25, "Low": 10}.get(top.get("criticality"), 10)
+    dependency_score = min(top.get("dependents_count", 0) * 8, 30)
+    doc_penalty = top.get("low_doc_areas", 0) * 5
+    project_exposure = min(top.get("projects_exposed", 0) * 4, 10)
+    workload_risk = 10 if top.get("weekly_hours", 0) >= 55 else 5 if top.get("weekly_hours", 0) >= 48 else 0
+    engagement_risk = 10 if top.get("engagement_score", 10) < 6 else 0
+    tied_at_score = [s["employee"] for s in spofs if s.get("severity_score") == top.get("severity_score")]
+
+    answer = (
+        f"{top['employee']} is ranked critical because they combine multiple risk signals: "
+        f"no backup, {top.get('criticality', 'unknown').lower()} role criticality, "
+        f"{top.get('dependents_count', 0)} dependents, {top.get('low_doc_areas', 0)} low-documentation areas, "
+        f"{top.get('projects_exposed', 0)} exposed project(s), {top.get('weekly_hours', 0)} weekly hours, "
+        f"and engagement score {top.get('engagement_score', 'unknown')}. "
+        f"Those factors add up to {top.get('severity_score', 0)}/100: "
+        f"criticality {criticality_score}, dependency {dependency_score}, documentation {doc_penalty}, "
+        f"project exposure {project_exposure}, workload {workload_risk}, engagement {engagement_risk}."
+    )
+    if len(tied_at_score) > 1:
+        answer += f" They are tied at this severity score with {', '.join(tied_at_score[1:4])}; revenue impact is a separate lens from resilience criticality."
+
+    return {
+        "answer": answer,
+        "most_critical": top,
+        "score_breakdown": {
+            "criticality": criticality_score,
+            "dependency": dependency_score,
+            "documentation": doc_penalty,
+            "project_exposure": project_exposure,
+            "workload": workload_risk,
+            "engagement": engagement_risk,
+        },
+        "spofs": spofs[:5],
+    }
+
+
+def _valuable_employees(limit: int = 5) -> list[dict[str, Any]]:
+    from scoring import load_all
+
+    data = load_all()
+    employees = data["employees"]
+    performance = data["performance"]
+    workload = data["workload"]
+    knowledge = data["knowledge"]
+    projects = data["projects"]
+    if employees.empty:
+        return []
+
+    rows = employees.merge(performance, on=["EmployeeID", "Employee", "Team"], how="left")
+    rows = rows.merge(workload[["EmployeeID", "WeeklyHours", "OverdueTasks"]], on="EmployeeID", how="left")
+    team_revenue = projects.groupby("Team")["AnnualContractValueUSD"].sum().to_dict() if not projects.empty else {}
+    rating_score = {
+        "Exceeds Expectations": 30,
+        "Meets Expectations": 20,
+        "Needs Improvement": 8,
+        "Below Expectations": 0,
+    }
+
+    valued = []
+    for _, row in rows.iterrows():
+        emp_knowledge = knowledge[knowledge["EmployeeID"] == row["EmployeeID"]]
+        doc_high = int((emp_knowledge["DocumentationLevel"] == "High").sum()) if not emp_knowledge.empty else 0
+        doc_total = int(len(emp_knowledge)) if not emp_knowledge.empty else 0
+        doc_pct = doc_high / doc_total if doc_total else 0
+        goals_total = float(row.get("GoalsTotal", 0) or 0)
+        goals_completed = float(row.get("GoalsCompleted", 0) or 0)
+        goals_pct = goals_completed / goals_total if goals_total else 0
+        engagement = float(row.get("EngagementScore", 0) or 0)
+        salary = float(row.get("AnnualSalaryUSD", 1) or 1)
+        revenue_exposure = float(team_revenue.get(row["Team"], 0))
+        revenue_to_cost = revenue_exposure / salary if salary else 0
+        score = (
+            rating_score.get(row.get("PerformanceRating"), 10)
+            + min(goals_pct * 25, 25)
+            + min(engagement * 3, 30)
+            + min(doc_pct * 15, 15)
+            + (10 if row.get("BackupAvailable") == "Yes" else 0)
+            + min(revenue_to_cost, 20)
+            - min(float(row.get("OverdueTasks", 0) or 0) * 2, 10)
+        )
+        valued.append({
+            "employee": row["Employee"],
+            "team": row["Team"],
+            "role": row["Role"],
+            "value_score": round(score, 1),
+            "performance_rating": row.get("PerformanceRating", "Unknown"),
+            "goals_completed": int(goals_completed),
+            "goals_total": int(goals_total),
+            "engagement_score": int(engagement),
+            "documentation": f"{doc_high}/{doc_total} high-doc knowledge areas",
+            "backup_available": row.get("BackupAvailable", "Unknown"),
+            "team_revenue_exposure_usd": int(revenue_exposure),
+        })
+
+    valued.sort(key=lambda e: e["value_score"], reverse=True)
+    return valued[:limit]
+
+
+def _format_valuable_answer(limit: int = 5) -> dict[str, Any]:
+    employees = _valuable_employees(limit)
+    if not employees:
+        return {"answer": "I could not find enough employee performance data to rank valuable employees."}
+
+    top = employees[0]
+    names = "; ".join(
+        f"{i + 1}. {e['employee']} ({e['team']}, {e['role']}) - value score {e['value_score']}"
+        for i, e in enumerate(employees)
+    )
+    answer = (
+        f"The most valuable employee by performance, engagement, documented knowledge, backup coverage, and business exposure is "
+        f"{top['employee']} ({top['team']}, {top['role']}) with a value score of {top['value_score']}. "
+        f"Top names: {names}. "
+        "This is different from 'most critical': critical means the organization is exposed if they leave; valuable means strong positive contribution."
+    )
+    return {"answer": answer, "valuable_employees": employees}
+
+
+def _best_performers(limit: int = 5) -> list[dict[str, Any]]:
+    from scoring import load_all
+
+    data = load_all()
+    employees = data["employees"]
+    performance = data["performance"]
+    workload = data["workload"]
+    if employees.empty or performance.empty:
+        return []
+
+    rows = employees.merge(performance, on=["EmployeeID", "Employee", "Team"], how="inner")
+    if not workload.empty:
+        rows = rows.merge(workload[["EmployeeID", "OverdueTasks", "WeeklyHours"]], on="EmployeeID", how="left")
+
+    rating_score = {
+        "Exceeds Expectations": 45,
+        "Meets Expectations": 30,
+        "Needs Improvement": 10,
+        "Below Expectations": 0,
+    }
+
+    performers = []
+    for _, row in rows.iterrows():
+        goals_total = float(row.get("GoalsTotal", 0) or 0)
+        goals_completed = float(row.get("GoalsCompleted", 0) or 0)
+        goals_pct = goals_completed / goals_total if goals_total else 0
+        engagement = float(row.get("EngagementScore", 0) or 0)
+        overdue = float(row.get("OverdueTasks", 0) or 0)
+        score = (
+            rating_score.get(row.get("PerformanceRating"), 15)
+            + min(goals_pct * 35, 35)
+            + min(engagement * 2, 20)
+            - min(overdue * 2, 10)
+        )
+        performers.append({
+            "employee": row["Employee"],
+            "team": row["Team"],
+            "role": row["Role"],
+            "performance_score": round(score, 1),
+            "performance_rating": row.get("PerformanceRating", "Unknown"),
+            "goals_completed": int(goals_completed),
+            "goals_total": int(goals_total),
+            "engagement_score": int(engagement),
+            "weekly_hours": float(row.get("WeeklyHours", 0) or 0),
+            "overdue_tasks": int(overdue),
+        })
+
+    performers.sort(key=lambda e: e["performance_score"], reverse=True)
+    return performers[:limit]
+
+
+def _format_best_performers_answer(limit: int = 5) -> dict[str, Any]:
+    performers = _best_performers(limit)
+    if not performers:
+        return {"answer": "I could not find enough performance data to rank the best performers."}
+
+    names = "; ".join(
+        f"{i + 1}. {e['employee']} ({e['team']}, {e['role']}) - score {e['performance_score']}, {e['performance_rating']}, goals {e['goals_completed']}/{e['goals_total']}, engagement {e['engagement_score']}/10"
+        for i, e in enumerate(performers)
+    )
+    return {
+        "answer": f"The best performers based on performance rating, goal completion, engagement, and overdue-task load are: {names}.",
+        "best_performers": performers,
+        "valuable_employees": performers,
+    }
+
+
+def _format_valuable_names_answer(limit: int = 5) -> dict[str, Any]:
+    employees = _valuable_employees(limit)
+    if not employees:
+        return {"answer": "I could not find enough employee performance data to name them."}
+
+    names = "; ".join(
+        f"{e['employee']} ({e['team']}, {e['role']}, score {e['value_score']})"
+        for e in employees
+    )
+    return {
+        "answer": f"They are: {names}.",
+        "valuable_employees": employees,
+    }
+
+
+def _latest_conversation_text(messages: list[dict] | None) -> str:
+    if not messages:
+        return ""
+    recent = [m.get("text", "") for m in messages if m.get("text")][-6:]
+    return " ".join(recent).lower()
+
+
+def _is_best_performer_query(query: str) -> bool:
+    ranking_words = ("best", "top", "highest", "strongest", "good", "great")
+    return (
+        any(word in query for word in ranking_words)
+        and "perform" in query
+    )
+
+
 # ---------------------------------------------------------------------------
 # NEW: Natural Language Query
 # ---------------------------------------------------------------------------
@@ -961,6 +1334,96 @@ def _team_spofs(team_name: str, limit: int = 3) -> list[str]:
 def natural_language_query(req: QueryRequest):
     query = req.query.lower()
     health = compute_org_health()
+    conversation_text = _latest_conversation_text(req.messages)
+    spof_data = compute_spof_ranking()
+
+    if (
+        ("input" in query and ("file" in query or "data" in query or "source" in query))
+        or "data source" in query
+        or "source file" in query
+        or "source files" in query
+        or "what files" in query
+        or "which files" in query
+        or "what data did you use" in query
+        or "where did this data come from" in query
+    ):
+        return _format_data_source_answer()
+
+    is_followup_people_question = (
+        ("who" in query)
+        and ("they" in query or "them" in query or "those" in query)
+    )
+    if is_followup_people_question:
+        if any(term in conversation_text for term in ("valuable", "valued", "retention", "committed", "top performer", "performer")):
+            return _format_valuable_names_answer()
+        if any(term in conversation_text for term in ("spof", "single point", "critical", "important", "risk")):
+            return _format_top_spof_answer(spof_data)
+
+    if (
+        ("why" in query or "reason" in query or "explain" in query)
+        and ("him" in query or "her" in query or "farhan" in query or "critical" in query or "important" in query or "imp" in query)
+    ):
+        employee_name = "Farhan" if "farhan" in query or "him" in query else None
+        return _format_spof_reason(spof_data, employee_name)
+
+    if (
+        "best performer" in query
+        or "best performers" in query
+        or "top performer" in query
+        or "top performers" in query
+        or "highest performer" in query
+        or "highest performers" in query
+        or "strongest performer" in query
+        or "strongest performers" in query
+        or _is_best_performer_query(query)
+    ):
+        return _format_best_performers_answer()
+
+    if (
+        "valuable" in query
+        or "valued" in query
+        or "best employee" in query
+        or "highest performer" in query
+        or "high retention" in query
+        or "committed employee" in query
+        or "committed employees" in query
+    ):
+        return _format_valuable_answer()
+
+    if (
+        "imp" in query
+        or "important employee" in query
+        or "important resource" in query
+        or "critical employee" in query
+        or "critical resource" in query
+        or "key employee" in query
+        or "key resource" in query
+        or "essential employee" in query
+    ):
+        if "employee" in query or "person" in query or "resource" in query or "who" in query or "emp" in query:
+            return _format_top_spof_answer(spof_data)
+
+    if "what if" in query or "scenario" in query or "combination" in query or "multiple" in query:
+        mentioned = _mentioned_employees(req.query)
+        if len(mentioned) >= 2:
+            scenario = simulate_scenario("attrition", removed_employees=mentioned)
+            result = _run_llm_pipeline(health, scenario)
+            return {
+                "answer": f"Scenario: {', '.join(mentioned)} leaving. Composite drops from {health['composite_score']} to {scenario['composite_score']}. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}. This combination reveals {len(mentioned)} interrelated SPOFs leaving simultaneously.",
+                "scenario": scenario,
+                "summary": result["summary"],
+            }
+
+    mentioned_for_attrition = _mentioned_employees(req.query)
+    if mentioned_for_attrition and ("leave" in query or "quit" in query or "fire" in query or "depart" in query):
+        scenario = simulate_scenario("attrition", removed_employees=mentioned_for_attrition)
+        result = _run_llm_pipeline(health, scenario)
+        plural = len(mentioned_for_attrition) > 1
+        return {
+            "answer": f"If {', '.join(mentioned_for_attrition)} {'leave' if plural else 'leaves'}, composite score drops from {health['composite_score']} to {scenario['composite_score']}. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
+            "scenario": scenario,
+            "summary": result["summary"],
+        }
 
     if "vikram" in query and ("leave" in query or "quit" in query or "fire" in query or "depart" in query or "what if" in query):
         removed = ["Vikram"]
@@ -992,7 +1455,7 @@ def natural_language_query(req: QueryRequest):
             "summary": result["summary"],
         }
 
-    if ("security" in query or "sec") in query and ("leave" in query or "quit" in query):
+    if ("security" in query or "sec" in query) and ("leave" in query or "quit" in query):
         removed = _team_spofs("Security", 3) or ["Anita Verma", "Meera", "Poonam"]
         scenario = simulate_scenario("attrition", removed_employees=removed)
         result = _run_llm_pipeline(health, scenario)
@@ -1002,7 +1465,7 @@ def natural_language_query(req: QueryRequest):
             "summary": result["summary"],
         }
 
-    if ("market" in query or "marketing") in query and ("leave" in query or "quit" in query):
+    if ("market" in query or "marketing" in query) and ("leave" in query or "quit" in query):
         removed = _team_spofs("Marketing", 3) or ["Shikha Dubey", "Priya", "Hari"]
         scenario = simulate_scenario("attrition", removed_employees=removed)
         result = _run_llm_pipeline(health, scenario)
@@ -1022,6 +1485,10 @@ def natural_language_query(req: QueryRequest):
             "summary": result["summary"],
         }
 
+    workload_pct = _workload_increase_pct(query)
+    if workload_pct is not None:
+        return _format_workload_scenario_answer(health, workload_pct)
+
     if "burnout" in query or "overwork" in query:
         burnout = health["indicators"]["burnout"]
         high = burnout["details"].get("high_burnout_employees", [])
@@ -1032,22 +1499,12 @@ def natural_language_query(req: QueryRequest):
         }
 
     if "what if" in query or "scenario" in query or "combination" in query or "multiple" in query:
-        all_employees = set()
-        from scoring import load_all
-        data = load_all()
-        emp_df = data.get("employees", None)
-        if emp_df is not None and not emp_df.empty and "Employee" in emp_df.columns:
-            known_names = set(emp_df["Employee"].tolist())
-            for word in query.replace(",", " ").split():
-                w = word.strip().title()
-                if w in known_names:
-                    all_employees.add(w)
-        if len(all_employees) >= 2:
-            removed = sorted(all_employees)
-            scenario = simulate_scenario("attrition", removed_employees=removed)
+        mentioned = _mentioned_employees(req.query)
+        if len(mentioned) == 1 and ("leave" in query or "quit" in query or "depart" in query or "fire" in query):
+            scenario = simulate_scenario("attrition", removed_employees=mentioned)
             result = _run_llm_pipeline(health, scenario)
             return {
-                "answer": f"Scenario: {', '.join(removed)} leaving. Composite drops from {health['composite_score']} to {scenario['composite_score']}. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}. This combination reveals {len(removed)} interrelated SPOFs leaving simultaneously.",
+                "answer": f"Scenario: {mentioned[0]} leaving. Composite drops from {health['composite_score']} to {scenario['composite_score']}. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
                 "scenario": scenario,
                 "summary": result["summary"],
             }
