@@ -15,6 +15,40 @@ from typing import Any
 
 import pandas as pd
 
+# ---------------------------------------------------------------------------
+# XGBoost / ML Model Stub
+# Production architecture supports swapping heuristic formulas with trained
+# models. Implement MLIndicatorModel and pass to compute_org_health().
+# ---------------------------------------------------------------------------
+class MLIndicatorModel:
+    """Interface for ML-backed indicator computation.
+    Replace heuristic functions by implementing this protocol:
+        predict_resilience(employees, dependencies, knowledge, projects) -> float
+        predict_trust(knowledge) -> float
+        predict_burnout(workload, performance) -> float
+        predict_retention(employees, performance) -> float
+    Each returns a score 0-100 matching the existing heuristic contract.
+    """
+    def predict_resilience(self, employees, dependencies, knowledge, projects) -> float:
+        raise NotImplementedError("Substitute with XGBoost/lightgbm model")
+    def predict_trust(self, knowledge) -> float:
+        raise NotImplementedError
+    def predict_burnout(self, workload, performance) -> float:
+        raise NotImplementedError
+    def predict_retention(self, employees, performance) -> float:
+        raise NotImplementedError
+
+
+def compute_with_model(model: MLIndicatorModel, data: dict) -> dict[str, Any]:
+    """Run all 4 indicators through an ML model instead of heuristics."""
+    return {
+        "resilience": {"score": model.predict_resilience(
+            data["employees"], data["dependencies"], data["knowledge"], data["projects"])},
+        "trust": {"score": model.predict_trust(data["knowledge"])},
+        "burnout": {"score": model.predict_burnout(data["workload"], data["performance"])},
+        "retention": {"score": model.predict_retention(data["employees"], data["performance"])},
+    }
+
 DATA_DIR = Path(__file__).parent / "data"
 DB_PATH = Path(__file__).resolve().parent.parent / "trupulse-db" / "trupulse.db"
 

@@ -910,6 +910,32 @@ def _run_llm_pipeline(health, scenario=None):
 
 
 # ---------------------------------------------------------------------------
+# Helper: LLM-powered chat response for novel queries
+# ---------------------------------------------------------------------------
+def _llm_chat(query: str, health: dict) -> str | None:
+    try:
+        from agents import _llm_call
+        context = (
+            f"Org health composite: {health['composite_score']}/100 ({health['overall_risk']} risk). "
+            f"Resilience: {health['indicators']['resilience']['score']}, "
+            f"Trust: {health['indicators']['trust']['score']}, "
+            f"Burnout: {health['indicators']['burnout']['score']}, "
+            f"Retention: {health['indicators']['retention']['score']}. "
+            f"Employees: {health['employee_count']}, Teams: {health['team_count']}."
+        )
+        prompt = (
+            "You are TruPulse AI, a workforce resilience analyst. Answer concisely in 2-3 sentences "
+            "using the org data provided. If you cannot answer from the data, suggest what the user "
+            "can ask about (risks, teams, scenarios, SPOFs, skills, burnout).\n\n"
+            f"Org Data: {context}\n\nUser Query: {query}\n\nResponse:"
+        )
+        text, _ = _llm_call(prompt, json_mode=False)
+        return text.strip()
+    except Exception:
+        return None
+
+
+# ---------------------------------------------------------------------------
 # Helper: get top SPOFs for a specific team
 # ---------------------------------------------------------------------------
 def _team_spofs(team_name: str, limit: int = 3) -> list[str]:
@@ -1061,6 +1087,9 @@ def natural_language_query(req: QueryRequest):
             "actions": actions[:3],
         }
 
+    llm_answer = _llm_chat(req.query, health)
+    if llm_answer:
+        return {"answer": llm_answer}
     pipeline = _run_llm_pipeline(health, None)
     return {
         "answer": pipeline["summary"]["insight"]["headline"] + " I've analyzed the full organizational data. Ask me about specific risks, teams, or scenarios.",
