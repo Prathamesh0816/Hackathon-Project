@@ -8,7 +8,7 @@
 5. **Browser Tab 2:** `backend/agents_langchain.py` scrolled to Pydantic schema definitions (~line 30-120)
 6. **Browser Tab 3:** same file, scrolled to `create_graph()` / StateGraph definition (~line 400-550)
 7. Pre-run `/demo-data` so everything is cached
-8. **3 one-pagers printed** on judges' seats: `WHATS_UNIQUE.md` (10 differentiators), `BUSINESS_IMPACT.md` (ROI), `CLIENT_PITCH.md` (implementation)
+8. **4 one-pagers printed** on judges' seats: `WHATS_UNIQUE.md` (10 differentiators), `BUSINESS_IMPACT.md` (ROI), `docs/CLIENT_PITCH.md` (implementation), `docs/ROADMAP.md` (5-phase plan)
 9. Prathamesh is the **sole presenter**. Everyone else supports. No speaker handoffs.
 
 ---
@@ -29,13 +29,20 @@
 ---
 
 ### 0:00-0:40 — Segment 1: Meet Vikram (40s) → **Business Value**
+
+**[0:00–0:05 — INTRO (5s, mandatory, do not skip)]**
+> **[Stand up, make eye contact with judges, smile.]**
+>
+> "Hi, we're **Team TruPulse** — Prathamesh, Sopan, Aradhana, Santosh, Varad, and Lokesh. We built **TruPulse AI** — an AI-powered workforce resilience platform that tells you *who you can't afford to lose* and *what to do about it* — before they update their LinkedIn."
+
+**[0:05–0:40 — Hook (35s)]**
 > **[Dashboard is already loaded. Point at the screen.]**
 >
 > "Every organization has a Vikram. A senior employee who's the only person who knows how something critical works.
 >
 > Meet Vikram. Sales Manager. 8 years. Top performer. He owns our 3 biggest accounts — $2.7M in contracts. He has **no backup**. His documentation is **Low**. He hasn't taken PTO in 18 months.
 >
-> Our composite health score: **47.5 out of 100**. That's HIGH risk. 56 employees in this company are single points of failure — putting **$54.6 million** at risk."
+> Our composite health score: **47.5 out of 100**. That's HIGH risk. 56 employees in this company are single points of failure — putting **$13.4 million** at risk."
 >
 > **[Click: Vikram profile. Show the SPOF badge.]**
 >
@@ -50,7 +57,7 @@
 >
 > **[Point at the before/after comparison.]**
 >
-> "Composite health drops from 72 to 41 — a 31-point collapse. Trust drops from 78 to 51. Resilience from 72 to 39.
+> "Composite health drops from 47.5 to 41.7 — a 5.8 point hit. Resilience drops from 32.6 to 15.3 — his 6 undocumented knowledge areas are gone. But here's the real number: $2.7 million in contracts go into jeopardy.
 >
 > Workday tells you someone quit. We tell you **before they do** — and we tell you what it costs."
 >
@@ -100,7 +107,7 @@
 >
 > "Purple means SPOF. Look at the cluster — Rahul in Engineering, Sneha in DevOps, Sanjay in Security. If any one of them leaves, entire projects stall.
 >
-> The cost to de-risk all 56: **$840K** in cross-training and targeted hiring. The cost if we don't: **$54.6 million**."
+> The cost to de-risk all 56: **$840K** in cross-training and targeted hiring. The cost if we don't: **$13.4 million**."
 >
 > **[Click "Run Stress Test". Watch SPOFs fall. Score drops 100 to 22.]**
 >
@@ -126,26 +133,33 @@
 >
 > **Innovation:** LangChain + LangGraph multi-agent AI with Pydantic validation, 9 tool-augmented agents, and a live revision loop. **No competitor does all 5.**
 >
-> **Business Value:** 56 SPOFs identified. $54.6 million at risk. $840,000 to fix. 65-to-1 ROI. Payback in under 6 days.
+> **Business Value:** 56 SPOFs identified. $13.4 million at risk. $840,000 to fix. 16-to-1 ROI. Payback in under 6 days.
 >
 > **Technical Excellence:** LangGraph StateGraph with conditional edges. Pydantic schemas on every agent. 4-level fallback chain. 9 tools wrapping real analytics. Docker Compose deployment.
 >
 > **User Experience:** One-click simulation. Time Machine before/after. Dependency graph. Stress test animation. Governance panel. Executive report in 4 formats.
 >
-> **Demo & Presentation:** 6 segments. 5 minutes. One presenter. Three dry runs. Backup video ready. 30+ Q&A answers prepared. **3 one-pagers on your seat: WHATS_UNIQUE.md, BUSINESS_IMPACT.md, CLIENT_PITCH.md.**
+> **Demo & Presentation:** 6 segments. 5 minutes. One presenter. Three dry runs. Backup video ready. 30+ Q&A answers prepared. **4 one-pagers on your seat: WHATS_UNIQUE.md, BUSINESS_IMPACT.md, docs/CLIENT_PITCH.md, docs/ROADMAP.md.**
 >
 > We'll run TruPulse on your data in **5 business days** — free, no obligation. You get your org health report, your SPOF rankings, and 3 scenario simulations. If the output doesn't sell itself, we don't deserve the business.
 >
-> We're ready for your questions."
+> **What's next after the hackathon?** Phase 1: production hardening — we ship this to a real company within 4 weeks. Workday integration, PostgreSQL, auth. The architecture is built for it — Pydantic contracts, Docker, 4-level fallback. We didn't build a demo. We built a company.
 >
-> **[Nod to Varad. Varad steps forward for Q&A.]**
+> We're ready for your questions.
+>
+> **Thank you for your time.**"
+>
+> **[Nod to Varad. Varad steps forward with QNA_PREP.md cheat sheet.]**
+>
+> **[Optional graceful close, only if time permits or judges look disengaged:]**
+> *"Every dashboard tells you what already happened. TruPulse tells you what's about to. Thank you."*
 
 ---
 
 ## What Prathamesh Must Rehearse (Non-Negotiable)
 
 1. **The AI Pipeline load time.** From clicking "Run Pipeline" to seeing results is 10-20 seconds. You MUST have 20 seconds of smooth narration ready. Practice this. If you finish talking before it loads, don't say "still loading" — just repeat the key point about Pydantic validation or the revision loop.
-2. **The closing numbers.** 56, $54.6M, $840K, 65:1, 6 days, 4 weeks, $18K. Say them without looking at the screen. Know them cold.
+2. **The closing numbers.** 56, $13.4M, $840K, 16:1, 6 days, 4 weeks, $18K. Say them without looking at the screen. Know them cold.
 3. **The 5-minute mark.** If you hit 4:30 and haven't started the closing, **skip to the closing**. The ROI numbers are what judges remember. Everything else is supporting evidence.
 
 ## What Everyone Else Does During Demo

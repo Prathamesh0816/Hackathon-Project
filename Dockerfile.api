@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential gcc g++ && \
     rm -rf /var/lib/apt/lists/*
 
-# Install backend dependencies (including LangChain/LangGraph)
+# Install backend dependencies
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -15,15 +15,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./backend/
 # Copy database/ for vectordb
 COPY database/ ./database/
-# Copy data files
-COPY backend/data/ ./backend/data/
+
+# Pre-populate uploaded_files/csv/ so dataset activate works in Docker
+# (CSVs live in backend/data/; activate_dataset() looks in uploaded_files/csv/)
+RUN mkdir -p /app/backend/uploaded_files/csv && \
+    cp /app/backend/data/*.csv /app/backend/uploaded_files/csv/
 
 WORKDIR /app/backend
 
 EXPOSE 8000
 
-# LangChain ChatOllama uses the base Ollama URL (without /api/generate)
-# agents_langchain.py strips /api/generate if present for backward compat
 ENV OLLAMA_URL=http://ollama:11434
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

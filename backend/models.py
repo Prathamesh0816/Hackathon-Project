@@ -25,6 +25,7 @@ class PipelineRequest(BaseModel):
     workload_increase_pct: int = 0
     restructure_team: Optional[str] = None
     use_fallback: bool = False
+    use_langchain: bool = True
 
 
 class FeedbackRequest(BaseModel):

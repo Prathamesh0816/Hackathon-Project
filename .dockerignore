@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+venv/
+.venv/
+.env
+.vscode/
+.idea/
+node_modules/
+dist/
+.vite/
+*.db
+chroma_data/
+chroma_db/
+uploaded_files/
+.git/
+.gitignore

@@ -84,6 +84,8 @@
 
 Most hackathon teams start with a technology — "let's build something with LangChain" or "let's try LangGraph." We started with a **human problem**: *"Vikram is a single point of failure. If he leaves, what happens?"*
 
+**We also refused to hardcode data.** Most hackathon demos hardcode 10-20 employees and call it a product. Our frontend loads every employee, team, and score from live API calls through the `/employees` endpoint — the same endpoint that powers What-If, Report, and every dropdown across 11 pages. Upload a different dataset, and every page adapts automatically. That's the difference between a demo and a product.
+
 This changed every decision:
 
 | Decision | If You Start With Tech | If You Start With Vikram |
@@ -92,7 +94,7 @@ This changed every decision:
 | How to structure AI | One prompt that does everything | 5 specialized agents, each with one job |
 | Whether to validate output | Ship what the LLM returns | Pydantic schemas — catch errors before UI |
 | Fallback strategy | "If it breaks, it breaks" | 4-level chain — demo never fails |
-| Business case | "It uses LangChain" | "$54.6M at risk, 65:1 ROI, payback in 6 days" |
+| Business case | "It uses LangChain" | "$13.4M at risk, 16:1 ROI, payback in 6 days" |
 | UX priority | Chat interface | Time Machine, dependency graph, one-click report |
 
 **The result:** A platform that doesn't just demonstrate a technology — it solves a specific, quantified business problem using the right technology for each layer.
@@ -101,7 +103,7 @@ This changed every decision:
 
 ## For Judges: One-Liner
 
-> *"Every hackathon project shows a feature. TruPulse shows a product — with LangGraph orchestration, Pydantic validation, tool-augmented agents, a revision loop, governance oversight, zero-data-exfil privacy, and an ROI of 65:1. No other team here has attempted all 10. No existing product in the market has all 10."*
+> *"Every hackathon project shows a feature. TruPulse shows a product — with LangGraph orchestration, Pydantic validation, tool-augmented agents, a revision loop, governance oversight, zero-data-exfil privacy, and an ROI of 16:1. No other team here has attempted all 10. No existing product in the market has all 10."*
 
 ---
 

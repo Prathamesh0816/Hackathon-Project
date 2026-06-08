@@ -1,13 +1,15 @@
 import os
 import json
+from pathlib import Path
 import pandas as pd
 from io import StringIO
 from file_classifier import classify_file, quick_classify_csv
 
-UPLOAD_DIR = "uploaded_files"
-CSV_DIR = os.path.join(UPLOAD_DIR, "csv")
-TEXT_DIR = os.path.join(UPLOAD_DIR, "text")
-META_FILE = os.path.join(UPLOAD_DIR, "file_metadata.json")
+_BASE = Path(__file__).resolve().parent
+UPLOAD_DIR = str(_BASE / "uploaded_files")
+CSV_DIR = str(_BASE / "uploaded_files" / "csv")
+TEXT_DIR = str(_BASE / "uploaded_files" / "text")
+META_FILE = str(_BASE / "uploaded_files" / "file_metadata.json")
 
 os.makedirs(CSV_DIR, exist_ok=True)
 os.makedirs(TEXT_DIR, exist_ok=True)

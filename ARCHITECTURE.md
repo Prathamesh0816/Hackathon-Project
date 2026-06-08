@@ -129,6 +129,7 @@ sequenceDiagram
 | GET | `/` | Health check + endpoint list |
 | GET | `/org-health` | 4-indicator org health composite |
 | GET | `/employee/{name}` | Full employee profile |
+| GET | `/employees` | List all employees (name, team, role, tenure, salary) from active data source |
 | GET | `/employee-data/{id}` | Employee data by ID |
 | POST | `/analyze-employee/{id}` | AI analysis per employee |
 | POST | `/whatif` | Scenario simulation |
@@ -203,7 +204,7 @@ sequenceDiagram
 ## Tech Stack
 
 - **Frontend:** React 18 + Vite + Tailwind CSS + Recharts
-- **Backend:** FastAPI (Python 3.12)
+- **Backend:** FastAPI (Python 3.12+, tested on 3.14)
 - **AI Framework:** LangChain (RunnableSequence, PydanticOutputParser) + LangGraph (StateGraph)
 - **AI Backend:** Ollama (qwen2.5:3b) with ChatOllama integration
 - **Agent Tools:** 9 LangChain tools wrapping scoring engine, analytics, and vector DB

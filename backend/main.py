@@ -13,6 +13,7 @@ import json
 import math
 import re
 import time
+from pathlib import Path
 from typing import Any, Optional
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
@@ -83,14 +84,7 @@ except ImportError:
     _PIPELINE_BACKEND = "raw"
 
 from agents import run_pipeline_fallback
-from analytics_enhanced import (
-    compute_skill_gaps,
-    compute_succession_planning,
-    compute_workforce_readiness,
-    compute_knowledge_concentration,
-    compute_spof_ranking,
-    compute_upskilling,
-)
+from report import render_html_report, render_text_report
 
 
 app = FastAPI(title="TruPulse AI", version="2.0", default_response_class=SafeJSONResponse)
@@ -115,11 +109,12 @@ def home():
         "pipeline_backend": _PIPELINE_BACKEND,
         "langchain_available": _LANGCHAIN_AVAILABLE,
         "endpoints": [
-            "/org-health", "/employee/{name}", "/whatif",
+            "/org-health", "/employee/{name}", "/employees", "/whatif",
             "/pipeline", "/feedback", "/report",
             "/skill-gaps", "/succession-planning", "/workforce-readiness",
             "/knowledge-concentration", "/spof-ranking", "/upskilling/{name}",
             "/text-input", "/feedback/suggestions", "/feedback/apply",
+            "/scenarios", "/demo-data", "/dataset/info",
         ],
     }
 
@@ -307,11 +302,46 @@ def analyze_employee(employee_id: str):
 
 
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# NEW: Employees list endpoint
+# ---------------------------------------------------------------------------
+@app.get("/employees")
+def employees_list():
+    """Return all employees from the active data source (CSV/SQLite/Upload)."""
+    from scoring import load_all
+    data = load_all()
+    if "employees" not in data or data["employees"].empty:
+        return {"employees": [], "total": 0}
+    emp = data["employees"]
+    from data_manager import get_active_info
+    info = get_active_info()
+    col_map = {
+        "Employee": "name", "Team": "team", "Role": "role",
+        "EmployeeID": "employee_id", "Criticality": "criticality",
+        "TenureYears": "tenure_years", "AnnualSalaryUSD": "annual_salary_usd",
+        "BackupAvailable": "backup_available", "ExperienceYears": "experience_years",
+    }
+    available = {k: v for k, v in col_map.items() if k in emp.columns}
+    out = emp[list(available.keys())].rename(columns=available).to_dict(orient="records")
+    return {
+        "employees": out,
+        "total": len(emp),
+        "source": info.get("filename", "employees.csv"),
+        "active": info.get("active", False),
+    }
+
+
+# ---------------------------------------------------------------------------
 # NEW: Org health endpoint
 # ---------------------------------------------------------------------------
 @app.get("/org-health")
 def org_health():
-    return compute_org_health()
+    result = compute_org_health()
+    from data_manager import get_active_info
+    info = get_active_info()
+    result["data_source"] = info.get("filename", "employees.csv")
+    result["data_active"] = info.get("active", False)
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -328,12 +358,6 @@ def employee_profile(name: str):
 # ---------------------------------------------------------------------------
 # NEW: What-If / Time Machine
 # ---------------------------------------------------------------------------
-class WhatIfRequest(BaseModel):
-    scenario_type: str = "attrition"   # attrition | workload_increase | team_restructuring | baseline
-    removed_employees: list[str] = []
-    workload_increase_pct: int = 0
-    restructure_team: Optional[str] = None
-
 
 @app.post("/whatif", response_model=WhatIfResponse)
 def whatif(req: WhatIfRequest):
@@ -508,14 +532,6 @@ def scenario_run(req: ScenarioRunRequest):
 # ---------------------------------------------------------------------------
 # NEW: 5-agent pipeline (LangChain + LangGraph with raw fallback)
 # ---------------------------------------------------------------------------
-class PipelineRequest(BaseModel):
-    scenario_type: str = "attrition"
-    removed_employees: list[str] = []
-    workload_increase_pct: int = 0
-    restructure_team: Optional[str] = None
-    use_fallback: bool = False
-    use_langchain: bool = True  # new: use LangChain pipeline
-
 
 @app.post("/pipeline")
 def pipeline(req: PipelineRequest):
@@ -571,13 +587,8 @@ def pipeline(req: PipelineRequest):
 
 # ---------------------------------------------------------------------------
 # NEW: Feedback (Human-in-the-Loop)
+# FeedbackRequest is imported from models.py
 # ---------------------------------------------------------------------------
-class FeedbackRequest(BaseModel):
-    employee: str
-    action_title: str
-    decision: str   # accept | veto | modify
-    reason: str = ""
-
 
 @app.post("/feedback")
 def post_feedback(req: FeedbackRequest):
@@ -592,9 +603,30 @@ def list_feedback():
 
 
 # ---------------------------------------------------------------------------
+# State persistence helpers (survive server restarts)
+# ---------------------------------------------------------------------------
+_STATE_DIR = Path(__file__).parent / "uploaded_files"
+
+
+def _load_state(name: str, default=None):
+    path = _STATE_DIR / f".{name}.json"
+    if path.exists():
+        try:
+            return json.loads(path.read_text())
+        except Exception:
+            pass
+    return default if default is not None else []
+
+
+def _save_state(name: str, data):
+    _STATE_DIR.mkdir(parents=True, exist_ok=True)
+    (_STATE_DIR / f".{name}.json").write_text(json.dumps(data, indent=2))
+
+
+# ---------------------------------------------------------------------------
 # NEW: Text / Chat Input
 # ---------------------------------------------------------------------------
-_TEXT_EMPLOYEES: list[dict[str, str]] = []
+_TEXT_EMPLOYEES: list[dict[str, str]] = _load_state("text_employees", [])
 
 
 def _parse_employee_text(text: str) -> list[dict[str, str]]:
@@ -628,6 +660,7 @@ def text_input(req: TextInputRequest):
     if not employees:
         raise HTTPException(status_code=400, detail="No valid employee data found in text")
     _TEXT_EMPLOYEES.extend(employees)
+    _save_state("text_employees", _TEXT_EMPLOYEES)
     return {
         "parsed_count": len(employees),
         "employees": employees,
@@ -637,13 +670,14 @@ def text_input(req: TextInputRequest):
 
 @app.get("/text-input/list")
 def list_text_inputs():
+    _TEXT_EMPLOYEES[:] = _load_state("text_employees", [])
     return {"count": len(_TEXT_EMPLOYEES), "employees": _TEXT_EMPLOYEES[-50:]}
 
 
 # ---------------------------------------------------------------------------
 # NEW: Human-AI Feedback Loop — Suggestions & Recalculation
 # ---------------------------------------------------------------------------
-_PENDING_SUGGESTIONS: list[dict[str, Any]] = []
+_PENDING_SUGGESTIONS: list[dict[str, Any]] = _load_state("pending_suggestions", [])
 
 
 @app.post("/feedback/suggestions")
@@ -701,6 +735,7 @@ def generate_suggestions():
             })
 
     _PENDING_SUGGESTIONS = suggestions
+    _save_state("pending_suggestions", suggestions)
     return {"suggestions": suggestions, "total_count": len(suggestions)}
 
 
@@ -740,30 +775,28 @@ def apply_decisions(req: ApplyDecisionsRequest):
     for mod in req.modified:
         applied.append({**mod, "status": "accepted", "source": "human_modified"})
 
-    # Recalculate: simulate the effect of accepted actions on org health
+    # Recalculate: project improvement from accepted actions
     baseline = compute_org_health()
-    removed = [a["target_employee"] for a in applied if a.get("type") in ("cross_train",) and a.get("target_employee")]
-    projected = simulate_scenario("attrition", removed_employees=removed if removed else None)
-
-    # If cross-training, reduce SPOF impact
     cross_train_count = sum(1 for a in applied if a.get("type") == "cross_train")
     doc_count = sum(1 for a in applied if a.get("type") == "document")
+    hire_count = sum(1 for a in applied if a.get("type") == "hire")
 
-    # Simple projected improvement heuristic
-    projected_score = projected["composite_score"]
-    improvement = (cross_train_count * 2.5) + (doc_count * 1.5)
+    # Each cross-train reduces SPOF severity by cutting dependency count
+    improvement = (cross_train_count * 2.5) + (doc_count * 1.5) + (hire_count * 1.0)
     after_score = round(min(baseline["composite_score"] + improvement, 100), 1)
 
-    projected["composite_score"] = after_score
-    projected["overall_risk"] = "LOW" if after_score >= 70 else "MEDIUM" if after_score >= 45 else "HIGH"
+    projected = {
+        "composite_score": after_score,
+        "overall_risk": "LOW" if after_score >= 70 else "MEDIUM" if after_score >= 45 else "HIGH",
+        "indicators": {
+            "resilience": round(min(baseline["indicators"]["resilience"]["score"] + cross_train_count * 3, 100), 1),
+            "trust": round(min(baseline["indicators"]["trust"]["score"] + doc_count * 1.5, 100), 1),
+            "burnout": round(max(baseline["indicators"]["burnout"]["score"] - doc_count * 1.0, 0), 1),
+            "retention": round(min(baseline["indicators"]["retention"]["score"] + hire_count * 1.0, 100), 1),
+        },
+    }
 
-    for key in projected["indicators"]:
-        if isinstance(projected["indicators"][key], dict) and "score" in projected["indicators"][key]:
-            projected["indicators"][key]["score"] = round(
-                min(projected["indicators"][key]["score"] + (cross_train_count * 3 if key == "resilience" else doc_count), 100), 1
-            )
-        elif isinstance(projected["indicators"][key], (int, float)):
-            projected["indicators"][key] = min(projected["indicators"][key] + (cross_train_count * 3 if key == "resilience" else doc_count), 100)
+    _save_state("pending_suggestions", _PENDING_SUGGESTIONS)
 
     return {
         "before_score": baseline["composite_score"],
@@ -797,374 +830,20 @@ def report(scenario_type: str = "baseline", removed: str = "", format: str = "ht
         pipeline_out = run_pipeline_fallback(health, scenario)
         title = f"TruPulse AI - What-If Report: {', '.join(removed_list)} leaving"
 
-    insight = pipeline_out["summary"]["insight"]
-    coaching = pipeline_out["summary"]["coaching"]
-    governance = pipeline_out["summary"]["governance"]
-    risk = health["indicators"]["resilience"]
-
-    def _bar(val, high=100, color=None):
-        pct = min(val / high * 100, 100)
-        if not color:
-            color = "#dc2626" if val < 40 else "#d97706" if val < 70 else "#16a34a"
-        return f'<div style="background:#e5e7eb;border-radius:999px;height:20px;overflow:hidden;position:relative"><div style="width:{pct:.0f}%;height:100%;background:{color};border-radius:999px;transition:width .3s"></div><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#1f2937">{val}/{high}</span></div>'
-
-    def _vbar(val, high=100, color=None, label=""):
-        pct = min(val / high * 100, 100)
-        if not color:
-            color = "#dc2626" if val < 40 else "#d97706" if val < 70 else "#16a34a"
-        return f'<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:40px;height:120px;background:#e5e7eb;border-radius:4px;overflow:hidden;position:relative;display:flex;align-items:flex-end"><div style="width:100%;height:{pct:.0f}%;background:{color};border-radius:4px;transition:height .3s"></div></div><span style="font-size:11px;font-weight:700;color:#1f2937">{label}</span><span style="font-size:14px;font-weight:800">{val}</span></div>'
-
-    spofs_full = spof_data.get("spofs", [])
-    spof_rows = "".join(
-        f'<tr><td>{s["employee"]}</td><td>{s["team"]}</td><td>{s["role"]}</td>'
-        f'<td><span class="risk-{s.get("severity_level","Medium").lower()}">{s.get("severity_level","")}</span></td>'
-        f'<td align=center>{s.get("dependents_count",0)}</td>'
-        f'<td align=center>{s.get("low_doc_areas",0)}</td>'
-        f'<td align=right>${s.get("revenue_at_risk_usd",0):,}</td></tr>'
-        for s in spofs_full[:15]
-    )
-
-    gaps_rows = "".join(
-        f'<tr><td>{t["team"]}</td><td align=center>{t["employee_count"]}</td>'
-        f'<td>{_bar(t["coverage_pct"],100)}</td>'
-        f'<td>{", ".join(t.get("missing_areas",[])[:4]) or "None"}</td>'
-        f'<td>{", ".join(t.get("critical_missing",[])) or "None"}</td></tr>'
-        for t in gaps.get("teams", [])
-    )
-
-    succession_rows = "".join(
-        f'<tr><td>{r["role"]}</td><td>{r["employee"]}</td><td>{r["team"]}</td>'
-        f'<td align=center>{"✓" if r.get("backup_available") else "✗"}</td>'
-        f'<td align=center>{"✓" if r.get("has_ready_successor") else "✗"}</td>'
-        f'<td align=right>{len(r.get("potential_successors",[]))}</td></tr>'
-        for r in succession.get("roles", [])
-    )
-
-    knowledge_rows = "".join(
-        f'<tr><td>{a["knowledge_area"]}</td><td align=center>{a["holder_count"]}</td>'
-        f'<td>{_bar(a["risk_score"],100)}</td>'
-        f'<td><span class="risk-{a["risk_level"].lower()}">{a["risk_level"]}</span></td>'
-        f'<td>{", ".join(a["holders"][:4])}{" +" + str(len(a["holders"])-4) + " more" if len(a["holders"])>4 else ""}</td></tr>'
-        for a in knowledge.get("concentrated_areas", [])
-    )
-
-    readiness_rows = "".join(
-        f'<tr><td>{t["team"]}</td><td align=center>{t["member_count"]}</td>'
-        f'<td align=center>{t["active_projects"]}</td>'
-        f'<td>{_bar(t["readiness_score"],100)}</td>'
-        f'<td align=center>{t.get("advanced_experts",0)}</td></tr>'
-        for t in readiness.get("team_readiness", [])
-    )
-
-    actions = coaching.get("actions", [])
-    actions_html = "".join(
-        f'<div style="border:1px solid #d1d5db;border-radius:8px;padding:12px;margin-bottom:8px">'
-        f'<div style="font-weight:600;font-size:14px">{a["title"]}</div>'
-        f'<div style="font-size:12px;color:#6b7280;margin-top:4px">'
-        f'Owner: {a.get("owner_role","-")} &middot; Deadline: {a.get("deadline_days","-")}d &middot; '
-        f'Est. Cost: ${a.get("estimated_cost_usd",0):,} &middot; Impact: {a.get("estimated_impact","-")}'
-        f'</div><div style="font-size:12px;color:#4b5563;margin-top:2px">{a.get("rationale","")}</div></div>'
-        for a in actions
-    )
-
-    upskill_items = coaching.get("upskilling_plan", [])
-    upskill_html = "".join(
-        f'<tr><td>{u.get("employee","")}</td><td>{u.get("skill_to_develop","")}</td>'
-        f'<td>{u.get("method","")}</td><td align=center>{u.get("duration_weeks","")}w</td></tr>'
-        for u in upskill_items
-    ) or "<tr><td colspan=4 style='text-align:center;color:#9ca3af'>No upskilling recommendations</td></tr>"
-
-    feedback_rows = "".join(
-        f'<tr><td>{f.get("employee","")}</td><td>{f.get("action_title","")}</td>'
-        f'<td><span class="risk-{f.get("decision","").lower()}">{f.get("decision","")}</span></td>'
-        f'<td style="font-size:11px;color:#6b7280">{f.get("reason","")}</td></tr>'
-        for f in feedback[-10:]
-    ) or "<tr><td colspan=4 style='text-align:center;color:#9ca3af'>No human feedback recorded</td></tr>"
-
-    comp = health["composite_score"]
-    ind = health["indicators"]
-    revenue_total = spof_data.get("total_annual_revenue_at_risk_usd", 0)
-
     if format == "text":
-        now = time.strftime('%Y-%m-%d %H:%M:%S')
-        lines = []
-        def a(l): lines.append(l)
-        a("=" * 72)
-        a(f"  {title}")
-        a("=" * 72)
-        a(f"  Generated {now} by TruPulse AI")
-        a(f"  Organizational Resilience Analytics")
-        a("-" * 72)
-        a("")
-        a(f"EXECUTIVE SUMMARY")
-        a(f"  Composite Health Score: {comp}/100 — {health['overall_risk']} RISK")
-        a(f"  {health['employee_count']} employees across {health['team_count']} teams | {health['project_count']} active projects")
-        a(f"  Annual Revenue at Risk: ${revenue_total:,}")
-        a(f"  {insight.get('headline','')}")
-        a("")
-        a(f"HEALTH INDICATORS")
-        for key, label in [("resilience","Resilience"),("trust","Trust"),("burnout","Burnout"),("retention","Retention")]:
-            s = ind[key]["score"]
-            a(f"  {label}: {s}/100 — {ind[key]['risk_level']} Risk")
-        a("")
-        if scenario_type != "baseline" and scenario:
-            a(f"WHAT-IF SCENARIO: {', '.join(removed_list)} leaving")
-            a(f"  Before: {health['composite_score']}")
-            a(f"  After:  {scenario['composite_score']}")
-            a(f"  Delta:  {scenario['composite_score'] - health['composite_score']}")
-            a(f"  Revenue at Risk: ${scenario.get('revenue_at_risk_usd',0):,}")
-            a("")
-        a(f"SINGLE POINTS OF FAILURE ({spof_data['total_spofs']} total)")
-        a(f"  Critical: {spof_data['critical_spofs']} | Revenue at Risk: ${revenue_total:,}")
-        for r in spof_data.get("rankings",[]):
-            a(f"  - {r['employee_name']} ({r['team_name']}, {r['role']}) — {r['severity']} — {r['dependents']} dependents — rev risk ${r['annual_revenue_at_risk_usd']:,}")
-        a("")
-        a(f"SKILL GAP ANALYSIS")
-        a(f"  Gaps: {gaps.get('total_gap_count',0)} areas with insufficient coverage")
-        for t in gaps.get("teams",[]):
-            tn = t.get("team_name") or t.get("team","?")
-            a(f"  Team {tn}: {t['coverage_pct']}% coverage — {len(t.get('missing_areas',[]))} missing — {len(t.get('critical_gaps',[]))} critical")
-        a("")
-        a(f"SUCCESSION PLANNING")
-        a(f"  Org Readiness: {succession.get('org_readiness','N/A')}% | Roles: {succession.get('total_high_roles',0)} | Covered: {succession.get('roles_covered',0)}")
-        for s in succession.get("succession_data",[]):
-            a(f"  {s['role']}: {s['current_holder']} — backup={'YES' if s.get('has_backup') else 'NO'} | successor={'YES' if s.get('has_successor') else 'NO'} (potential: {s.get('successor_potential','N/A')})")
-        a("")
-        a(f"KNOWLEDGE CONCENTRATION")
-        a(f"  Critical: {knowledge.get('critical_areas',0)} | Exposure: {knowledge.get('org_exposure_pct',0)}% | Areas: {knowledge.get('total_areas',0)}")
-        for k in (knowledge.get("concentrated_areas",[]) or knowledge.get("knowledge_data",[])):
-            a(f"  {k.get('knowledge_area','?')}: holders={len(k.get('holders',[]))} | risk={k.get('risk_score',0)} | level={k.get('risk_level','')}")
-        a("")
-        a(f"WORKFORCE READINESS")
-        a(f"  Score: {readiness.get('readiness_score','N/A')} | Level: {readiness.get('readiness_level','')}")
-        for t in readiness.get("teams",[]):
-            a(f"  {t.get('team_name','?')}: {t.get('employee_count',0)} members | {t.get('project_count',0)} projects | readiness={t.get('readiness_pct',0)}%")
-        a("")
-        a(f"AI RECOMMENDATIONS")
-        a(f"  {insight.get('headline','')}")
-        for p in insight.get("patterns",[]):
-            a(f"  [{p.get('severity','?')}] {p.get('title','')}: {p.get('evidence','')}")
-        for a_ in insight.get("actions",[]):
-            a(f"  Action: {a_.get('action','')} — {a_.get('impact','')} (${a_.get('cost_estimate_usd',0):,}, {a_.get('duration_months',0)}mo)")
-        if upskill_items:
-            a(f"  UPSKILLING PLAN:")
-            for u in upskill_items:
-                a(f"    {u.get('employee','?')} → {u.get('skill_to_develop','?')} via {u.get('method','?')} ({u.get('duration_weeks','?')}w)")
-        a("")
-        a(f"HUMAN FEEDBACK ({len(feedback)} decisions)")
-        for f in feedback:
-            a(f"  {f.get('employee_name','?')}: {f.get('action','?')} — {f.get('decision','?')} ({f.get('reason','')})")
-        a("")
-        a(f"GOVERNANCE & VALIDATION")
-        g = pipeline_out.get("governance",{})
-        a(f"  Confidence: {g.get('confidence_score','N/A')}/100")
-        a(f"  Rationale: {g.get('confidence_rationale','N/A')}")
-        a(f"  Counter-Argument: {g.get('counter_argument','N/A')}")
-        a(f"  Review: {g.get('human_review_required','N/A')} — {g.get('human_review_reason','')}")
-        a("")
-        a("=" * 72)
-        a("  AT A GLANCE")
-        a(f"  Composite: {comp}/100 | Risk: {health['overall_risk']}")
-        a(f"  Employees: {health['employee_count']} | Teams: {health['team_count']}")
-        a(f"  SPOFs: {spof_data['total_spofs']} | Revenue at Risk: ${revenue_total:,}")
-        a(f"  Skill Gaps: {gaps.get('total_gap_count',0)} | Knowledge Exposure: {knowledge.get('org_exposure_pct',0)}%")
-        a(f"  Succession: {succession.get('org_readiness','N/A')}% | Readiness: {readiness.get('readiness_score','N/A')}")
-        a(f"  Human Decisions: {len(feedback)} | Type: {'Current State' if scenario_type=='baseline' else 'What-If'}")
-        a("-" * 72)
-        a(f"  TruPulse AI | Generated {now}")
-        a(f"  Predict. Simulate. Strengthen.")
-        a("=" * 72)
-        return PlainTextResponse("\n".join(lines))
+        return PlainTextResponse(render_text_report(
+            title=title, health=health, spof_data=spof_data,
+            gaps=gaps, succession=succession, readiness=readiness,
+            knowledge=knowledge, feedback=feedback, pipeline_out=pipeline_out,
+            scenario_type=scenario_type, removed_list=removed_list, scenario=scenario,
+        ))
 
-    # --- HTML REPORT ---
-    return HTMLResponse(f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<title>{title}</title>
-<style>
-  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{ font-family: 'Segoe UI', -apple-system, sans-serif; max-width: 1100px; margin: 0 auto; padding: 40px 30px; color: #111827; font-size: 13px; line-height: 1.5; }}
-  h1 {{ font-size: 26px; border-bottom: 4px solid #2563eb; padding-bottom: 10px; margin-bottom: 20px; color: #111827; }}
-  h2 {{ font-size: 18px; color: #2563eb; margin-top: 30px; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #e5e7eb; }}
-  h3 {{ font-size: 15px; color: #374151; margin-top: 20px; margin-bottom: 8px; }}
-  .meta {{ color: #6b7280; font-size: 12px; margin-bottom: 24px; }}
-  table {{ width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px; }}
-  th {{ background: #f3f4f6; text-align: left; padding: 8px 10px; font-weight: 600; color: #374151; border: 1px solid #d1d5db; }}
-  td {{ padding: 7px 10px; border: 1px solid #d1d5db; color: #374151; }}
-  tr:nth-child(even) {{ background: #f9fafb; }}
-  .risk-high {{ color: #dc2626; font-weight: 700; }}
-  .risk-medium {{ color: #d97706; font-weight: 700; }}
-  .risk-low {{ color: #16a34a; font-weight: 700; }}
-  .risk-accept {{ color: #16a34a; font-weight: 700; }}
-  .risk-veto {{ color: #dc2626; font-weight: 700; }}
-  .risk-modify {{ color: #d97706; font-weight: 700; }}
-  .kpi-row {{ display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; }}
-  .kpi {{ flex: 1; min-width: 140px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; text-align: center; }}
-  .kpi .val {{ font-size: 32px; font-weight: 800; line-height: 1.2; }}
-  .kpi .lbl {{ font-size: 11px; color: #64748b; margin-top: 4px; }}
-  .kpi .sub {{ font-size: 10px; color: #94a3b8; margin-top: 2px; }}
-  .section {{ page-break-inside: avoid; }}
-  .footer {{ margin-top: 40px; padding-top: 16px; border-top: 1px solid #d1d5db; font-size: 11px; color: #9ca3af; text-align: center; }}
-  .badge {{ display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }}
-  .badge-high {{ background: #fef2f2; color: #dc2626; }}
-  .badge-medium {{ background: #fffbeb; color: #d97706; }}
-  .badge-low {{ background: #f0fdf4; color: #16a34a; }}
-  .col-charts {{ display: flex; gap: 12px; justify-content: center; padding: 16px 0; }}
-  .summary-box {{ background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 16px 20px; margin: 16px 0; }}
-  .summary-box p {{ font-size: 14px; color: #1e40af; }}
-  .no-print {{ display: block; }}
-  @media print {{ body {{ padding: 20px; }} .no-print {{ display: none; }} }}
-  .print-btn {{ display: inline-block; background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; }}
-  .print-btn:hover {{ background: #1d4ed8; }}
-</style>
-<script>
-  function printReport() {{ window.print(); }}
-  window.addEventListener('DOMContentLoaded', function() {{
-    var p = new URLSearchParams(window.location.search);
-    if (p.get('print') === '1') setTimeout(function() {{ window.print(); }}, 500);
-  }});
-</script>
-</head><body>
-
-<div class="no-print" style="text-align:right;margin-bottom:12px">
-  <button class="print-btn" onclick="printReport()">Print Report</button>
-  &nbsp;
-  <a href="?format=text" style="color:#2563eb;font-size:13px;text-decoration:underline">Download as Text</a>
-</div>
-<h1>{title}</h1>
-<p class="meta">Generated {time.strftime('%Y-%m-%d %H:%M:%S')} by <b>TruPulse AI</b> &middot; Organizational Resilience Analytics &middot; Predict. Simulate. Strengthen.</p>
-
-<!-- EXECUTIVE SUMMARY -->
-<div class="summary-box section">
-  <h2 style="border:none;margin:0 0 8px 0;color:#1e40af">Executive Summary</h2>
-  <p><b>Composite Health Score: {comp}/100</b> &mdash; <span class="badge badge-{"high" if comp<40 else "medium" if comp<70 else "low"}">{health["overall_risk"]} RISK</span></p>
-  <p style="margin-top:6px">{health["employee_count"]} employees across {health["team_count"]} teams &middot; {health["project_count"]} active projects &middot; <b>${revenue_total:,} annual revenue at risk</b></p>
-  <p style="margin-top:6px">{insight.get("headline","")}</p>
-</div>
-
-<!-- INDICATOR SCORES -->
-<div class="section">
-  <h2>1. Organizational Health Indicators</h2>
-  <div class="kpi-row">
-    <div class="kpi"><div class="val" style="color:{'#dc2626' if comp<40 else '#d97706' if comp<70 else '#16a34a'}">{comp}</div><div class="lbl">Composite Score</div><div class="sub">{health["overall_risk"]} Risk</div></div>
-    <div class="kpi"><div class="val" style="color:#dc2626">{ind["resilience"]["score"]}</div><div class="lbl">Resilience</div><div class="sub">{ind["resilience"]["risk_level"]} Risk &middot; {ind["resilience"]["details"]["spof_count"]} SPOFs</div></div>
-    <div class="kpi"><div class="val" style="color:{'#dc2626' if ind['trust']['score']<40 else '#d97706'}">{ind["trust"]["score"]}</div><div class="lbl">Trust</div><div class="sub">{ind["trust"]["risk_level"]} Risk</div></div>
-    <div class="kpi"><div class="val" style="color:{'#dc2626' if ind['burnout']['score']<40 else '#d97706'}">{ind["burnout"]["score"]}</div><div class="lbl">Burnout</div><div class="sub">{ind["burnout"]["risk_level"]} Risk</div></div>
-    <div class="kpi"><div class="val" style="color:#16a34a">{ind["retention"]["score"]}</div><div class="lbl">Retention</div><div class="sub">{ind["retention"]["risk_level"]} Risk</div></div>
-  </div>
-  <div class="col-charts">
-    {_vbar(ind["resilience"]["score"], 100, "#dc2626", "Resilience")}
-    {_vbar(ind["trust"]["score"], 100, "#d97706", "Trust")}
-    {_vbar(ind["burnout"]["score"], 100, "#d97706", "Burnout")}
-    {_vbar(ind["retention"]["score"], 100, "#16a34a", "Retention")}
-  </div>
-</div>
-
-{f"""
-<div class="section">
-  <h2>2. What-If Scenario Impact</h2>
-  <p>Scenario: <b>{', '.join(removed_list)}</b> leaving the organization</p>
-  <div class="kpi-row">
-    <div class="kpi"><div class="val">{health['composite_score']}</div><div class="lbl">Before</div></div>
-    <div class="kpi"><div class="val" style="color:{'#dc2626' if scenario and scenario['composite_score']<health['composite_score'] else '#16a34a'}">{scenario['composite_score'] if scenario else health['composite_score']}</div><div class="lbl">After</div></div>
-    <div class="kpi"><div class="val" style="color:{'#dc2626' if scenario and scenario['composite_score']<health['composite_score'] else '#16a34a'}">{scenario['composite_score']-health['composite_score'] if scenario else 0}</div><div class="lbl">Delta</div></div>
-    <div class="kpi"><div class="val">${scenario.get('revenue_at_risk_usd',0):,}</div><div class="lbl">Revenue at Risk</div></div>
-  </div>
-</div>
-""" if scenario_type != "baseline" and scenario else ""}
-
-<!-- SPOF RANKING -->
-<div class="section">
-  <h2>3. Single Points of Failure ({spof_data['total_spofs']} total)</h2>
-  <p><b>{spof_data['critical_spofs']} critical</b> &middot; Total annual revenue at risk: <b>${revenue_total:,}</b></p>
-  <table><thead><tr><th>Employee</th><th>Team</th><th>Role</th><th>Severity</th><th>Dep.</th><th>Low Doc</th><th>Rev. at Risk</th></tr></thead>
-  <tbody>{spof_rows}</tbody></table>
-</div>
-
-<!-- SKILL GAPS -->
-<div class="section">
-  <h2>4. Skill Gap Analysis</h2>
-  <p>Org-wide gaps: <b>{gaps.get('total_gap_count',0)}</b> knowledge areas with insufficient coverage</p>
-  <table><thead><tr><th>Team</th><th>Employees</th><th>Coverage</th><th>Missing Areas</th><th>Critical Gaps</th></tr></thead>
-  <tbody>{gaps_rows}</tbody></table>
-</div>
-
-<!-- SUCCESSION PLANNING -->
-<div class="section">
-  <h2>5. Succession Planning</h2>
-  <p>Org readiness: <b>{succession.get('org_readiness','N/A')}%</b> &middot; {succession.get('total_high_roles',0)} critical roles &middot; {succession.get('roles_covered',0)} ready-now successors</p>
-  <table><thead><tr><th>Role</th><th>Current Holder</th><th>Team</th><th>Backup?</th><th>Successor?</th><th>Potential</th></tr></thead>
-  <tbody>{succession_rows}</tbody></table>
-</div>
-
-<!-- KNOWLEDGE CONCENTRATION -->
-<div class="section">
-  <h2>6. Knowledge Concentration Risk</h2>
-  <p>{knowledge.get('critical_areas',0)} critical areas &middot; {knowledge.get('org_exposure_pct',0)}% org exposure &middot; {knowledge.get('total_areas',0)} total knowledge areas</p>
-  <table><thead><tr><th>Knowledge Area</th><th>Holders</th><th>Risk Score</th><th>Level</th><th>Holders</th></tr></thead>
-  <tbody>{knowledge_rows}</tbody></table>
-</div>
-
-<!-- WORKFORCE READINESS -->
-<div class="section">
-  <h2>7. Workforce Readiness</h2>
-  <p>Overall readiness: <b>{readiness.get('readiness_score','N/A')}</b> &middot; <span class="badge badge-{readiness.get('readiness_level','Medium').lower()}">{readiness.get('readiness_level','')}</span></p>
-  <table><thead><tr><th>Team</th><th>Members</th><th>Projects</th><th>Readiness</th><th>Experts</th></tr></thead>
-  <tbody>{readiness_rows}</tbody></table>
-</div>
-
-<!-- AI PIPELINE RECOMMENDATIONS -->
-<div class="section">
-  <h2>8. AI Pipeline Recommendations</h2>
-  <h3>Insight</h3>
-  <p>{insight.get("headline","")}</p>
-  <ul style="margin:8px 0 16px 20px">{"".join(f'<li style="margin:4px 0;font-size:13px"><b>{p.get("title","")}:</b> {p.get("evidence","")} <span class="badge badge-{p.get("severity","low").lower()}">{p.get("severity","")}</span></li>' for p in insight.get("patterns",[]))}</ul>
-
-  <h3>Recommended Actions</h3>
-  {actions_html or "<p style='color:#9ca3af'>No specific actions generated</p>"}
-
-  {f'''
-  <h3>Upskilling Plan</h3>
-  <table><thead><tr><th>Employee</th><th>Skill</th><th>Method</th><th>Duration</th></tr></thead>
-  <tbody>{upskill_html}</tbody></table>
-  ''' if upskill_items else ""}
-</div>
-
-<!-- HUMAN FEEDBACK -->
-<div class="section">
-  <h2>9. Human-in-the-Loop Feedback</h2>
-  <p>Past {len(feedback)} decision(s) recorded by human reviewers</p>
-  <table><thead><tr><th>Employee</th><th>Action</th><th>Decision</th><th>Reason</th></tr></thead>
-  <tbody>{feedback_rows}</tbody></table>
-</div>
-
-<!-- GOVERNANCE -->
-<div class="section">
-  <h2>10. Governance & Validation</h2>
-  <p><b>Confidence Score:</b> {governance.get('confidence_score','N/A')}/100</p>
-  <p><b>Rationale:</b> {governance.get('confidence_rationale','N/A')}</p>
-  <p><b>Counter-Argument:</b> {governance.get('counter_argument','N/A')}</p>
-  <p><b>Human Review Required:</b> {governance.get('human_review_required','N/A')} &mdash; {governance.get('human_review_reason','')}</p>
-</div>
-
-<!-- SUMMARY TABLE -->
-<div class="section">
-  <h2>11. At a Glance</h2>
-  <table>
-    <tr><td><b>Composite Score</b></td><td>{comp}/100</td><td><b>Overall Risk</b></td><td><span class="badge badge-{"high" if comp<40 else "medium" if comp<70 else "low"}">{health["overall_risk"]}</span></td></tr>
-    <tr><td><b>Total Employees</b></td><td>{health["employee_count"]}</td><td><b>Total Teams</b></td><td>{health["team_count"]}</td></tr>
-    <tr><td><b>SPOFs</b></td><td>{spof_data["total_spofs"]} (critical: {spof_data["critical_spofs"]})</td><td><b>Revenue at Risk</b></td><td>${revenue_total:,}</td></tr>
-    <tr><td><b>Skill Gaps</b></td><td>{gaps.get('total_gap_count',0)}</td><td><b>Knowledge Exposure</b></td><td>{knowledge.get('org_exposure_pct',0)}%</td></tr>
-    <tr><td><b>Succession Readiness</b></td><td>{succession.get('org_readiness','N/A')}%</td><td><b>Workforce Readiness</b></td><td>{readiness.get('readiness_score','N/A')}</td></tr>
-    <tr><td><b>Human Decisions</b></td><td>{len(feedback)}</td><td><b>Report Type</b></td><td>{'Current State' if scenario_type=='baseline' else 'What-If'}</td></tr>
-  </table>
-</div>
-
-<div class="footer">
-  <p>TruPulse AI &middot; Generated {time.strftime('%Y-%m-%d at %H:%M:%S')} &middot; Local LLM via Ollama &middot; 5-Agent Collective Intelligence &middot; ChromaDB Vector Knowledge &middot; Human-in-the-Loop Governance</p>
-  <p style="margin-top:4px"><b>Predict. Simulate. Strengthen.</b> &mdash; This report is confidential and intended for management use.</p>
-</div>
-
-</body></html>""")
+    return HTMLResponse(render_html_report(
+        title=title, health=health, spof_data=spof_data,
+        gaps=gaps, succession=succession, readiness=readiness,
+        knowledge=knowledge, feedback=feedback, pipeline_out=pipeline_out,
+        scenario_type=scenario_type, removed_list=removed_list, scenario=scenario,
+    ))
 
 
 # ---------------------------------------------------------------------------
@@ -1216,23 +895,43 @@ def upskilling(employee_name: str):
 
 
 # ---------------------------------------------------------------------------
+# Helper: run LLM pipeline with fallback chain
+# ---------------------------------------------------------------------------
+def _run_llm_pipeline(health, scenario=None):
+    feedback = get_feedback_overrides()[-10:]
+    try:
+        return run_pipeline(health, scenario, feedback_overrides=feedback)
+    except Exception:
+        try:
+            from agents import run_pipeline as _raw_pipeline
+            return _raw_pipeline(health, scenario, feedback_overrides=feedback)
+        except Exception:
+            return run_pipeline_fallback(health, scenario)
+
+
+# ---------------------------------------------------------------------------
+# Helper: get top SPOFs for a specific team
+# ---------------------------------------------------------------------------
+def _team_spofs(team_name: str, limit: int = 3) -> list[str]:
+    try:
+        spof_data = compute_spof_ranking()
+        return [s["employee"] for s in spof_data["spofs"] if s["team"].lower() == team_name.lower()][:limit]
+    except Exception:
+        return []
+
+
+# ---------------------------------------------------------------------------
 # NEW: Natural Language Query
 # ---------------------------------------------------------------------------
 @app.post("/query")
-def natural_language_query(body: dict):
-    query = body.get("query", "").lower()
-
+def natural_language_query(req: QueryRequest):
+    query = req.query.lower()
     health = compute_org_health()
-
-    # ---- MULTI-SCENARIO QUERY HANDLER ----
-    # Each scenario represents a different combination/permutation of employees leaving
 
     if "vikram" in query and ("leave" in query or "quit" in query or "fire" in query or "depart" in query or "what if" in query):
         removed = ["Vikram"]
         scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = run_pipeline_fallback(health, scenario)
-        spof_data = compute_spof_ranking()
-        vikram_spof = next((s for s in spof_data["spofs"] if s["employee"] == "Vikram"), {})
+        result = _run_llm_pipeline(health, scenario)
         return {
             "answer": f"If Vikram (Sales Manager) leaves, composite score drops from {health['composite_score']} to {scenario['composite_score']}. He owns $8M+ in strategic accounts with NO backup. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}. Account recovery takes 6-9 months.",
             "scenario": scenario,
@@ -1240,41 +939,41 @@ def natural_language_query(body: dict):
         }
 
     if "sales" in query and ("all" in query or "entire" in query or "team" in query) and ("leave" in query or "quit" in query):
-        removed = ["Vikram", "Vikram Sharma", "Tanvi", "Jatin"]
+        removed = _team_spofs("Sales", 5) or ["Vikram", "Vikram Sharma", "Tanvi", "Jatin"]
         scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = run_pipeline_fallback(health, scenario)
+        result = _run_llm_pipeline(health, scenario)
         return {
-            "answer": f"If the ENTIRE Sales team SPOFs leave (Vikram, Vikram Sharma, Tanvi, Jatin), composite craters from {health['composite_score']} to {scenario['composite_score']}. Total revenue at risk: ${scenario['revenue_at_risk_usd']:,}. This represents 60%+ of the sales pipeline collapsing simultaneously.",
+            "answer": f"If the ENTIRE Sales team SPOFs leave ({', '.join(removed)}), composite craters from {health['composite_score']} to {scenario['composite_score']}. Total revenue at risk: ${scenario['revenue_at_risk_usd']:,}. This represents 60%+ of the sales pipeline collapsing simultaneously.",
             "scenario": scenario,
             "summary": result["summary"],
         }
 
     if ("engineer" in query or "engineering" in query) and ("leave" in query or "quit" in query or "fire" in query):
-        removed = ["Neha Kapoor", "Lalit", "Ishita"]
+        removed = _team_spofs("Engineering", 3) or ["Neha Kapoor", "Lalit", "Ishita"]
         scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = run_pipeline_fallback(health, scenario)
+        result = _run_llm_pipeline(health, scenario)
         return {
-            "answer": f"If Neha Kapoor (Chief Architect), Lalit, and Ishita leave, the composite drops from {health['composite_score']} to {scenario['composite_score']}. Engineering loses its Chief Architect, Senior Backend Engineer, and Senior Frontend Engineer. System Modernization and API Gateway projects stall. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
+            "answer": f"If {', '.join(removed)} leave, the composite drops from {health['composite_score']} to {scenario['composite_score']}. Engineering loses its top SPOFs. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
             "scenario": scenario,
             "summary": result["summary"],
         }
 
     if ("security" in query or "sec") in query and ("leave" in query or "quit" in query):
-        removed = ["Anita Verma", "Meera", "Poonam"]
+        removed = _team_spofs("Security", 3) or ["Anita Verma", "Meera", "Poonam"]
         scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = run_pipeline_fallback(health, scenario)
+        result = _run_llm_pipeline(health, scenario)
         return {
-            "answer": f"If Anita Verma (Security Lead), Meera, and Poonam leave, composite drops from {health['composite_score']} to {scenario['composite_score']}. Security Org loses its architect, SOC analyst, and senior engineer. Govt security contracts ($3.9M) and SOC2 compliance are at immediate risk. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
+            "answer": f"If {', '.join(removed)} leave, composite drops from {health['composite_score']} to {scenario['composite_score']}. Security Org loses its top SPOFs. Govt security contracts and SOC2 compliance are at immediate risk. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
             "scenario": scenario,
             "summary": result["summary"],
         }
 
     if ("market" in query or "marketing") in query and ("leave" in query or "quit" in query):
-        removed = ["Shikha Dubey", "Priya", "Hari"]
+        removed = _team_spofs("Marketing", 3) or ["Shikha Dubey", "Priya", "Hari"]
         scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = run_pipeline_fallback(health, scenario)
+        result = _run_llm_pipeline(health, scenario)
         return {
-            "answer": f"If Shikha Dubey (Marketing Director), Priya, and Hari leave, composite drops from {health['composite_score']} to {scenario['composite_score']}. Global Marketing Campaign ($1.8M) loses leadership. Shikha has rumored competitor interest from RetailMax. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
+            "answer": f"If {', '.join(removed)} leave, composite drops from {health['composite_score']} to {scenario['composite_score']}. Marketing loses its top SPOFs. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
             "scenario": scenario,
             "summary": result["summary"],
         }
@@ -1282,7 +981,7 @@ def natural_language_query(body: dict):
     if ("architect" in query or "neha" in query) and ("leave" in query or "quit" in query):
         removed = ["Neha Kapoor"]
         scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = run_pipeline_fallback(health, scenario)
+        result = _run_llm_pipeline(health, scenario)
         return {
             "answer": f"If Neha Kapoor (Chief Architect) leaves, composite drops from {health['composite_score']} to {scenario['composite_score']}. She is the sole design authority for ALL engineering projects. Her knowledge is entirely undocumented. 4 senior engineers depend on her technical direction. Project delays estimated at 4+ months. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
             "scenario": scenario,
@@ -1292,7 +991,6 @@ def natural_language_query(body: dict):
     if "burnout" in query or "overwork" in query:
         burnout = health["indicators"]["burnout"]
         high = burnout["details"].get("high_burnout_employees", [])
-        # Also check Ravi Deshmukh specifically
         extra = "Ravi Deshmukh (DevOps) works 72hrs/week — the highest in the org. He's projected to reach critical burnout within 4-6 weeks."
         return {
             "answer": f"Burnout score: {burnout['score']} ({burnout['risk_level']} risk). {len(high)} employees show high burnout signals: {', '.join(high[:5])}. {extra} PTO deficit and overdue tasks are the main drivers.",
@@ -1300,31 +998,31 @@ def natural_language_query(body: dict):
         }
 
     if "what if" in query or "scenario" in query or "combination" in query or "multiple" in query:
-        # Dynamic scenario: parse employee names from query
         all_employees = set()
-        from scoring import _load
-        emp_df = _load("employees.csv")
-        known_names = set(emp_df["Employee"].tolist()) if not emp_df.empty else set()
-        for word in query.replace(",", " ").split():
-            w = word.strip().title()
-            if w in known_names:
-                all_employees.add(w)
+        from scoring import load_all
+        data = load_all()
+        emp_df = data.get("employees", None)
+        if emp_df is not None and not emp_df.empty and "Employee" in emp_df.columns:
+            known_names = set(emp_df["Employee"].tolist())
+            for word in query.replace(",", " ").split():
+                w = word.strip().title()
+                if w in known_names:
+                    all_employees.add(w)
         if len(all_employees) >= 2:
             removed = sorted(all_employees)
             scenario = simulate_scenario("attrition", removed_employees=removed)
-            result = run_pipeline_fallback(health, scenario)
+            result = _run_llm_pipeline(health, scenario)
             return {
                 "answer": f"Scenario: {', '.join(removed)} leaving. Composite drops from {health['composite_score']} to {scenario['composite_score']}. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}. This combination reveals {len(removed)} interrelated SPOFs leaving simultaneously.",
                 "scenario": scenario,
                 "summary": result["summary"],
             }
 
-    # Attrition scenario for top 5 SPOFs
     if ("top" in query or "all" in query) and ("spof" in query or "critical" in query) and ("leave" in query or "depart" in query):
         spof_data = compute_spof_ranking()
         top5 = [s["employee"] for s in spof_data["spofs"][:5]]
         scenario = simulate_scenario("attrition", removed_employees=top5)
-        result = run_pipeline_fallback(health, scenario)
+        result = _run_llm_pipeline(health, scenario)
         return {
             "answer": f"Worst-case: Top 5 SPOFs ({', '.join(top5)}) leaving simultaneously. Composite collapses from {health['composite_score']} to {scenario['composite_score']}. Total annual revenue at risk: ${scenario['revenue_at_risk_usd']:,}. This is the maximum-impact permutation — recovery would take 12-18 months.",
             "scenario": scenario,
@@ -1348,14 +1046,6 @@ def natural_language_query(body: dict):
             "gaps": worst,
         }
 
-    if "workload" in query or "burnout" in query:
-        burnout = health["indicators"]["burnout"]
-        high = burnout["details"].get("high_burnout_employees", [])
-        return {
-            "answer": f"Burnout score: {burnout['score']} ({burnout['risk_level']} risk). {len(high)} employees show high burnout signals: {', '.join(high[:5])}. PTO deficit and overdue tasks are the main drivers.",
-            "burnout": burnout,
-        }
-
     if "health" in query or "overall" in query or "organization" in query:
         return {
             "answer": f"Overall organizational health: {health['composite_score']}/100 ({health['overall_risk']} risk). Resilience: {health['indicators']['resilience']['score']}, Trust: {health['indicators']['trust']['score']}, Burnout: {health['indicators']['burnout']['score']}, Retention: {health['indicators']['retention']['score']}. {health['employee_count']} employees across {health['team_count']} teams.",
@@ -1364,15 +1054,14 @@ def natural_language_query(body: dict):
 
     if "cross-train" in query or "train" in query or "upskill" in query:
         spof_data = compute_spof_ranking()
-        pipeline = run_pipeline_fallback(health, None)
+        pipeline = _run_llm_pipeline(health, None)
         actions = pipeline["summary"]["coaching"]["actions"]
         return {
             "answer": f"Top priority: cross-train backups for {spof_data['total_spofs']} SPOFs. Recommended: {actions[0]['title']} within {actions[0]['deadline_days']} days (est. ${actions[0]['estimated_cost_usd']:,}). Also document critical processes within 60 days.",
             "actions": actions[:3],
         }
 
-    # Default: run full pipeline
-    pipeline = run_pipeline_fallback(health, None)
+    pipeline = _run_llm_pipeline(health, None)
     return {
         "answer": pipeline["summary"]["insight"]["headline"] + " I've analyzed the full organizational data. Ask me about specific risks, teams, or scenarios.",
         "summary": pipeline["summary"],

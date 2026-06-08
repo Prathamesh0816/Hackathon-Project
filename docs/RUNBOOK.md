@@ -8,7 +8,7 @@
 
 | Tool | Version | Check Command |
 |------|---------|--------------|
-| Python | 3.12+ | `python --version` |
+| Python | 3.12+ (tested on 3.14) | `python --version` |
 | Node.js | 20+ | `node --version` |
 | npm | 10+ | `npm --version` |
 | Docker (optional) | 24+ | `docker --version` |
@@ -115,7 +115,11 @@ curl http://127.0.0.1:8000/org-health
 curl -X POST http://127.0.0.1:8000/whatif \
   -H "Content-Type: application/json" \
   -d '{"scenario_type":"attrition","removed_employees":["Vikram"]}'
-# Expected: {"comparison":{"composite_delta":3.8,...}}
+# Expected: composite drops 47.5→41.7 (-5.8 delta)
+
+# Employees list
+curl http://127.0.0.1:8000/employees
+# Expected: {"employees": [...], "total": 115, "source": "csv"}
 
 # SPOF ranking
 curl http://127.0.0.1:8000/spof-ranking
@@ -171,7 +175,8 @@ curl -X POST http://127.0.0.1:8000/feedback/suggestions
 curl -X POST http://127.0.0.1:8000/feedback/apply \
   -H "Content-Type: application/json" \
   -d '{"accepted_ids":["sug_cross_train_Vikram"],"rejected_ids":[]}'
-# Expected: {"before_score": 47.5, "after_score": 52.3, "delta": 2.5}
+# Expected: {"before_score": 47.5, "after_score": number, "delta": number}
+# Note: actual delta depends on how many suggestions were accepted (cross_train * 2.5 + doc * 1.5)
 ```
 
 ### 4e. Test all endpoints
@@ -183,6 +188,7 @@ import requests
 endpoints = [
   ('GET', '/'),
   ('GET', '/org-health'),
+  ('GET', '/employees'),
   ('GET', '/spof-ranking'),
   ('GET', '/skill-gaps'),
   ('GET', '/succession-planning'),
@@ -190,9 +196,15 @@ endpoints = [
   ('GET', '/knowledge-concentration'),
   ('GET', '/employee/Vikram'),
   ('GET', '/upskilling/Vikram'),
+  ('GET', '/scenarios'),
+  ('GET', '/demo-data'),
+  ('GET', '/reactions'),
   ('POST', '/whatif', {'scenario_type':'attrition','removed_employees':['Vikram']}),
+  ('POST', '/pipeline', {'scenario_type':'attrition','removed_employees':['Vikram'],'use_fallback':True}),
   ('POST', '/query', {'query':'What is our overall health?'}),
   ('GET', '/report'),
+  ('GET', '/dataset/info'),
+  ('GET', '/dataset/files'),
   ('POST', '/text-input', {'text':'Employee: Test, Team: QA, Role: Tester'}),
   ('POST', '/feedback/suggestions'),
   ('POST', '/feedback/apply', {'accepted_ids':['sug_1'],'rejected_ids':[]}),
@@ -217,16 +229,16 @@ for ep in endpoints:
 
 | Time | Action | Screen | Speaker |
 |------|--------|--------|---------|
-| 0:00 | "Meet Vikram — 56 SPOFs, $54.6M at risk" | Dashboard | Lokesh |
-| 0:30 | Show composite score 47.5 (HIGH), 4 indicator gauges | KPICards | Lokesh |
-| 1:00 | Click SPOF tab, show 56 SPOFs ranked | SPOF page | Lokesh |
-| 1:30 | Go to What-If, remove Vikram, run simulation | What-If page | Lokesh |
-| 2:00 | Show composite delta +3.8, revenue impact | TimeMachine | Lokesh |
-| 2:15 | Type employee via text input, show parsed result | TextInput | Lokesh |
-| 2:30 | Show feedback panel, accept a suggestion | FeedbackPanel | Lokesh |
-| 3:00 | Show Skill Gaps (6 gaps across 14 teams) | SkillGaps page | Lokesh |
-| 3:30 | Generate management report, show HTML + print | Report page | Lokesh |
-| 4:00 | Architecture deep-dive: vector DB, agents, scoring | PPT slide | Lokesh |
+| 0:00 | "Meet Vikram — 56 SPOFs, $13.4M at risk" | Dashboard | Prathamesh |
+| 0:30 | Show composite score 47.5 (HIGH), 4 indicator gauges | KPICards | Prathamesh |
+| 1:00 | Click SPOF tab, show 56 SPOFs ranked | SPOF page | Prathamesh |
+| 1:30 | Go to What-If, remove Vikram, run simulation | What-If page | Prathamesh |
+| 2:00 | Show composite drop (-5.8 delta), revenue impact at risk | TimeMachine | Prathamesh |
+| 2:15 | Type employee via text input, show parsed result | TextInput | Prathamesh |
+| 2:30 | Show feedback panel, accept a suggestion | FeedbackPanel | Prathamesh |
+| 3:00 | Show Skill Gaps (6 gaps across 14 teams) | SkillGaps page | Prathamesh |
+| 3:30 | Generate management report, show HTML + print | Report page | Prathamesh |
+| 4:00 | Architecture deep-dive: vector DB, agents, scoring | PPT slide | Prathamesh |
 | 4:45 | Wrap + Q&A | All | Everyone |
 
 **Contingency:** If Ollama is down, the pipeline falls back to rule-based templates automatically. Demo still works.
@@ -239,7 +251,7 @@ for ep in endpoints:
 ```bash
 cd frontend
 npm run dev
-# Verify all 10 pages render correctly
+# Verify all 11 pages render correctly
 # Test TextInput component with sample data
 # Test FeedbackPanel accept/reject/edit flow
 # Test responsive layout (mobile/tablet/desktop)
@@ -248,8 +260,8 @@ npm run dev
 ### Sopan (QA — End-to-End Testing)
 ```bash
 # 1. Start backend + frontend
-# 2. Verify all 35+ API endpoints (section 4e above)
-# 3. Test all 4 report formats (HTML, Text, PDF, Print)
+# 2. Verify all 35+ API endpoints (section 4e above — now covers 22 endpoints)
+# 3. Test all 4 report formats (HTML, Text, Print, PDF-via-Ctrl+P)
 # 4. Test text input with various formats
 # 5. Test feedback loop (suggestions → apply → score change)
 # 6. Test frontend pages load without console errors
@@ -329,6 +341,13 @@ print(f'LangChain available: {LANGCHAIN_AVAILABLE}')
 | CORS error in browser | Wrong port | Frontend must use proxy (port 3000 → 8000) |
 | Slow first API call | ChromaDB downloading model | Wait for download, subsequent calls are fast |
 | `Port 8000 already in use` | Another process | Kill it: `netstat -ano | findstr :8000` then `taskkill /PID <pid> /F` |
+| `pip install` fails on pandas/pydantic (no wheel) | Python 3.14 + no C++ build tools | Use pre-built wheels: `pip install pandas==3.0.3 pydantic==2.13.4` or downgrade to Python 3.12 |
+| `Vite proxy not working` / API calls fail | Vite not proxying `/api` correctly | Check `vite.config.js` — proxy must target `http://localhost:8000` with `changeOrigin: true` |
+| `Node version too old` | Node < 18 | Install Node 20+ from https://nodejs.org |
+| `'ollama' is not recognized` | Ollama not installed or not in PATH | Download from https://ollama.com or run via Docker: `docker run -d -p 11434:11434 ollama/ollama` |
+| Frontend shows old data after backend change | Browser cache | Hard refresh: Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac) |
+| `sqlite3.OperationalError: no such table` | Database not seeded | Run: `cd trupulse-db && python scripts/seed_from_csv.py` |
+| Frontend loads but shows empty lists | Backend running but no data loaded | Check `GET /employees` returns data. If empty, upload CSVs via Upload page or seed DB |
 
 ---
 
@@ -351,7 +370,7 @@ hackathon-project/
 │   └── requirements.txt
 ├── frontend/            # React 18 + Vite + TailwindCSS
 │   ├── src/
-│   │   ├── pages/       # 10 pages
+│   │   ├── pages/       # 11 pages
 │   │   ├── components/  # 15 components (incl. TextInput, FeedbackPanel)
 │   │   └── services/    # API client
 │   └── package.json
@@ -377,6 +396,7 @@ hackathon-project/
 
 ## 9. Final Checklist Before Demo
 
+- [ ] **Numbers alignment:** verified all demo script numbers match live API (`GET /org-health`, `GET /spof-ranking`, `POST /whatif`) — composite 47.5, 56 SPOFs, $13.4M, $2.7M at risk
 - [ ] Backend starts: `uvicorn main:app --port 8000` → 200 OK
 - [ ] Frontend builds: `npm run build` → no errors
 - [ ] All 35+ endpoints respond correctly (check 4e)

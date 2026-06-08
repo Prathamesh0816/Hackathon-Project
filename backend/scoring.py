@@ -112,21 +112,37 @@ def _load_from_csv() -> dict[str, pd.DataFrame]:
     }
 
 
+_CACHE: dict[str, Any] = {"data": None, "ts": 0.0}
+_CACHE_TTL = 2.0  # seconds before cache invalidates
+
+
 def load_all() -> dict[str, pd.DataFrame]:
-    # 1. Active uploaded dataset (highest priority)
+    import time
+    now = time.time()
+    # 1. Active uploaded dataset (highest priority) — always fresh
     try:
         from data_manager import get_active_dataset
         active = get_active_dataset()
         if active is not None:
+            _CACHE["data"] = active
+            _CACHE["ts"] = now
             return active
     except Exception:
         pass
-    # 2. SQLite database
+    # 2. Return cached if still valid
+    if _CACHE["data"] is not None and (now - _CACHE["ts"]) < _CACHE_TTL:
+        return _CACHE["data"]
+    # 3. SQLite database
     db = _load_from_db()
     if db is not None:
+        _CACHE["data"] = db
+        _CACHE["ts"] = now
         return db
-    # 3. CSV files (fallback)
-    return _load_from_csv()
+    # 4. CSV files (fallback)
+    result = _load_from_csv()
+    _CACHE["data"] = result
+    _CACHE["ts"] = now
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -447,6 +463,7 @@ def simulate_scenario(
     removed_emp_ids: list[str] = []
     removed_emp_salaries: list[int] = []
     revenue_at_risk = 0
+    disruption_penalty = 0.0
 
     if scenario_type == "attrition" and removed_employees:
         mask = employees["Employee"].isin(removed_employees)
@@ -458,15 +475,35 @@ def simulate_scenario(
         performance = performance[~performance["EmployeeID"].isin(removed_emp_ids)]
         dependencies = dependencies[~dependencies["Owner"].isin(removed_employees)]
 
-        # Crude revenue-at-risk model: 1.5x annual salary, scaled by team contracts
+        # Revenue at risk — unique per team, no double-counting
+        counted_teams: set[str] = set()
         for emp_name in removed_employees:
             emp_row = data["employees"][data["employees"]["Employee"] == emp_name]
             if not emp_row.empty:
                 team = emp_row.iloc[0]["Team"]
+                if team in counted_teams:
+                    continue
+                counted_teams.add(team)
                 team_revenue = data["projects"][
                     (data["projects"]["Team"] == team) & (data["projects"]["AnnualContractValueUSD"] > 0)
                 ]["AnnualContractValueUSD"].sum()
                 revenue_at_risk += int(team_revenue * 0.35)
+
+        # SPOF departure shock: losing a critical knowledge-holder has a measurable
+        # but proportional impact. Resilience drops modestly (not to zero), revenue
+        # at risk is the headline. Penalty = undocumented knowledge + role criticality.
+        for emp_name in removed_employees:
+            emp_row = data["employees"][data["employees"]["Employee"] == emp_name]
+            if not emp_row.empty:
+                e = emp_row.iloc[0]
+                is_spof = e["BackupAvailable"] == "No" and e["Criticality"] in ("High", "Medium")
+                if is_spof:
+                    emp_id = e["EmployeeID"]
+                    emp_knowledge = data["knowledge"][data["knowledge"]["EmployeeID"] == emp_id]
+                    low_doc = int((emp_knowledge["DocumentationLevel"] == "Low").sum())
+                    criticality_mult = 1.5 if e["Criticality"] == "High" else 1.0
+                    spof_penalty = (low_doc * 1.5 + 3.0) * criticality_mult
+                    disruption_penalty += spof_penalty
 
     elif scenario_type == "workload_increase" and workload_increase_pct > 0:
         workload["WeeklyHours"] = (workload["WeeklyHours"] * (1 + workload_increase_pct / 100)).round(1)
@@ -485,6 +522,10 @@ def simulate_scenario(
     burnout = compute_burnout(workload, performance)
     retention = compute_retention(employees, performance)
 
+    # SPOF departure shock applies entirely to resilience (knowledge loss, backup gap)
+    if disruption_penalty > 0:
+        resilience["score"] = max(0.0, resilience["score"] - disruption_penalty)
+
     composite = round(
         0.35 * resilience["score"]
         + 0.20 * trust["score"]
@@ -493,18 +534,21 @@ def simulate_scenario(
         1,
     )
 
+    composite = max(0.0, composite)
+
     return {
         "scenario": scenario_type,
         "removed_employees": removed_employees,
         "workload_increase_pct": workload_increase_pct,
         "restructure_team": restructure_team,
-        "composite_score": composite,
+        "composite_score": round(composite, 1),
         "revenue_at_risk_usd": revenue_at_risk,
+        "spof_departure_shock": round(disruption_penalty, 1),
         "indicators": {
-            "resilience": resilience["score"],
-            "trust": trust["score"],
-            "burnout": burnout["score"],
-            "retention": retention["score"],
+            "resilience": round(resilience["score"], 1),
+            "trust": round(trust["score"], 1),
+            "burnout": round(burnout["score"], 1),
+            "retention": round(retention["score"], 1),
         },
     }
 

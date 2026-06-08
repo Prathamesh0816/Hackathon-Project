@@ -11,7 +11,18 @@ Organizational Resilience Analytics Platform
 
 *Tagline:* Real-time workforce resilience intelligence — because your next critical departure is already visible.
 
-Team: Prathamesh, Sopan, Aradhana, Santosh, Varad, Lokesh
+> *"Hi, we're Team TruPulse. We built an AI platform that tells you who you can't afford to lose — and what to do about it — before they update their LinkedIn."*
+
+**Team**
+
+| Member | Role |
+|--------|------|
+| **Prathamesh** | Product Owner, Frontend & Presentation Lead |
+| **Sopan** | QA Lead |
+| **Aradhana** | Backend & Database Lead |
+| **Santosh** | AI Lead |
+| **Varad** | Business Analyst & Documentation Lead |
+| **Lokesh** | Demo & Coordination Lead |
 
 > *"Meet Vikram. Sales Manager, 8 years, 3 dependents, no backup. His knowledge spans 5 critical areas — only he knows them. If he leaves tomorrow, $2.7M in revenue goes with him."*
 
@@ -24,7 +35,7 @@ Team: Prathamesh, Sopan, Aradhana, Santosh, Varad, Lokesh
 | Metric | Industry Reality |
 |--------|-----------------|
 | 56+ SPOFs | In a typical 115-person team |
-| $54.6M | Annual revenue at risk per org |
+| $13.4M | Annual revenue at risk per org |
 | 40%+ | Knowledge held by 1-2 people |
 | 68% | Orgs with NO succession plan |
 | $600K | Average cost of a critical departure |
@@ -38,12 +49,12 @@ Team: Prathamesh, Sopan, Aradhana, Santosh, Varad, Lokesh
 **Architecture**
 
 ```
-React 18 + Vite     FastAPI (Python 3.12)     LangChain + LangGraph    Ollama LLM
+React 18 + Vite     FastAPI (Python 3.12+)    LangChain + LangGraph    Ollama LLM
 ┌────────────┐      ┌──────────────────┐      ┌──────────────────┐      ┌────────┐
 │  Dashboard │─────▶│  Scoring Engine  │─────▶│  RunnableSequence │──────│ Qwen   │
-│  What-If   │◀────▶│  15+ Endpoints   │◀────▶│  StateGraph       │      │2.5:3b  │
+│  What-If   │◀────▶│  35+ Endpoints   │◀────▶│  StateGraph       │      │2.5:3b  │
 │  Reports   │      │  LangChain Tools  │      │  Pydantic Output  │      │Fallback│
-│  TextInput │      │  File Ingest     │      │  9 Tool Wrappers  │      └────────┘
+│  Upload    │      │  File Ingest     │      │  9 Tool Wrappers  │      └────────┘
 │  Feedback  │      │  Spec Models     │      └──────────────────┘
 └────────────┘      └──────────────────┘
 ```
@@ -64,10 +75,10 @@ React 18 + Vite     FastAPI (Python 3.12)     LangChain + LangGraph    Ollama LL
 
 | Indicator | Score | Risk | What It Measures |
 |-----------|-------|------|-----------------|
-| Resilience | 29.0 | HIGH | SPOF count, backup availability, documentation |
-| Trust | 47.5 | HIGH | Experience distribution, tenure stability |
-| Burnout | 38.1 | MEDIUM | Workload hours, engagement scores |
-| Retention | 73.4 | LOW | Compensation parity, role satisfaction |
+| Resilience | 32.6 | HIGH | SPOF count, backup availability, documentation |
+| Trust | 50.2 | MEDIUM | Experience distribution, tenure stability |
+| Burnout | 51.1 | MEDIUM | Workload hours, engagement scores |
+| Retention | 69.0 | MEDIUM | Compensation parity, role satisfaction |
 
 **Composite: 47.5 — HIGH Risk**
 
@@ -81,7 +92,7 @@ React 18 + Vite     FastAPI (Python 3.12)     LangChain + LangGraph    Ollama LL
 
 | Scenario | Composite Delta | Revenue Impact |
 |----------|----------------|---------------|
-| Vikram leaves | +3.8 | $2.7M at risk |
+| Vikram leaves | -5.8 | $2.7M at risk |
 | 20% workload increase (Engineering) | -5.2 | $640K |
 | Team restructure (Sales + Product) | +2.1 | $310K |
 
@@ -103,7 +114,7 @@ React 18 + Vite     FastAPI (Python 3.12)     LangChain + LangGraph    Ollama LL
 
 | Module | Output | Business Value |
 |--------|--------|---------------|
-| **SPOF Ranking** | 56 SPOFs identified, $54.6M at risk | Who to cross-train first |
+| **SPOF Ranking** | 56 SPOFs identified, $13.4M at risk | Who to cross-train first |
 | **Skill Gap Detection** | 6 org-wide gaps, 11 teams analyzed | Where to hire/upskill |
 | **Succession Planning** | 8 critical roles, 3 ready-now successors | Who can step in tomorrow |
 | **Knowledge Concentration** | 40% org exposure, 8 critical areas | Where knowledge is fragile |
@@ -215,18 +226,25 @@ Report includes: Executive Summary, 4 KPI charts (CSS bar graphs), SPOF ranking 
 
 **Why Bet on TruPulse?**
 - **$1.2M–$2.2M** annual prevented loss per 200-person company (defensible methodology in `BUSINESS_IMPACT.md`)
-- **65:1 ROI** — payback in under 6 days
+- **16:1 ROI** — payback in under 6 days
 - **$18K/year** for mid-market — 10x cheaper than building, 5x cheaper than Workday add-ons
 - Zero cloud cost (Ollama local), runs on any laptop, no data leaves your infra
 
+**What's Next — Our Answer When Judges Ask**
+> *"Phase 1: production hardening — PostgreSQL, auth, CI/CD — deployable tomorrow. Phase 2: replace heuristics with XGBoost trained on real HRIS data. Phase 3: connect to Workday and Slack. Phase 4: industry-specific versions. Phase 5: open the platform. First feature after hackathon: Workday integration — because that's what the first paying customer will ask for."*
+
 **"Resilience isn't reactive. It's real-time. It's TruPulse."**
+
+**Thank you. We're ready for your questions.**
+
+*(Optional closer, time permitting):* *"Every dashboard tells you what already happened. TruPulse tells you what's about to."*
 
 ---
 
 ## Backup Slides (Q&A)
 
 ### B1: Technical Architecture Detail
-- FastAPI with CORS middleware, 15+ endpoints, Pydantic models for validation
+- FastAPI with CORS middleware, 35+ endpoints, Pydantic models for validation
 - 4-format report system: HTML (CSS charts), Text (plain), PDF (browser), Print (auto-dialog)
 - Docker Compose: 3 services (api, web, ollama)
 - One-command deploy: `docker-compose up --build`
@@ -254,3 +272,15 @@ Report includes: Executive Summary, 4 KPI charts (CSS bar graphs), SPOF ranking 
 - 6 members across frontend, backend, AI, QA, business, coordination
 - Built in 2 days for this hackathon
 - Production-ready architecture with clear upgrade path
+
+### B6: Why We Win — Judging Criteria Alignment
+
+| Criterion (Weight) | Why We Win | Evidence |
+|--------------------|-----------|----------|
+| **Innovation (25%)** | LangGraph StateGraph + conditional revision loop + Pydantic-validated agent outputs + 9 tool-augmented agents + 4-level fallback chain — no other team has all 5 | `WHATS_UNIQUE.md` (10 differentiators), `DEMO_SCRIPT.md` Segment 3 |
+| **Business Value (25%)** | 56 SPOFs, $13.4M at risk, $840K to de-risk, **16:1 ROI**, payback in <6 days, quantified methodology — not hand-wavy | `BUSINESS_IMPACT.md`, Q&A prep §ROI |
+| **Technical (20%)** | 35+ endpoints, LangChain + LangGraph pipeline, Pydantic v2 contracts, Docker Compose, 4-level fallback, 9 tools, offline-capable | `RUNBOOK.md`, `ARCHITECTURE.md`, `backend/agents_langchain.py` |
+| **Scalability (15%)** | O(n) scoring (sub-second at 115, ~500ms at 10K), ChromaDB (100K+ vectors), Docker replicas, SQLAlchemy (SQLite↔Postgres swap in 1 line) | `ROADMAP.md` Phase 3 (100K benchmark), `QNA_PREP.md` §scalability |
+| **UI/UX (10%)** | Force-directed SPOF graph with animation, Time Machine before/after, governance panel, one-click report (HTML/Text/PDF), responsive | `DEMO_SCRIPT.md` Segments 2+4, 11 UI pages |
+| **Presentation (5%)** | 5-min 6-segment script with timing, named hero (Vikram), 3 printed handouts, backup video, 30+ Q&A answers prepared | `DEMO_SCRIPT.md`, `DAY_PLAN.md`, `QNA_PREP.md` |
+| **Estimated Total** | **88-94/100** (up from 82-93 after LangGraph + Pydantic + feedback additions) | All docs aligned to criteria |

@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import WhatIfFloating from './WhatIfFloating'
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: '◉' },
@@ -53,6 +54,7 @@ export default function Layout({ children }) {
         </header>
         <div className="flex-1 p-6 overflow-y-auto">{children}</div>
       </main>
+      <WhatIfFloating />
     </div>
   )
 }

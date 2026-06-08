@@ -7,18 +7,44 @@
 
 ## Quick Start (5 Minutes)
 
-### Prerequisites
-- Python 3.12+
+### Option A: Docker (Recommended — One Command)
+
+```bash
+docker compose up --build
+```
+
+Then open http://localhost:3000
+
+The backend starts on http://localhost:8000 with 115 employees pre-loaded. No Python/Node setup needed.
+
+**AI pipeline:** The Ollama container auto-pulls `qwen2.5:3b` on first start (may take 1-5 min). The API waits for the Ollama server before starting, so AI works out of the box. If the model pull times out, the pipeline falls back to deterministic templates — still works without AI.
+
+Check AI status: `docker logs trupulse-ollama` should show "Model qwen2.5:3b pulled successfully."
+
+### Option B: Manual Setup
+
+#### Prerequisites
+- Python 3.12+ (tested on 3.14)
 - Node.js 20+
 - (Optional) [Ollama](https://ollama.com) with `qwen2.5:3b` — for AI pipeline. Fallback mode works without it.
-- LangChain + LangGraph (auto-installed via `requirements.txt`) — powers agent orchestration
 
-### 1. Backend
+#### 0. Environment (Optional — for Ollama)
+
+```bash
+cd backend
+copy .env.example .env
+# Edit .env if needed:
+#   OLLAMA_URL=http://localhost:11434
+#   OLLAMA_MODEL=qwen2.5:3b
+```
+
+The pipeline auto-falls back to deterministic templates if no .env is configured.
+
+#### 1. Backend
 
 ```bash
 cd backend
 python -m venv venv
-
 # Windows PowerShell:
 .\venv\Scripts\Activate.ps1
 
@@ -28,7 +54,7 @@ uvicorn main:app --reload --port 8000
 
 Verify: `curl http://localhost:8000/` returns JSON.
 
-### 2. Frontend
+#### 2. Frontend
 
 ```bash
 cd frontend
@@ -38,7 +64,7 @@ npm run dev
 
 Open: http://localhost:3000
 
-### 3. (Optional) AI — Ollama
+#### 3. (Optional) AI — Ollama
 
 ```bash
 ollama pull qwen2.5:3b
@@ -46,7 +72,7 @@ ollama pull qwen2.5:3b
 
 The pipeline auto-falls back to deterministic templates if Ollama isn't running. Demo-safe.
 
-### 4. (Optional) Database — SQLite / Vector DB
+#### 4. (Optional) Database — SQLite / Vector DB
 
 ```bash
 cd trupulse-db
@@ -74,18 +100,17 @@ Opens at http://localhost:3000
 
 | Time | Step | Who |
 |------|------|-----|
-| **0:00** | *"Most companies measure financial health. We measure workforce health."* | Lokesh |
+| **0:00** | *"Most companies measure financial health. We measure workforce health."* | Prathamesh |
 | **0:30** | Dashboard: composite health **47.5/100** (HIGH risk), 4 indicators | Prathamesh |
-| **1:00** | Click **Vikram** — Sales Manager, 8yr, no backup, **$2.7M revenue at risk** | Varad |
-| **2:00** | **What-If** — select Vikram departing → Time Machine: **72→41** | Prathamesh |
-| **3:00** | **AI Pipeline** — 5 agents run: Insight → Risk → Simulation → Coaching → Governance | Santosh |
+| **1:00** | Click **Vikram** — Sales Manager, 8yr, no backup, **$2.7M revenue at risk** | Prathamesh |
+| **2:00** | **What-If** — select Vikram departing → Time Machine: **47.5→41.7 (-5.8)** | Prathamesh |
+| **3:00** | **AI Pipeline** — 5 agents run on LangGraph StateGraph with revision loop | Prathamesh |
 | **3:30** | **Governance Panel** — confidence score, bias check, reasoning trace | Prathamesh |
-| **4:00** | **SPOF Dependency Graph** — 56 nodes pulsing, click to highlight | Prathamesh |
-| **4:15** | **Stress Test** — SPOFs fall one by one, score drops to 22 | Prathamesh |
-| **4:30** | **AI Chat** — "What if top 3 engineers leave?" → instant answer | Prathamesh |
-| **4:45** | **Resilience Report** — download HTML, executive-ready | Prathamesh |
+| **4:00** | **SPOF Dependency Graph** — 56 nodes, purple = SPOF, click to highlight | Prathamesh |
+| **4:15** | **Stress Test** — SPOFs fall one by one, resilience drops to 22 | Prathamesh |
+| **4:30** | **What-If Engineering** — remove top 3 engineers → $5.3M at risk | Prathamesh |
+| **4:45** | **Resilience Report** — download HTML, executive-ready in one click | Prathamesh |
 | **4:55** | *"The companies that win act before it's too late."* | Prathamesh |
-
 **Backup:** Lokesh has a recorded demo video on phone. If anything fails, play the video.
 
 ---
@@ -122,18 +147,32 @@ Hackathon-Project/
 │   ├── schema.sql          # 7 tables (SQLite + PostgreSQL compatible)
 │   ├── scripts/seed_from_csv.py
 │   └── README.md
-├── docs/                   # Documentation (9+ files)
+├── docs/                   # Documentation (9 files)
+│   ├── CLIENT_PITCH.md     # 1-page client proposal
+│   ├── ROADMAP.md          # 5-phase product roadmap (24 months)
+│   ├── RUNBOOK.md          # 22-endpoint test script + troubleshooting
+│   ├── PPT_CONTENT.md      # Slide-by-slide presentation guide
+│   ├── PROJECT_OVERVIEW.md # High-level project description
+│   ├── TECHNICAL_EXPLANATION.md # Architecture deep-dive
+│   ├── SPECIFICATIONS.md   # Tech stack + design decisions
+│   ├── 2DAY_PLAN.md        # Day 2 schedule with dinner break
+│   └── PLAN_OF_ACTION.md   # Pre-hackathon prep checklist
 ├── docker-compose.yml      # One-command full stack
-├── Dockerfile.api
+├── Dockerfile.api          # Python 3.12-slim + all deps
+├── Dockerfile.web          # Node 20 build + nginx serve
+├── .dockerignore           # Skips venv, node_modules, __pycache__
+├── ollama-entrypoint.sh    # Auto-pulls qwen2.5:3b on container start
 ├── Dockerfile.web
 ├── ARCHITECTURE.md         # Mermaid diagrams for PPT
-├── BUSINESS_IMPACT.md      # $54.6M revenue at risk, 65:1 ROI, pricing, TCO
+├── BUSINESS_IMPACT.md      # $13.4M revenue at risk, 16:1 ROI, pricing, TCO
 ├── DEMO_SCRIPT.md          # Word-for-word 5-min script with positioning
 ├── DAY_PLAN.md             # Day-wise workload distribution
 ├── QNA_PREP.md             # Every judge + client question + answer
 ├── **WHATS_UNIQUE.md**     # **10 things no other project/competitor does — print for judges**
-├── docs/CLIENT_PITCH.md    # 1-page proposal for client conversations
-└── docs/ROADMAP.md         # 5-phase product roadmap (24 months)
+├── **JUDGE_EXECUTIVE_SUMMARY.md** # **One-page reference for judges during Q&A**
+├── **HOW_TO_WIN.md**       # **3 execution steps: dry run, code tabs, backup video**
+├── **FROM_SCRATCH.md**     # **Full lifecycle guide: planning → development → presentation**
+└── **SPRINT_PLAN.md**      # **Agile sprint plan with epics, PBIs, user stories, assignments**
 ```
 
 ---
@@ -145,6 +184,7 @@ Hackathon-Project/
 | GET | `/` | Health check + endpoint list |
 | GET | `/org-health` | 4-indicator composite score |
 | GET | `/employee/{name}` | Full employee profile |
+| GET | `/employees` | List all employees (name, team, role, tenure, salary) from active data source |
 | GET | `/employee-data/{id}` | Employee data by ID |
 | POST | `/analyze-employee/{id}` | AI analysis per employee |
 | POST | `/whatif` | Scenario simulation |
@@ -180,8 +220,6 @@ Hackathon-Project/
 
 ---
 
----
-
 ## Why This Stack Works Together
 
 | Component | Problem | Solution | Why It Works |
@@ -199,6 +237,10 @@ Hackathon-Project/
 | **Regex text parser** | NLP is overengineered for template input | Pattern-based parsing | <1ms, predictable, fails gracefully with 400 |
 | **In-memory feedback store** | DB setup overhead for ephemeral data | Python list | <5ms apply, SQLAlchemy-ready for production |
 | **Docker Compose** | Environment mismatch between laptops | 3-service containerized stack | One command (`up --build`), `depends_on` ordering, port isolation |
+
+| **Skeleton loading** | Spinner feels unfinished | Content-aware skeleton pages for all 8 data pages | Shows structure immediately; professional UX |
+| **.env.example** | Ollama config was undocumented | Single env file for OLLAMA_URL + OLLAMA_MODEL | Reproducible setup, no hardcoded config |
+| **Dynamic employees endpoint** | Hardcoded 35 employees in frontend | `/employees` endpoint returns live data from CSV/DB/upload | Real data, not mock data; works with any dataset |
 
 > Full per-component rationale with code references: see [`docs/TECHNICAL_EXPLANATION.md`](docs/TECHNICAL_EXPLANATION.md).
 
@@ -221,13 +263,13 @@ Hackathon-Project/
 
 | Criteria (Weight) | Score | How We Deliver |
 |-------------------|-------|----------------|
-| Innovation (25%) | 22-24/25 | 10 differentiators: LangChain + LangGraph orchestration, tool-augmented agents, Pydantic-validated outputs, revision loop + Predictive Simulation, Collective Agent AI, Human-in-the-Loop, Governance-First AI, Privacy-Preserving, Zero-to-Insight |
-| Business Value (25%) | 20-22/25 | $54.6M revenue at risk, 65:1 ROI, $1.2M-$2.2M annual prevented loss per 200-person company |
+| Innovation (25%) | 23-24/25 | 10 differentiators: LangChain + LangGraph orchestration, tool-augmented agents, Pydantic-validated outputs, revision loop + Predictive Simulation, Collective Agent AI, Human-in-the-Loop, Governance-First AI, Privacy-Preserving, Zero-to-Insight |
+| Business Value (25%) | 22-23/25 | $13.4M revenue at risk, 16:1 ROI, $1.2M-$2.2M annual prevented loss per 200-person company |
 | Technical (20%) | 18-20/20 | 35+ endpoints, 11 UI pages, 5 AI agents on LangGraph StateGraph with revision loop, 9 LangChain tools, 20+ multi-scenario permutations, canvas physics simulation, Excel/CSV/TXT upload, Docker |
-| Scalability (15%) | 12-14/15 | XGBoost-ready scaffold, SQLAlchemy (SQLite ↔ Postgres in 1 line), Docker orchestration |
+| Scalability (15%) | 13-14/15 | XGBoost-ready scaffold, SQLAlchemy (SQLite ↔ Postgres in 1 line), Docker orchestration |
 | UI/UX (10%) | 8-9/10 | Force-directed dependency graph, stress test animation, Time Machine, chat interface, governance panel |
-| Presentation (5%) | 3-5/5 | Named hero (Vikram), 5-min script with stopwatch timing, Q&A prep for every likely question |
-| **Weighted Total** | **82-93/100** | **Top 3 contender** |
+| Presentation (5%) | 4-5/5 | Named hero (Vikram), 5-min script with stopwatch timing, Q&A prep for every likely question |
+| **Weighted Total** | **88-94/100** | **Top 3 contender — up from 82-93 after LangGraph + Pydantic + feedback additions** |
 
 ---
 
@@ -239,6 +281,9 @@ Hackathon-Project/
 | `BUSINESS_IMPACT.md` | Business value slide content + ROI methodology + pricing + TCO comparison |
 | `ARCHITECTURE.md` | Architecture diagram + innovation differentiators |
 | `QNA_PREP.md` | Every judge & client question + practiced answer (technical, business, commercial) |
+| `JUDGE_EXECUTIVE_SUMMARY.md` | One-page reference for judges — answers, doc map, scoring targets |
+| `HOW_TO_WIN.md` | **3 execution steps: dry run procedure, code tab navigation, backup video setup** |
+| `FROM_SCRATCH.md` | Full lifecycle guide: planning → development → testing → docs → PPT → presentation |
 | `DEMO_SCRIPT.md` | Word-for-word 5-minute script with competitive positioning |
 | `DAY_PLAN.md` | Day-wise workload for all 6 team members |
 | `docs/CLIENT_PITCH.md` | 1-page proposal: implementation, pricing, ROI guarantee — for client conversations |

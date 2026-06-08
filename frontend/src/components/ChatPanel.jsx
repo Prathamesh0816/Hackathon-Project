@@ -91,14 +91,28 @@ export default function ChatPanel({ onResult }) {
               }`}
             >
               {msg.text}
-              {msg.data?.summary?.coaching?.actions?.length > 0 && (
+              {msg.data?.summary?.coaching?.actions?.length > 0 ? (
                 <div className="mt-2 pt-2 border-t border-gray-200">
                   <p className="text-xs font-medium text-tru-600 mb-1">Recommended Actions:</p>
                   {msg.data.summary.coaching.actions.slice(0, 3).map((a, j) => (
                     <p key={j} className="text-xs text-gray-600">→ {a.title}</p>
                   ))}
                 </div>
-              )}
+              ) : msg.data?.actions?.length > 0 ? (
+                <div className="mt-2 pt-2 border-t border-gray-200">
+                  <p className="text-xs font-medium text-tru-600 mb-1">Recommended Actions:</p>
+                  {msg.data.actions.slice(0, 3).map((a, j) => (
+                    <p key={j} className="text-xs text-gray-600">→ {a.title || a}</p>
+                  ))}
+                </div>
+              ) : msg.data?.spofs?.length > 0 ? (
+                <div className="mt-2 pt-2 border-t border-gray-200">
+                  <p className="text-xs font-medium text-tru-600 mb-1">Top SPOFs:</p>
+                  {msg.data.spofs.slice(0, 3).map((s, j) => (
+                    <p key={j} className="text-xs text-gray-600">→ {s.employee} ({s.team})</p>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </div>
         ))}

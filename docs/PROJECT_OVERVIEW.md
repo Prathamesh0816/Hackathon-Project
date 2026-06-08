@@ -9,7 +9,7 @@ TruPulse AI is an **organizational workforce resilience analytics platform** tha
 Organizations lose millions due to unexpected departures of key employees. Traditional HR analytics are retrospective (exit interviews, annual surveys). By the time you know there's a problem, the employee has already left.
 
 **Real-world impact:**
-- $54.6M annual revenue at risk per organization (TruPulse benchmark)
+- $13.4M annual revenue at risk per organization (TruPulse benchmark)
 - 56+ single points of failure in a typical 115-person team
 - Knowledge concentration: 40%+ of critical knowledge held by 1–2 people
 - 68% of organizations have no succession plan for critical roles
@@ -38,7 +38,7 @@ TruPulse AI provides **real-time, forward-looking** workforce analytics:
 | Layer | Technology | Why |
 |-------|-----------|-----|
 | **Frontend** | React 18 + Vite + TailwindCSS + Recharts | Fast dev, responsive UI, rich charts |
-| **Backend** | FastAPI (Python 3.12) | High performance, async, auto-docs |
+| **Backend** | FastAPI (Python 3.12+, tested on 3.14) | High performance, async, auto-docs |
 | **AI Framework** | LangChain (RunnableSequence, PydanticOutputParser) + LangGraph (StateGraph) | Structured agent I/O, graph-based orchestration, revision loops |
 | **Agent Tools** | 9 LangChain tools wrapping scoring + analytics | Tool-augmented agents with grounded data |
 | **Vector DB** | ChromaDB (sentence-transformers ONNX) | Semantic knowledge retrieval, no external infra |
@@ -52,7 +52,7 @@ TruPulse AI provides **real-time, forward-looking** workforce analytics:
 ```
                      ┌─────────────────────────────┐
                      │     Frontend (React 18)      │
-                     │  10 Pages · 13 Components    │
+                     │  11 Pages · 16+ Components   │
                      └──────────┬──────────────────┘
                                 │ HTTP (JSON)
                      ┌──────────▼──────────────────┐

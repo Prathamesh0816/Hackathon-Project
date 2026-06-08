@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { postWhatIf, postPipeline } from '../services/api'
+import { useState, useEffect } from 'react'
+import { postWhatIf, postPipeline, getEmployees } from '../services/api'
 import Loading from '../components/Loading'
 import KPICard from '../components/KPICard'
 import StatusBadge from '../components/StatusBadge'
@@ -16,28 +16,40 @@ const SCENARIOS = [
   { value: 'baseline', label: 'Baseline (Current State)' },
 ]
 
-const EMPLOYEES = [
-  'Vikram', 'Rahul', 'Neha', 'Sanjay', 'Nikhil',
-  'Aarti', 'Meera', 'Pooja', 'Sneha', 'Amit',
-]
-
-const TEAMS = [
-  'Engineering', 'Sales', 'Product', 'Security', 'Support',
-  'Infrastructure', 'Finance', 'HR', 'Marketing', 'Legal', 'Operations',
-]
-
 export default function WhatIf() {
+  const [allEmployees, setAllEmployees] = useState([])
+  const [allTeams, setAllTeams] = useState([])
   const [scenarioType, setScenarioType] = useState('attrition')
   const [removedEmployees, setRemovedEmployees] = useState([])
   const [workloadPct, setWorkloadPct] = useState(20)
-  const [restructureTeam, setRestructureTeam] = useState('Engineering')
-  const [result, setResult] = useState(null)
-  const [pipelineResult, setPipelineResult] = useState(null)
+  const [restructureTeam, setRestructureTeam] = useState('')
+
+  useEffect(() => {
+    getEmployees().then((data) => {
+      const emps = data.employees || []
+      setAllEmployees(emps)
+      const names = emps.map((e) => e.name || e.Employee).filter(Boolean)
+      if (names.length > 0) setRemovedEmployees([names[0]])
+      const teams = [...new Set(emps.map((e) => e.team))].filter(Boolean).sort()
+      setAllTeams(teams)
+      if (teams.length > 0) setRestructureTeam(teams[0])
+    }).catch(() => {})
+  }, [])
+
+  const saved = JSON.parse(localStorage.getItem('trupulse_whatif') || 'null')
+  const [result, setResult] = useState(saved?.result || null)
+  const [pipelineResult, setPipelineResult] = useState(saved?.pipelineResult || null)
   const [loading, setLoading] = useState(false)
   const [pipelineLoading, setPipelineLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [showPipeline, setShowPipeline] = useState(false)
+  const [showPipeline, setShowPipeline] = useState(saved?.showPipeline || false)
   const [feedbackTarget, setFeedbackTarget] = useState(null)
+
+  useEffect(() => {
+    if (result || pipelineResult) {
+      localStorage.setItem('trupulse_whatif', JSON.stringify({ result, pipelineResult, showPipeline }))
+    }
+  }, [result, pipelineResult, showPipeline])
 
   const toggleEmployee = (name) => {
     setRemovedEmployees((prev) =>
@@ -117,7 +129,7 @@ export default function WhatIf() {
               Select Employees to Remove ({removedEmployees.length} selected)
             </label>
             <div className="flex flex-wrap gap-2">
-              {EMPLOYEES.map((name) => (
+              {allEmployees.map((e) => e.name || e.Employee).filter(Boolean).map((name) => (
                 <button
                   key={name}
                   onClick={() => toggleEmployee(name)}
@@ -162,7 +174,7 @@ export default function WhatIf() {
               onChange={(e) => setRestructureTeam(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
             >
-              {TEAMS.map((t) => (
+              {(allTeams.length > 0 ? allTeams : ['Engineering']).map((t) => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </select>

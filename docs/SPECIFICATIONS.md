@@ -26,7 +26,8 @@ Interactive Swagger UI with:
 | 1 | GET | `/` | — | `HealthCheckResponse` | Health check + endpoint list + LangChain availability |
 | 2 | GET | `/org-health` | — | `OrgHealthResponse` | 4-indicator composite score |
 | 3 | GET | `/employee/{name}` | — | `dict` (raw) | Employee profile with SPOF/upskilling |
-| 4 | POST | `/whatif` | `WhatIfRequest` | `WhatIfResponse` | Simulate attrition/workload/restructure |
+| 4 | GET | `/employees` | — | `dict` | List all employees from active data source |
+| 5 | POST | `/whatif` | `WhatIfRequest` | `WhatIfResponse` | Simulate attrition/workload/restructure |
 | 5 | POST | `/pipeline` | `PipelineRequest` | `dict` (raw) | Run 5-agent AI pipeline |
 | 6 | POST | `/feedback` | `FeedbackRequest` | `FeedbackResponse` | Record human accept/veto/modify |
 | 7 | GET | `/feedback` | — | `dict` | List past feedback overrides |
@@ -156,10 +157,10 @@ Interactive Swagger UI with:
   "team_count": 14,
   "project_count": 34,
   "indicators": {
-    "resilience": {"score": 29.0, "risk_level": "HIGH", "details": {"spof_count": 56, ...}},
-    "trust": {"score": 47.5, "risk_level": "HIGH", "details": {...}},
-    "burnout": {"score": 38.1, "risk_level": "MEDIUM", "details": {...}},
-    "retention": {"score": 73.4, "risk_level": "LOW", "details": {...}}
+    "resilience": {"score": 32.6, "risk_level": "HIGH", "details": {"spof_count": 56, ...}},
+    "trust": {"score": 50.2, "risk_level": "MEDIUM", "details": {...}},
+    "burnout": {"score": 51.1, "risk_level": "MEDIUM", "details": {...}},
+    "retention": {"score": 69.0, "risk_level": "MEDIUM", "details": {...}}
   }
 }
 ```

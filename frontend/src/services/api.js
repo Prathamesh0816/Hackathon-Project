@@ -19,6 +19,7 @@ async function poster(path, body) {
   return res.json()
 }
 
+export const getEmployees = () => fetcher('/employees')
 export const getOrgHealth = () => fetcher('/org-health')
 export const getEmployeeProfile = (name) => fetcher(`/employee/${encodeURIComponent(name)}`)
 export const getSkillGaps = () => fetcher('/skill-gaps')

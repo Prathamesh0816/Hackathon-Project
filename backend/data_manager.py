@@ -29,9 +29,12 @@ UPLOAD_DIR = Path(__file__).parent / "uploaded_files"
 CSV_DIR = UPLOAD_DIR / "csv"
 TEXT_DIR = UPLOAD_DIR / "text"
 MAPPING_FILE = UPLOAD_DIR / "dataset_mapping.json"
+_ACTIVE_STATE_FILE = UPLOAD_DIR / ".active_dataset.json"
 
 os.makedirs(CSV_DIR, exist_ok=True)
 os.makedirs(TEXT_DIR, exist_ok=True)
+
+DEFAULT_DATA_DIR = Path(__file__).parent / "data"
 
 # ---------------------------------------------------------------------------
 # Expected column names (what the scoring engine needs)
@@ -299,6 +302,7 @@ def activate_dataset(filename: str, column_mapping: dict[str, str] | None = None
         pass
 
     employee_count = len(_active_dataset["employees"])
+    _save_active_state()
     return {
         "status": "ok",
         "filename": filename,
@@ -309,15 +313,55 @@ def activate_dataset(filename: str, column_mapping: dict[str, str] | None = None
     }
 
 
+def _save_active_state():
+    """Persist the active filename so it can be reloaded after restart."""
+    try:
+        if _active_filename:
+            _ACTIVE_STATE_FILE.write_text(json.dumps({"filename": _active_filename, "mapping": _active_mapping}))
+        elif _ACTIVE_STATE_FILE.exists():
+            _ACTIVE_STATE_FILE.unlink()
+    except Exception:
+        pass
+
+
+def _load_active_state():
+    """Reload the active dataset from disk if state file exists."""
+    global _active_dataset, _active_mapping, _active_filename
+    if _active_dataset is not None:
+        return
+    if not _ACTIVE_STATE_FILE.exists():
+        return
+    try:
+        state = json.loads(_ACTIVE_STATE_FILE.read_text())
+        filename = state.get("filename")
+        mapping = state.get("mapping")
+        if filename:
+            result = activate_dataset(filename, mapping)
+            if result.get("status") == "error":
+                _ACTIVE_STATE_FILE.unlink(missing_ok=True)
+    except Exception:
+        _ACTIVE_STATE_FILE.unlink(missing_ok=True)
+
+
 def get_active_dataset() -> dict[str, pd.DataFrame] | None:
     """Return the active dataset, or None if none is active."""
+    _load_active_state()
     return _active_dataset
 
 
 def get_active_info() -> dict[str, Any]:
     """Return info about the active dataset."""
+    _load_active_state()
     if not _active_dataset:
-        return {"active": False, "message": "Using default CSVs from backend/data/"}
+        csv_files = [f.name for f in DEFAULT_DATA_DIR.glob("*.csv")] if DEFAULT_DATA_DIR.is_dir() else []
+        return {
+            "active": True,
+            "filename": "employees.csv",
+            "employee_count": 0,
+            "team_count": 0,
+            "data_source": "default CSVs from backend/data/",
+            "available_files": csv_files,
+        }
     emp = _active_dataset.get("employees", pd.DataFrame())
     return {
         "active": True,
@@ -334,6 +378,8 @@ def clear_active_dataset() -> dict[str, str]:
     _active_dataset = None
     _active_mapping = None
     _active_filename = None
+    if _ACTIVE_STATE_FILE.exists():
+        _ACTIVE_STATE_FILE.unlink()
     return {"status": "ok", "message": "Reset to default CSVs"}
 
 

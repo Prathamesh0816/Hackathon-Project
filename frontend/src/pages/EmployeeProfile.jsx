@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getEmployeeProfile, getUpskilling } from '../services/api'
-import Loading from '../components/Loading'
+import { SkeletonPage } from '../components/Skeleton'
 import ErrorState from '../components/ErrorState'
 import StatusBadge from '../components/StatusBadge'
 
@@ -22,7 +22,7 @@ export default function EmployeeProfile() {
       .finally(() => setLoading(false))
   }, [name])
 
-  if (loading) return <Loading />
+  if (loading) return <SkeletonPage />
   if (error) return <ErrorState message={error} />
   if (!profile || profile.error) return <ErrorState message={profile?.error || 'Employee not found'} />
 

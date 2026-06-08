@@ -1,15 +1,21 @@
-import { useState } from 'react'
-import { getReportHtml } from '../services/api'
-import Loading from '../components/Loading'
-
-const EMPLOYEES = ['Vikram', 'Rahul', 'Neha', 'Sanjay', 'Nikhil', 'Aarti', 'Meera']
+import { useState, useEffect } from 'react'
+import { getReportHtml, getEmployees } from '../services/api'
+import { SkeletonCard } from '../components/Skeleton'
 
 export default function Report() {
+  const [allEmployees, setAllEmployees] = useState([])
   const [scenarioType, setScenarioType] = useState('baseline')
   const [removed, setRemoved] = useState([])
   const [html, setHtml] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+
+  useEffect(() => {
+    getEmployees().then((data) => {
+      const names = (data.employees || []).map((e) => e.name || e.Employee).filter(Boolean)
+      setAllEmployees(names)
+    }).catch(() => {})
+  }, [])
 
   const toggleEmployee = (name) => {
     setRemoved((prev) =>
@@ -65,7 +71,7 @@ export default function Report() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Select employees leaving</label>
             <div className="flex flex-wrap gap-2">
-              {EMPLOYEES.map((name) => (
+              {(allEmployees.length > 0 ? allEmployees : []).map((name) => (
                 <button
                   key={name}
                   onClick={() => toggleEmployee(name)}

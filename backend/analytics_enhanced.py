@@ -425,10 +425,11 @@ def compute_spof_ranking() -> dict[str, Any]:
             100,
         )
 
-        # Revenue at risk
+        # Revenue at risk = what's lost if THIS person leaves (team-level impact)
         team_revenue = projects[
             (projects["Team"] == emp["Team"]) & (projects["AnnualContractValueUSD"] > 0)
         ]["AnnualContractValueUSD"].sum()
+        revenue_at_risk = int(team_revenue * 0.35)
 
         spofs.append(
             {
@@ -449,12 +450,19 @@ def compute_spof_ranking() -> dict[str, Any]:
                 "weekly_hours": hours,
                 "engagement_score": engagement,
                 "annual_salary_usd": int(emp["AnnualSalaryUSD"]),
-                "revenue_at_risk_usd": int(team_revenue * 0.35),
+                "revenue_at_risk_usd": revenue_at_risk,
             }
         )
 
     spofs.sort(key=lambda s: s["severity_score"], reverse=True)
-    total_annual_risk = sum(s["revenue_at_risk_usd"] for s in spofs)
+
+    # Total = unique team revenue (no double-counting)
+    counted_teams: set[str] = set()
+    total_annual_risk = 0
+    for s in spofs:
+        if s["team"] not in counted_teams:
+            counted_teams.add(s["team"])
+            total_annual_risk += s["revenue_at_risk_usd"]
 
     return {
         "spofs": spofs,

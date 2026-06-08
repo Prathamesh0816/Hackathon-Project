@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 
 const EVENTS = [
-  { icon: '📊', text: 'Composite health score: 39.6/100 — HIGH risk', type: 'alert' },
-  { icon: '⚠️', text: '11 single points of failure detected across 6 teams', type: 'alert' },
-  { icon: '💰', text: '$4.2M annual revenue at risk from top-3 SPOFs', type: 'risk' },
-  { icon: '👤', text: 'Vikram (Sales) — no backup, 10yr tenure, highest SPOF score', type: 'risk' },
-  { icon: '🔥', text: '8 employees flagged for high burnout signals', type: 'alert' },
-  { icon: '🧠', text: '33 of 60 knowledge areas at critical concentration risk', type: 'alert' },
+  { icon: '📊', text: 'Composite health score: 47.5/100 — HIGH risk', type: 'alert' },
+  { icon: '⚠️', text: '56 single points of failure detected across 14 teams', type: 'alert' },
+  { icon: '💰', text: '$5.6M annual revenue at risk from top-3 SPOFs', type: 'risk' },
+  { icon: '👤', text: 'Vikram (Sales) — no backup, 8yr tenure, $2.7M revenue at risk', type: 'risk' },
+  { icon: '🔥', text: '10 employees flagged for high burnout signals', type: 'alert' },
+  { icon: '🧠', text: '211 of 468 knowledge areas at low documentation risk', type: 'alert' },
   { icon: '✅', text: 'AI pipeline ready — 5 agents operational', type: 'success' },
-  { icon: '📋', text: 'Succession gap: only 41.7% of critical roles have ready successors', type: 'alert' },
+  { icon: '📋', text: 'Succession coverage: 95% of critical roles have ready successors', type: 'success' },
 ]
 
 export default function OrgPulseTicker() {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getSuccessionPlanning } from '../services/api'
-import Loading from '../components/Loading'
+import { SkeletonPage } from '../components/Skeleton'
 import ErrorState from '../components/ErrorState'
 import KPICard from '../components/KPICard'
 import StatusBadge from '../components/StatusBadge'
@@ -19,7 +19,7 @@ export default function SuccessionPlanning() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <Loading />
+  if (loading) return <SkeletonPage />
   if (error) return <ErrorState message={error} />
   if (!data) return <ErrorState message="No succession data" />
 

@@ -7,7 +7,7 @@
 ## 1. Backend: FastAPI (Python)
 
 ### What we used
-FastAPI 0.115+ with Python 3.12, running via uvicorn.
+FastAPI 0.115+ with Python 3.12+ (tested on 3.14), running via uvicorn.
 
 ### Why
 - **High performance:** Built on Starlette + Pydantic. Handles ~50K requests/sec — more than enough for a hackathon demo, and production-ready.
@@ -194,10 +194,10 @@ When an agent queries "Who has knowledge gaps in cloud architecture?", ChromaDB 
 - **Rapid prototyping:** No context switching between CSS files and components. Styles are inline in JSX.
 
 ### Why it works
-Component composition keeps the UI maintainable: 10 pages × 15 shared components. Each page is a simple composition: `<Dashboard>` = `<OrgPulseTicker>` + `<KPICards>` + `<StressTest>` + `<TimeMachine>`.
+Component composition keeps the UI maintainable: 11 pages × 16+ shared components. Each page is a simple composition: `<Dashboard>` = `<OrgPulseTicker>` + `<KPICards>` + `<StressTest>` + `<TimeMachine>`.
 
 ### Key files
-- `frontend/src/pages/` — 10 pages
+- `frontend/src/pages/` — 11 pages
 - `frontend/src/components/` — 15 components (TextInput, FeedbackPanel, OrgPulseTicker, etc.)
 - `frontend/src/services/api.js` — API client with all endpoint functions
 

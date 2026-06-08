@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { getSpofRanking } from '../services/api'
 import KPICard from '../components/KPICard'
 import StatusBadge from '../components/StatusBadge'
-import Loading from '../components/Loading'
+import { SkeletonPage } from '../components/Skeleton'
 import ErrorState from '../components/ErrorState'
 import DependencyGraph from '../components/DependencyGraph'
 import StressTest from '../components/StressTest'
@@ -20,7 +20,7 @@ export default function SpofRanking() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <Loading />
+  if (loading) return <SkeletonPage />
   if (error) return <ErrorState message={error} />
   if (!data) return <ErrorState message="No SPOF data" />
 

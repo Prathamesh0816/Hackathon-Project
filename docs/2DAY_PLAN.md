@@ -1,5 +1,7 @@
 # TruPulse AI — 2-Day Execution Plan (Realistic, Guarantee Top 3)
 
+> **Note:** This file is a summary reference. The single source of truth for the hackathon day plan is **`DAY_PLAN.md`** in the project root. Update that file, not this one.
+
 ## Execution Philosophy
 
 > **"Judge a hackathon by the demo, not the repo."**
@@ -19,7 +21,7 @@
 | `pip install -r requirements.txt` succeeds | Aradhana | 10 min | **YES** |
 | Cache `/demo-data` endpoint | Aradhana | 5 min | **YES** |
 | Record backup demo video (phone, 5 min, no cuts) | Lokesh | 20 min | **YES** |
-| Print 10 copies of **`WHATS_UNIQUE.md`** (1-pager), `BUSINESS_IMPACT.md` (1-pager), `CLIENT_PITCH.md` (1-pager) | Varad | 15 min | **YES** — 3 handouts cover differentiation, ROI, and implementation |
+| Print 10 copies of **`WHATS_UNIQUE.md`** (1-pager), `BUSINESS_IMPACT.md` (1-pager), `docs/CLIENT_PITCH.md` (1-pager) | Varad | 15 min | **YES** — 3 handouts cover differentiation, ROI, and implementation |
 | Print `QNA_PREP.md` cheat sheet (1 page, both sides) | Varad | 5 min | **YES** |
 | Read `DEMO_SCRIPT.md` aloud, time it | Prathamesh | 15 min | **YES** — confirm fit |
 | Sleep before midnight | **Everyone** | — | **YES** — exhausted teams stumble |
@@ -43,8 +45,8 @@
 
 | Person | Task | Must Complete By 12:30? |
 |--------|------|------------------------|
-| **Prathamesh** | Walk all 10 pages. Fix loading states, error boundaries, mobile breakpoints. **No new components.** | ✅ |
-| **Sopan** | Run **Critical Path Checklist** (15 items from DAY_PLAN.md). Report failures immediately. | ✅ |
+| **Prathamesh** | Walk all 11 pages. Fix loading states, error boundaries, mobile breakpoints. **No new components.** | ✅ |
+| **Sopan** | Run **Critical Path Checklist** (16 items from DAY_PLAN.md). Report failures immediately. | ✅ |
 | **Aradhana** | Fix every endpoint failure Sopan reports. Cache `/demo-data`. Verify report in all 4 formats. | ✅ |
 | **Santosh** | Run LangChain pipeline 3x with Ollama. Run fallback 3x. Verify `pipeline_type` in every response. | ✅ |
 | **Varad** | Final PPT polish. Align slides to 6-segment demo. Print handouts. | ✅ |
@@ -85,10 +87,10 @@
 - Time every segment. Know exactly where you are at 1:00, 2:00, 3:00, 4:00.
 - **Practice talking while clicking.** The AI Pipeline takes 10-20 seconds to load. You need 20 seconds of narrative to cover it.
 
-### 5:30-6:00 — Rest & Prep
-- Everyone reviews their Q&A sections.
-- Varad: confirm Q&A cheat sheet answers are memorized. **Practice tagging judges' criteria in answers** (see QNA_PREP.md strategy table).
-- Lokesh: confirm backup video, HDMI, handouts ready.
+### 5:30-6:00 — Dinner Break
+- Eat. No screens. No code talk.
+- Team stays together but talks about anything except the hackathon.
+- 30 minutes of rest prevents 7 PM burnout.
 
 ### 6:00-6:30 — Tony Meeting (Dress Rehearsal)
 - Prathamesh presents full demo to Tony.
@@ -96,9 +98,9 @@
 - If Tony is impressed → you're on track.
 
 ### 6:30-7:00 — Debrief & Day 2 Plan
-- Fix anything Tony flagged.
+- Fix anything Tony flagged — nothing else.
 - Confirm Day 2 call time: **7:00 AM sharp.**
-- Everyone sleeps before midnight.
+- **After 7:00: no laptops. Everyone sleeps before midnight.**
 
 ---
 
@@ -110,11 +112,11 @@
 | **7:30-8:00** | **Dry Run #3** | **Prathamesh** | One clean run-through. 6 segments. 5 minutes. If it works → **stop touching everything.** If not → fix ONE thing. |
 | **8:00-9:00** | Buffer (60 min) | **All** | Nothing broke? Good. Review Q&A. Practice the closing line. **No code changes even if you have ideas.** |
 | **9:00-9:30** | Watch Other Demos | **All** | Pay attention to competitors. Adjust nothing. If they're good, execute your plan better. If they're weak, execute your plan anyway. |
-| **9:30-9:50** | Team Huddle | **All** | 5-minute motivation. "We know the story. We know the data. We've rehearsed 3x. Execute what we practiced." |
+| **9:30-9:50** | Team Huddle + Rest | **All** | 5-min motivation: "We know the story. We know the data. We've rehearsed 3x. Execute what we practiced." Then 15 min of quiet confidence. No last-minute changes. |
 | **9:50-10:00** | Final Prep | Lokesh | Stopwatch ready. Handouts in hand. Backup video on phone, cued. |
-| **10:00-10:05** | **DEMO** | **Prathamesh** | 6 segments. 300 seconds. Vikram. 56 SPOFs. $54.6M. 65:1 ROI. LangChain + LangGraph. Done. |
+| **10:00-10:05** | **DEMO** | **Prathamesh** | 6 segments. 300 seconds. Vikram. 56 SPOFs. $13.4M. 16:1 ROI. LangChain + LangGraph. Done. |
 | **10:05-10:10** | **Q&A** | **Varad leads** | Varad answers first. Tag Santosh (AI) or Aradhana (architecture) if needed. Never say "I don't know." |
-| **10:10+** | Submission | Lokesh | Submit GitHub link. Submit demo video. Submit PPT. **Hand out 3 one-pagers:** `WHATS_UNIQUE.md` (differentiation), `BUSINESS_IMPACT.md` (ROI), `CLIENT_PITCH.md` (implementation). |
+| **10:10+** | Submission | Lokesh | Submit GitHub link. Submit demo video. Submit PPT. **Hand out 4 one-pagers:** `WHATS_UNIQUE.md` (differentiation), `BUSINESS_IMPACT.md` (ROI), `docs/CLIENT_PITCH.md` (implementation), `docs/ROADMAP.md` (roadmap). |
 
 ---
 
@@ -122,12 +124,12 @@
 
 | Time | Segment | Prathamesh Says | Prathamesh Clicks |
 |------|---------|----------------|-------------------|
-| 0:00-0:40 | **Meet Vikram** | *"56 SPOFs. $54.6M at risk. Meet Vikram — no backup, no docs, burned out. 47.5/100 composite — HIGH risk."* | Dashboard loads. Show org health. Click Vikram profile. |
-| 0:40-1:20 | **What-If** | *"He leaves Friday: composite drops 31 points, $2.7M in jeopardy. Before vs after."* | Run attrition scenario on Vikram. Time Machine compares. |
+| 0:00-0:40 | **Meet Vikram** | *"56 SPOFs. $13.4M at risk. Meet Vikram — no backup, no docs, burned out. 47.5/100 composite — HIGH risk."* | Dashboard loads. Show org health. Click Vikram profile. |
+| 0:40-1:20 | **What-If** | *"He leaves Friday: composite drops 5.8 points (47.5→41.7), $2.7M in jeopardy. Before vs after."* | Run attrition scenario on Vikram. Time Machine compares. |
 | 1:20-2:15 | **AI Pipeline** | [Click. Narrate during load.] *"5 LangChain agents on a LangGraph StateGraph. Each output Pydantic-validated. Governance checks confidence — below 40% triggers a revision loop. All local — no data leaves your infra."* | Click Run Pipeline. Talk through the 10-20s load. Show trace, governance panel, `pipeline_type`. |
 | 2:15-2:55 | **SPOF Map** | *"56 purple nodes. Each one is someone who can leave and take critical knowledge with them. Watch the stress test."* | Show dependency graph. Run stress test. Score 100→22. |
 | 2:55-3:30 | **Report** | *"One click. Executive-ready. HTML, PDF, text. Everything your board needs to act."* | Download report. Show it. |
-| 3:30-5:00 | **Closing** | *"56 SPOFs. $54.6M at risk. $840K to fix. ROI: 65:1. Payback under 6 days. Implementation: 4 weeks. LangChain + LangGraph — no competitor does all 5. We're ready for your questions."* | Final slide. Team stands confident. Hand off to Varad. |
+| 3:30-5:00 | **Closing** | *"56 SPOFs. $13.4M at risk. $840K to fix. ROI: 16:1. Payback under 6 days. Implementation: 4 weeks. LangChain + LangGraph — no competitor does all 5. We're ready for your questions."* | Final slide. Team stands confident. Hand off to Varad. |
 
 ---
 
@@ -136,11 +138,11 @@
 | Priority | What Judges See | How We Deliver |
 |----------|----------------|----------------|
 | 1 | **Flawless demo** | 3 dry runs, feature freeze at 4PM, buffer time, backup video |
-| 2 | **Named hero story** | "Vikram" is memorable. 56 SPOFs, $54.6M — specific numbers stick |
-| 3 | **Quantified business case** | 65:1 ROI, 6-day payback, $18K/yr pricing — concrete, defensible |
+| 2 | **Named hero story** | "Vikram" is memorable. 56 SPOFs, $13.4M — specific numbers stick |
+| 3 | **Quantified business case** | 16:1 ROI, 6-day payback, $18K/yr pricing — concrete, defensible |
 | 4 | **Visible tech innovation** | Show `pipeline_type: langchain_langgraph`. Show Pydantic schema. Show revision count. |
 | 5 | **Confident team** | Prathamesh doesn't stumble. Varad answers first Q&A without hesitation. Everyone nods. |
-| 6 | **Leave-behind** | 3 one-pagers: WHATS_UNIQUE.md (differentiation) + BUSINESS_IMPACT.md (ROI) + CLIENT_PITCH.md (implementation). They forget 90% of demos. Paper stays. |
+| 6 | **Leave-behind** | 4 one-pagers: WHATS_UNIQUE.md, BUSINESS_IMPACT.md, docs/CLIENT_PITCH.md, docs/ROADMAP.md. They forget 90% of demos. Paper stays. |
 
 ---
 

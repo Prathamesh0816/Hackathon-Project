@@ -78,4 +78,4 @@ Upload your employee CSV → we send you a full org health report, SPOF ranking,
 
 ---
 
-> *"The hackathon prototype identified 56 SPOFs putting $54.6M at risk in the demo dataset. Payback period was calculated at 6 days. The question isn't whether you can afford TruPulse — it's whether you can afford not to."*
+> *"The hackathon prototype identified 56 SPOFs putting $13.4M at risk in the demo dataset. Payback period was calculated at 6 days. The question isn't whether you can afford TruPulse — it's whether you can afford not to."*

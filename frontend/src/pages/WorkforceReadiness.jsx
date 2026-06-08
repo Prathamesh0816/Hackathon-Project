@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getWorkforceReadiness } from '../services/api'
-import Loading from '../components/Loading'
+import { SkeletonPage } from '../components/Skeleton'
 import ErrorState from '../components/ErrorState'
 import KPICard from '../components/KPICard'
 import StatusBadge from '../components/StatusBadge'
@@ -18,7 +18,7 @@ export default function WorkforceReadiness() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <Loading />
+  if (loading) return <SkeletonPage />
   if (error) return <ErrorState message={error} />
   if (!data) return <ErrorState message="No readiness data" />
 

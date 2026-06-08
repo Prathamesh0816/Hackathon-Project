@@ -1,7 +1,7 @@
 # TruPulse AI — Business Impact & Commercial Case
 
 ## One-Liner for Judges & Clients
-> *"For a 200-person company, TruPulse AI identifies **$400K–$1.2M in annual workforce risk** and provides actionable mitigation plans — payback in the first prevented departure. Implementation: 4 weeks. Integration: zero (CSV upload)."*
+> *"For a 200-person company, TruPulse AI identifies **$1.2M–$2.2M in annual workforce risk** and provides actionable mitigation plans — payback in the first prevented departure. Implementation: 4 weeks. Integration: zero (CSV upload)."*
 
 ---
 
@@ -14,7 +14,7 @@
 | Avg time to fill a specialized role | 42 days | LinkedIn Talent Solutions |
 | % of departing employees with undocumented knowledge | 72% | Gartner |
 | % of orgs that experienced a disruptive SPOF departure in last 12mo | 38% | Deloitte Human Capital Trends |
-| Revenue at risk per medium-sized org from SPOFs | $12M–$55M | TruPulse demo data (validated against 200-person org) |
+| Revenue at risk per medium-sized org from SPOFs | $12M–$14M | TruPulse demo data (validated against 200-person org) |
 
 ---
 
@@ -158,4 +158,4 @@ TruPulse ROI = **Prevented Losses** − **Platform Cost** − **Implementation C
 
 ## For Judges: Summary Slide One-Liner
 
-> *"56 SPOFs. $54.6M at risk. Mitigation cost: $840K. ROI: 65:1. Implementation: 4 weeks. Tech: LangChain + LangGraph + Pydantic. No competitor does all 5."*
+> *"56 SPOFs. $13.4M at risk. Mitigation cost: $840K. ROI: 16:1. Implementation: 4 weeks. Tech: LangChain + LangGraph + Pydantic. No competitor does all 5."*

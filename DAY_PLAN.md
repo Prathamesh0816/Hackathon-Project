@@ -50,8 +50,8 @@
 | **10:00-10:15** | Standup (15 min) | **All** | Verify all pre-work done. If Ollama not pulled, do it NOW (first 15 min, not during presentation). |
 | **10:15-10:30** | Warm-up checks | Everyone individually | Start servers, verify endpoints, confirm UI loads |
 | **10:30-12:30** | **Sprint 1: Stabilize (2h, parallel)** | | **No new features. Only stabilizing existing ones.** |
-| | | Prathamesh | Walk through all 10 pages. Fix styling, loading states, error messages. No new components. |
-| | | Sopan | **Run critical-path checklist** (13 items in DAY_PLAN.md). Report failures immediately. |
+| | | Prathamesh | Walk through all 11 pages. Fix styling, loading states, error messages. No new components. |
+| | | Sopan | **Run critical-path checklist** (16 items in DAY_PLAN.md). Report failures immediately. |
 | | | Aradhana | Fix any endpoint failures Sopan reports. Cache `/demo-data`. Verify report HTML/PDF/Text. |
 | | | Santosh | Run pipeline 3x with Ollama. Run fallback 3x. Verify `pipeline_type` in response. |
 | | | Varad | Final PPT polish. Print Q&A cheat sheet. Print 10 copies of BUSINESS_IMPACT.md one-pager. |
@@ -66,10 +66,10 @@
 | **3:30-4:00** | **Feature Freeze Deadline** | **All** | **Last commit before freeze.** Push code. No more changes unless demo-breaking bug. |
 | **4:00-4:15** | Break | **All** | Step away. 15 min. |
 | **4:15-5:00** | **Sprint 3: Dry Run #2** | **All** | Full dry run #2 with Prathamesh presenting. Same 6 segments. If this run is clean → you're ready. If not → fix only the one thing that broke. Do not chase edge cases. |
-| **5:00-5:30** | Final fixes | Santosh + Aradhana | Only demo-blocking bugs. No "nice to have." |
-| **5:30-6:00** | **Rehearsal** | **Prathamesh** | Present demo 3x alone with stopwatch. Say it aloud. Time every segment. If the AI Pipeline takes 20 seconds to load, you need to talk for 20 seconds while it loads — rehearse that. |
+| **5:00-5:30** | **Rehearsal** | **Prathamesh** | Present demo 3x alone with stopwatch. Say it aloud. Time every segment. If the AI Pipeline takes 20 seconds to load, you need to talk for 20 seconds while it loads — rehearse that. |
+| **5:30-6:00** | **Dinner Break** | **All** | Eat. No screens. No code talk. 30 min of rest prevents 7 PM burnout. Keep it light. |
 | **6:00-6:30** | Tony Meeting | **Prathamesh presents** | Present to Tony. This is your dress rehearsal. If Tony spots a flaw, fix it tonight. If Tony is impressed, you're on track. |
-| **6:30-7:00** | Debrief + Day 2 Prep | **All** | What did Tony say? Fix anything. Confirm Day 2 schedule. Everyone knows call time (7:00 AM). |
+| **6:30-7:00** | Debrief + Day 2 Prep | **All** | What did Tony say? Fix anything Tony flagged — nothing else. Confirm Day 2 call time (7:00 AM). **After 7:00: no laptops. Sleep before midnight.** |
 
 ---
 
@@ -84,10 +84,10 @@
 | | | Lokesh | Backup phone video ready to play. HDMI cable connected. Stopwatch ready. |
 | | | Everyone | **No laptops during judging. Pay attention to other demos. Respect their stage time.** |
 | **9:00-9:30** | Watch other demos | **All** | See what the competition is doing. Adjust nothing. |
-| **9:30-10:00** | Huddle | **All** | 5 min. Motivate. "We've rehearsed this. We know the data. We know the story. Execute." |
-| **10:00-10:05** | **Demo** | **Prathamesh** | 300 seconds. 6 segments. One presenter. Vikram story. 56 SPOFs. $54.6M. 65:1 ROI. LangChain + LangGraph. Done. |
+| **9:30-10:00** | Huddle + Quiet Time | **All** | 5-min motivation. Then 25 min of quiet confidence. No changes. No "what if." Just breathe. |
+| **10:00-10:05** | **Demo** | **Prathamesh** | 300 seconds. 6 segments. One presenter. Vikram story. 56 SPOFs. $13.4M. 16:1 ROI. LangChain + LangGraph. Done. |
 | **10:05-10:10** | Q&A | **Varad leads, team supports** | Varad answers first. If stumped, tag Santosh (tech) or Aradhana (architecture). **Never say "I don't know" — say "Let me ask my teammate who owns that."** |
-| **10:10+** | Submission | Lokesh | Submit GitHub link. Submit demo video. Submit PPT. **Hand out 3 one-pagers:** `WHATS_UNIQUE.md` (differentiation), `BUSINESS_IMPACT.md` (ROI), `CLIENT_PITCH.md` (implementation). |
+| **10:10+** | Submission | Lokesh | Submit GitHub link. Submit demo video. Submit PPT. **Hand out 4 one-pagers:** `WHATS_UNIQUE.md` (differentiation), `BUSINESS_IMPACT.md` (ROI), `docs/CLIENT_PITCH.md` (implementation), `docs/ROADMAP.md` (roadmap). |
 
 ---
 
@@ -95,21 +95,22 @@
 
 | Time | Segment | What Prathamesh Says | What Prathamesh Clicks |
 |------|---------|---------------------|----------------------|
-| 0:00-0:40 | **Meet Vikram** | "56 SPOFs. $54.6M at risk. Meet Vikram — no backup, no documentation, burned out." | Dashboard loads. Org health 47.5/100. Click Vikram profile. |
+| 0:00-0:40 | **Meet Vikram** | "56 SPOFs. $13.4M at risk. Meet Vikram — no backup, no documentation, burned out." | Dashboard loads. Org health 47.5/100. Click Vikram profile. |
 | 0:40-1:20 | **What-If** | "If he leaves Friday: $2.7M in jeopardy. Watch the score drop." | Run attrition scenario on Vikram. Time Machine shows before/after. |
 | 1:20-2:15 | **AI Pipeline** | [Click. Talk while it loads.] "5 LangChain agents. LangGraph StateGraph. Each output Pydantic-validated. Governance checks confidence, flags for human review, can trigger a revision loop. All local — no data leaves your infra." | Click Run Pipeline. Narrative covers 10-20s load time. Show 5 agent boxes, governance panel. |
 | 2:15-2:55 | **SPOF Map** | "56 purple nodes = 56 single points of failure. Watch what happens when we don't act." | Show dependency graph. Run stress test. Score drops 100→22. |
 | 2:55-3:30 | **Report** | "One click. Executive-ready. HTML, PDF, text. Everything the board needs." | Download report. Pause on it. |
-| 3:30-5:00 | **Closing + Pitch** | "56 SPOFs. $54.6M at risk. $840K to fix. 65:1 ROI. Payback under 6 days. Implementation: 4 weeks. LangChain + LangGraph + Pydantic — no competitor does all 5. Questions?" | Show final slide with ROI numbers. Hand off to Varad for Q&A. |
+| 3:30-5:00 | **Closing + Pitch** | "56 SPOFs. $13.4M at risk. $840K to fix. 16:1 ROI. Payback under 6 days. Implementation: 4 weeks. LangChain + LangGraph + Pydantic — no competitor does all 5. Questions?" | Show final slide with ROI numbers. Hand off to Varad for Q&A. |
 
 ---
 
 ## Critical Path Checklist (Must Pass Before Demo)
 
-**Run this 30 min before presenting. All 15 must pass.**
+**Run this 30 min before presenting. All 16 must pass.**
 
 | # | Test | Status |
 |---|------|--------|
+| 0 | **Numbers alignment:** demo script numbers match live API — composite 47.5, 56 SPOFs, $13.4M, Vikram $2.7M, 47.5→41.7 (-5.8) | ☐ |
 | 1 | `localhost:8000/` returns health check JSON | ☐ |
 | 2 | `localhost:3000/` loads Dashboard | ☐ |
 | 3 | `/org-health` returns 4 indicators with scores | ☐ |
@@ -145,7 +146,7 @@
 
 1. **Flawless execution** — Nothing breaks on stage. (Practice 5x+.)
 2. **Vikram story** — A named hero the judges care about in 5 seconds. (Don't show features. Tell a story.)
-3. **Quantified ROI** — $54.6M at risk, 65:1, payback in 6 days. (Judges write down numbers.)
+3. **Quantified ROI** — $13.4M at risk, 16:1, payback in 6 days. (Judges write down numbers.)
 4. **Visible tech innovation** — Show `pipeline_type: langchain_langgraph`, show the Pydantic schema, show the revision loop. (Don't just say it — show it. See `WHATS_UNIQUE.md` for the full list.)
 5. **Team confidence** — Prathamesh delivers smoothly, Varad answers the first Q&A question without hesitation, everyone nods confidently.
-6. **Leave-behind** — 3 one-pagers in every judge's hand: `WHATS_UNIQUE.md` (differentiation), `BUSINESS_IMPACT.md` (ROI), `CLIENT_PITCH.md` (implementation). (They forget 90% of demos. Paper stays on their desk.)
+6. **Leave-behind** — 4 one-pagers in every judge's hand: `WHATS_UNIQUE.md`, `BUSINESS_IMPACT.md`, `docs/CLIENT_PITCH.md`, `docs/ROADMAP.md`. (They forget 90% of demos. Paper stays on their desk.)

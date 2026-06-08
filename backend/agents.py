@@ -24,12 +24,12 @@ from typing import Any
 
 import requests
 
-# Vector DB integration — sibling database/ folder
-VECTOR_DB_PATH = Path(__file__).resolve().parent.parent / "database"
-if VECTOR_DB_PATH.exists():
-    sys.path.insert(0, str(VECTOR_DB_PATH))
+# Vector DB integration — sibling database/ package
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if (_PROJECT_ROOT / "database").exists():
+    sys.path.insert(0, str(_PROJECT_ROOT))
     try:
-        from vectordb import search_knowledge, search_employees, knowledge_count
+        from database.vectordb import search_knowledge, search_employees, knowledge_count
         _VECTOR_AVAILABLE = True
     except Exception:
         _VECTOR_AVAILABLE = False
@@ -38,6 +38,10 @@ else:
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:3b")
+
+# Normalize URL: ensure /api/generate path is present (LangChain uses base URL, raw agents need the full path)
+if not OLLAMA_URL.rstrip("/").endswith("/api/generate"):
+    OLLAMA_URL = OLLAMA_URL.rstrip("/") + "/api/generate"
 
 
 def _llm_call(prompt: str, json_mode: bool = True) -> tuple[str, float]:
@@ -545,6 +549,24 @@ def run_pipeline_fallback(
 # FEEDBACK STORE (in-memory, swap to DB in production)
 # ---------------------------------------------------------------------------
 _FEEDBACK: list[dict[str, Any]] = []
+_FEEDBACK_FILE = Path(__file__).resolve().parent / "uploaded_files" / ".feedback.json"
+
+
+def _load_feedback():
+    global _FEEDBACK
+    if not _FEEDBACK and _FEEDBACK_FILE.exists():
+        try:
+            _FEEDBACK = json.loads(_FEEDBACK_FILE.read_text())
+        except Exception:
+            _FEEDBACK = []
+
+
+def _save_feedback():
+    _FEEDBACK_FILE.parent.mkdir(parents=True, exist_ok=True)
+    _FEEDBACK_FILE.write_text(json.dumps(_FEEDBACK, indent=2))
+
+
+_load_feedback()
 
 
 def record_feedback(
@@ -561,10 +583,12 @@ def record_feedback(
         "reason": reason,
     }
     _FEEDBACK.append(entry)
+    _save_feedback()
     return entry
 
 
 def get_feedback_overrides() -> list[dict[str, Any]]:
+    _load_feedback()
     return _FEEDBACK
 
 

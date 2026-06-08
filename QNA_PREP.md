@@ -45,7 +45,7 @@
 > *"The XGBoost scaffold is in `scoring.py` lines 6-7 — it says 'Production architecture is XGBoost-ready: swap compute_resilience_score() with a trained model.' Today we use a heuristic because we don't have years of HRIS training data. The architecture is designed so you drop in a model later — the API contract doesn't change."*
 
 ### Q: "What's the tech stack?"
-> *"FastAPI backend, React + Tailwind frontend, LangChain + LangGraph for agent orchestration, ChatOllama for LLM access, ChromaDB for vector search, CSV/SQLite for data. Docker Compose to run everything. PostgreSQL-ready via SQLAlchemy. 9 LangChain tools wrapping the scoring and analytics engines. Entire stack is Python 3.12."*
+> *"FastAPI backend, React 18 + Tailwind frontend, LangChain + LangGraph for agent orchestration, ChatOllama for LLM access, ChromaDB for vector search, CSV/SQLite for data. Docker Compose to run everything. PostgreSQL-ready via SQLAlchemy. 9 LangChain tools wrapping the scoring and analytics engines. Entire stack is Python 3.12+ (tested on 3.14)."*
 
 ### Q: "How accurate are your predictions?"
 > *"Our scoring engine is validated against the demo dataset — we can show that the 56 SPOFs identified correlate with real-world patterns (tenure, documentation gaps, PTO deficit, critical role flags). For ML accuracy, we need HRIS training data with known departure outcomes. We've designed Phase 2 specifically for this — once we have 6 months of real data, the XGBoost model will provide calibrated probability scores with confidence intervals."*
@@ -73,6 +73,28 @@
 
 ### Q: "How do you handle 50,000+ employees across global teams?"
 > *"The scoring engine is O(n) — linear. At 115 employees it's sub-second. At 50,000 we estimate 2-5 seconds with the heuristic engine. ChromaDB handles 100K+ vectors. For truly global deployments, we'd shard by region (each region has its own Ollama + ChromaDB instance) and aggregate at the enterprise level. The LangChain agents are completely stateless — horizontal scale behind a load balancer is trivial. See `docs/ROADMAP.md` Phase 3 for the 100K-employee benchmark."*
+
+---
+
+## Reality Gap Questions
+
+### Q: "How does this connect to real HR systems like Workday or BambooHR?"
+> *"Today, you upload CSV exports — which every HR system can produce — and get results in 30 seconds. For Phase 1 (months 1-3), we're building native API connectors: Workday RaaS endpoints, BambooHR API, and a generic REST adapter. The architecture is designed for this — the `/employees` endpoint already returns a standard schema (name, team, role, tenure, salary) that any connector can map to. The scoring engine doesn't care where the data comes from — CSV, REST API, or database — it just needs the same fields. We'd prioritize Workday first because that's what enterprise clients ask for. See `docs/ROADMAP.md` Phase 1 for details."*
+
+### Q: "Are there any tests? How do you know this actually works?"
+> *"For the hackathon: we tested via the UI, the `/docs` Swagger interface, and manual endpoint checks. The frontend builds with zero errors (`vite build` succeeds with 860+ modules). The backend compiles cleanly. For Phase 1: we're adding pytest for backend (unit tests on `scoring.py` weights, integration tests on all 35+ endpoints, property-based tests for the simulation engine) and Vitest + React Testing Library for frontend (component rendering, API mock validation). The SPOF algorithm is already validated against the demo dataset — every SPOF can be traced to specific triggering criteria. But yes, automated test coverage is a Phase 1 priority, not a current feature."*
+
+### Q: "This data looks synthetic. How do I know TruPulse works on real data?"
+> *"The demo dataset of 115 employees across 14 teams is synthetic — we built it for the hackathon. But every algorithm is designed for real HR data: names, teams, roles, tenure in years, salary in dollars, PTO balance, documentation scores out of 100. These are standard HRIS fields. The `/upload` endpoint accepts any CSV with these columns and runs the same pipeline. We've designed the scoring engine to handle messy real-world data — missing fields default to conservative assumptions, unmapped columns are flagged, and the report always shows which employees couldn't be fully scored. The 5-day trial exists specifically so prospects can run TruPulse on their real data and see the output."*
+
+### Q: "What about security and authentication? There's no login."
+> *"For the hackathon demo, the app runs on localhost — no network exposure. There's no login because there's no multi-tenancy yet. For Phase 1: we add JWT-based auth with role-based access (admin, manager, viewer), session management, and optional SSO (OAuth 2.0 / SAML). The backend already has the middleware scaffold — add one dependency and wire it in. Every endpoint returns structured JSON, so adding auth is a middleware layer, not a rewrite. We prioritized functionality over security for the demo because the capability is what judges evaluate — but production security is a 4-week Phase 1 item, not an afterthought."*
+
+### Q: "Why did you move from hardcoded data to dynamic API calls?"
+> *"The original build had 35 employee objects hardcoded in Employees.jsx, 10 names hardcoded in WhatIf.jsx, and 7 names hardcoded in Report.jsx. That worked for the demo but wasn't real software — if you uploaded a different dataset, the dropdowns would show the wrong people. We replaced all hardcoded data with calls to the new `/employees` endpoint, which returns employees from whatever data source is active — CSV, SQLite, or uploaded file. This means TruPulse actually works with any dataset, not just the one we hardcoded. It also means the `team` filter on the Employees page shows real teams from the data, not a hardcoded list. This was a fundamental architecture fix — real products load data, not hardcode it."*
+
+### Q: "The revision loop triggers at 40% confidence. Why 40%? What about 50% or 30%?"
+> *"40% was chosen as a calibrated threshold: above 40% means the Governance agent has moderate confidence that the coaching output is actionable and can proceed to the frontend. Below 40% means the output is unreliable enough that the system should revise. Why not 30%? That would let too many low-quality outputs through. Why not 50%? That would trigger too many unnecessary revisions (doubling pipeline latency). 40% was the sweet spot after testing. The threshold is also configurable — change one constant in `should_revise()` in `agents_langchain.py`. And the Governance output always includes the exact confidence score and reasoning, so a human can override regardless of the threshold. The revision loop cap of 2 iterations ensures the system can't loop forever."*
 
 ---
 
@@ -171,7 +193,7 @@
 > *"The LangGraph StateGraph with the conditional revision loop. Most agent pipelines are linear — A → B → C. Ours is a directed graph where the Governance node can route back to Coaching. Getting the state management right — passing revision context, capping the retry count, ensuring the UI still renders cleanly regardless of how many revisions happened — was genuinely difficult. The 4-level fallback chain was also challenging because every level had to produce the same response schema. If LangGraph fails, the sequential fallback needs to look identical to the frontend."*
 
 ### Q: "How many lines of code?"
-> *"Backend: ~3,500 lines across agents_langchain.py, agent_tools.py, scoring.py, analytics_enhanced.py, models.py, vectordb.py, storage.py. Frontend: ~5,000 lines across 10 pages and 15 components. The LangGraph pipeline itself is ~200 lines — the StateGraph definition, conditional edges, and node functions. That's the part we'd show a technical judge: 200 lines that encapsulate more architecture than most hackathon projects have in total."*
+> *"Backend: ~3,500 lines across agents_langchain.py, agent_tools.py, scoring.py, analytics_enhanced.py, models.py, vectordb.py, storage.py. Frontend: ~5,000 lines across 11 pages and 16+ components. The LangGraph pipeline itself is ~200 lines — the StateGraph definition, conditional edges, and node functions. That's the part we'd show a technical judge: 200 lines that encapsulate more architecture than most hackathon projects have in total."*
 
 ### Q: "Can I see the actual code that builds the graph?"
 > *"Absolutely — it's in `backend/agents_langchain.py` around line 450, the `create_graph()` function. You'll see the StateGraph builder, the 5 nodes, the conditional edge from Governance → Coaching with the `should_revise` routing function. It's 200 lines and fully commented. We can open it right now."*

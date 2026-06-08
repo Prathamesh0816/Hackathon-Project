@@ -42,11 +42,11 @@ except ImportError:
     pass
 
 # Existing modules
-VECTOR_DB_PATH = Path(__file__).resolve().parent.parent / "database"
-if VECTOR_DB_PATH.exists():
-    sys.path.insert(0, str(VECTOR_DB_PATH))
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if (_PROJECT_ROOT / "database").exists():
+    sys.path.insert(0, str(_PROJECT_ROOT))
     try:
-        from vectordb import search_knowledge, search_employees, knowledge_count
+        from database.vectordb import search_knowledge, search_employees, knowledge_count
         _VECTOR_AVAILABLE = True
     except Exception:
         _VECTOR_AVAILABLE = False

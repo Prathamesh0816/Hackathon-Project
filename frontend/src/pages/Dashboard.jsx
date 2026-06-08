@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { getOrgHealth, getSpofRanking, getSkillGaps, getWorkforceReadiness } from '../services/api'
+import { getOrgHealth, getSpofRanking, getSkillGaps, getWorkforceReadiness, getDatasetInfo } from '../services/api'
 import KPICard from '../components/KPICard'
 import GaugeChart from '../components/GaugeChart'
-import Loading from '../components/Loading'
+import { SkeletonGrid, SkeletonCard, SkeletonPage } from '../components/Skeleton'
 import ErrorState from '../components/ErrorState'
 import ChatPanel from '../components/ChatPanel'
 import OrgPulseTicker from '../components/OrgPulseTicker'
@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [chatResult, setChatResult] = useState(null)
+  const [dataInfo, setDataInfo] = useState(null)
 
   useEffect(() => {
     Promise.all([
@@ -23,18 +24,20 @@ export default function Dashboard() {
       getSpofRanking(),
       getSkillGaps(),
       getWorkforceReadiness(),
+      getDatasetInfo().catch(() => null),
     ])
-      .then(([h, s, g, r]) => {
+      .then(([h, s, g, r, di]) => {
         setHealth(h)
         setSpof(s)
         setGaps(g)
         setReadiness(r)
+        setDataInfo(di)
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <Loading />
+  if (loading) return <SkeletonPage />
   if (error) return <ErrorState message={error} />
   if (!health) return <ErrorState message="No health data returned" />
 
@@ -48,11 +51,18 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Organizational Health Dashboard</h1>
-        <p className="text-gray-500 mt-1">
-          {health.employee_count} employees · {health.team_count} teams · {health.project_count} active projects
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Organizational Health Dashboard</h1>
+          <p className="text-gray-500 mt-1">
+            {health.employee_count} employees · {health.team_count} teams · {health.project_count} active projects
+          </p>
+        </div>
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs">
+          <span className={`w-2 h-2 rounded-full ${dataInfo?.active ? 'bg-green-500' : 'bg-blue-500'}`} />
+          <span className="text-gray-500">Data:</span>
+          <span className="font-medium text-gray-700">{health.data_source || 'employees.csv'}</span>
+        </div>
       </div>
 
       <OrgPulseTicker />
