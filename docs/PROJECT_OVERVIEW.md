@@ -186,7 +186,7 @@ cd backend && pip install -r requirements.txt && uvicorn main:app --port 8000
 cd frontend && npm install && npm run dev
 
 # Seed vector database (one-time after first backend data load)
-cd database && pip install -r requirements.txt && python seed_vectordb.py
+cd database && pip install chromadb sentence-transformers && python seed_vectordb.py
 ```
 
 ## Report Formats

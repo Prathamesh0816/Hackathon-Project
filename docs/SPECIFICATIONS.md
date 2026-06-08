@@ -28,37 +28,37 @@ Interactive Swagger UI with:
 | 3 | GET | `/employee/{name}` | — | `dict` (raw) | Employee profile with SPOF/upskilling |
 | 4 | GET | `/employees` | — | `dict` | List all employees from active data source |
 | 5 | POST | `/whatif` | `WhatIfRequest` | `WhatIfResponse` | Simulate attrition/workload/restructure |
-| 5 | POST | `/pipeline` | `PipelineRequest` | `dict` (raw) | Run 5-agent AI pipeline |
-| 6 | POST | `/feedback` | `FeedbackRequest` | `FeedbackResponse` | Record human accept/veto/modify |
-| 7 | GET | `/feedback` | — | `dict` | List past feedback overrides |
-| 8 | POST | `/feedback/suggestions` | — | `SuggestionResponse` | Generate AI suggestions for review |
-| 9 | POST | `/feedback/apply` | `ApplyDecisionsRequest` | `RecalculateResponse` | Apply human decisions + recalculate |
-| 10 | POST | `/text-input` | `TextInputRequest` | `TextInputResponse` | Parse employee data from plain text |
-| 11 | GET | `/text-input/list` | — | `dict` | List recent text inputs |
-| 12 | POST | `/upload-file` | `UploadFile` | `dict` | Upload CSV/TXT/XLSX |
-| 13 | GET | `/files` | — | `dict` | List uploaded files |
-| 14 | GET | `/employee-data/{id}` | — | `dict` | Structured data + text notes |
-| 15 | POST | `/analyze-employee/{id}` | — | `dict` | Per-employee AI analysis |
-| 16 | GET | `/spof-ranking` | — | `dict` | SPOFs ranked by severity |
-| 17 | GET | `/skill-gaps` | — | `dict` | Org-wide skill gaps |
-| 18 | GET | `/succession-planning` | — | `dict` | Succession readiness |
-| 19 | GET | `/workforce-readiness` | — | `dict` | Team capacity vs pipeline |
-| 20 | GET | `/knowledge-concentration` | — | `dict` | Knowledge at-risk areas |
-| 21 | GET | `/upskilling/{name}` | — | `dict` | Personalized upskilling paths |
-| 22 | POST | `/query` | `QueryRequest` | `dict` | Natural language multi-scenario query |
-| 23 | GET | `/report` | Query params | `HTMLResponse` / `PlainTextResponse` | Printable resilience report (4 formats) |
-| 24 | GET | `/demo-data` | — | `dict` | Pre-cached demo snapshot (10 scenarios) |
-| 25 | GET | `/scenarios` | — | `dict` | 20+ predefined scenario permutations catalog |
-| 26 | POST | `/scenario-run` | `ScenarioRunRequest` | `ScenarioRunResponse` | Scenario with reaction type |
-| 27 | GET | `/reactions` | — | `dict` | Available reaction types |
-| 28 | POST | `/dataset/upload` | `UploadFile` | `dict` | Upload + auto-activate dataset |
-| 29 | POST | `/dataset/activate` | query + optional mapping | `dict` | Activate specific dataset |
-| 30 | GET | `/dataset/info` | — | `dict` | Current dataset status |
-| 31 | GET | `/dataset/files` | — | `dict` | List all uploaded datasets |
-| 32 | POST | `/dataset/clear` | — | `dict` | Reset to default CSVs |
-| 33 | POST | `/dataset/preview` | `UploadFile` | `dict` | Preview file + suggested column mapping |
-| 34 | GET | `/dataset/employee-data/{name}` | — | `dict` | Employee from active dataset |
-| 35 | GET | `/dataset/employees` | — | `dict` | List all employees |
+| 6 | POST | `/pipeline` | `PipelineRequest` | `dict` (raw) | Run 5-agent AI pipeline |
+| 7 | POST | `/feedback` | `FeedbackRequest` | `FeedbackResponse` | Record human accept/veto/modify |
+| 8 | GET | `/feedback` | — | `dict` | List past feedback overrides |
+| 9 | POST | `/feedback/suggestions` | — | `SuggestionResponse` | Generate AI suggestions for review |
+| 10 | POST | `/feedback/apply` | `ApplyDecisionsRequest` | `RecalculateResponse` | Apply human decisions + recalculate |
+| 11 | POST | `/text-input` | `TextInputRequest` | `TextInputResponse` | Parse employee data from plain text |
+| 12 | GET | `/text-input/list` | — | `dict` | List recent text inputs |
+| 13 | POST | `/upload-file` | `UploadFile` | `dict` | Upload CSV/TXT/XLSX |
+| 14 | GET | `/files` | — | `dict` | List uploaded files |
+| 15 | GET | `/employee-data/{id}` | — | `dict` | Structured data + text notes |
+| 16 | POST | `/analyze-employee/{id}` | — | `dict` | Per-employee AI analysis |
+| 17 | GET | `/spof-ranking` | — | `dict` | SPOFs ranked by severity |
+| 18 | GET | `/skill-gaps` | — | `dict` | Org-wide skill gaps |
+| 19 | GET | `/succession-planning` | — | `dict` | Succession readiness |
+| 20 | GET | `/workforce-readiness` | — | `dict` | Team capacity vs pipeline |
+| 21 | GET | `/knowledge-concentration` | — | `dict` | Knowledge at-risk areas |
+| 22 | GET | `/upskilling/{name}` | — | `dict` | Personalized upskilling paths |
+| 23 | POST | `/query` | `QueryRequest` | `dict` | Natural language multi-scenario query |
+| 24 | GET | `/report` | Query params | `HTMLResponse` / `PlainTextResponse` | Printable resilience report (2 formats) |
+| 25 | GET | `/demo-data` | — | `dict` | Pre-cached demo snapshot (10 scenarios) |
+| 26 | GET | `/scenarios` | — | `dict` | 20+ predefined scenario permutations catalog |
+| 27 | POST | `/scenario-run` | `ScenarioRunRequest` | `ScenarioRunResponse` | Scenario with reaction type |
+| 28 | GET | `/reactions` | — | `dict` | Available reaction types |
+| 29 | POST | `/dataset/upload` | `UploadFile` | `dict` | Upload + auto-activate dataset |
+| 30 | POST | `/dataset/activate` | query + optional mapping | `dict` | Activate specific dataset |
+| 31 | GET | `/dataset/info` | — | `dict` | Current dataset status |
+| 32 | GET | `/dataset/files` | — | `dict` | List all uploaded datasets |
+| 33 | POST | `/dataset/clear` | — | `dict` | Reset to default CSVs |
+| 34 | POST | `/dataset/preview` | `UploadFile` | `dict` | Preview file + suggested column mapping |
+| 35 | GET | `/dataset/employee-data/{name}` | — | `dict` | Employee from active dataset |
+| 36 | GET | `/dataset/employees` | — | `dict` | List all employees |
 
 ---
 

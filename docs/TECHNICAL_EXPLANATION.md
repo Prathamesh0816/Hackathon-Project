@@ -7,7 +7,7 @@
 ## 1. Backend: FastAPI (Python)
 
 ### What we used
-FastAPI 0.115+ with Python 3.12+ (tested on 3.14), running via uvicorn.
+FastAPI 0.111 with Python 3.12+ (tested on 3.14), running via uvicorn.
 
 ### Why
 - **High performance:** Built on Starlette + Pydantic. Handles ~50K requests/sec — more than enough for a hackathon demo, and production-ready.

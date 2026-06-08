@@ -1,16 +1,22 @@
+# Python
 __pycache__/
 *.pyc
+*.pyo
 venv/
 .venv/
+
+# Environment
 .env
-.vscode/
-.idea/
-node_modules/
-dist/
-.vite/
-*.db
-chroma_data/
-chroma_db/
-uploaded_files/
 .git/
 .gitignore
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Build context
+docs/
+*.md
+.DS_Store
+Thumbs.db

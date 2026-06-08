@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Employees from './pages/Employees'
@@ -27,6 +27,7 @@ export default function App() {
         <Route path="/workforce-readiness" element={<WorkforceReadiness />} />
         <Route path="/report" element={<Report />} />
         <Route path="/upload" element={<Upload />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
   )

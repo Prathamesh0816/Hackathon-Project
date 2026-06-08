@@ -12,9 +12,37 @@ from typing import Any
 CHROMA_DIR = Path(__file__).parent / "chroma_data"
 
 
-def _get_client():
+# ---------------------------------------------------------------------------
+# Lazy init & client singleton
+# ---------------------------------------------------------------------------
+_COLLECTIONS_ENSUMED = False
+
+
+def _ensure_collections():
+    global _COLLECTIONS_ENSUMED
+    if _COLLECTIONS_ENSUMED:
+        return
     import chromadb
-    return chromadb.PersistentClient(path=str(CHROMA_DIR))
+    client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+    for coll in (COLL_KNOWLEDGE, COLL_EMPLOYEES):
+        try:
+            client.get_collection(coll)
+        except Exception:
+            client.create_collection(coll)
+    _COLLECTIONS_ENSUMED = True
+
+
+_CLIENT: Any = None
+
+
+def _get_client():
+    global _CLIENT
+    if _CLIENT is not None:
+        return _CLIENT
+    _ensure_collections()
+    import chromadb
+    _CLIENT = chromadb.PersistentClient(path=str(CHROMA_DIR))
+    return _CLIENT
 
 
 # ---------------------------------------------------------------------------
@@ -24,24 +52,12 @@ COLL_KNOWLEDGE = "employee_knowledge"
 COLL_EMPLOYEES = "employee_profiles"
 
 
-def ensure_collections():
-    """Create collections if they don't exist yet."""
-    client = _get_client()
-    for coll in (COLL_KNOWLEDGE, COLL_EMPLOYEES):
-        try:
-            client.get_collection(coll)
-        except Exception:
-            client.create_collection(coll)
-
-
 def get_knowledge_collection():
-    client = _get_client()
-    return client.get_collection(COLL_KNOWLEDGE)
+    return _get_client().get_collection(COLL_KNOWLEDGE)
 
 
 def get_profile_collection():
-    client = _get_client()
-    return client.get_collection(COLL_EMPLOYEES)
+    return _get_client().get_collection(COLL_EMPLOYEES)
 
 
 # ---------------------------------------------------------------------------
@@ -89,12 +105,15 @@ def search_by_knowledge_area(area: str) -> list[dict]:
 
 
 def get_team_knowledge_gaps(team: str) -> list[str]:
-    """Identify knowledge areas the team lacks coverage for."""
+    """Identify knowledge areas the team lacks coverage for.
+    Returns areas where no team member has Advanced/Expert proficiency.
+    """
     coll = get_knowledge_collection()
     results = coll.get(where={"team": team})
+    all_areas = set(r["metadata"]["knowledge_area"] for r in _format_get_results(results))
     covered = set(r["metadata"]["knowledge_area"] for r in _format_get_results(results)
                   if r["metadata"].get("proficiency") in ("Advanced", "Expert"))
-    return list(covered)
+    return sorted(all_areas - covered)
 
 
 def knowledge_count() -> int:
@@ -152,6 +171,5 @@ def _format_get_results(results) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Init on import
+# Init (no import-time side effects — collections created on first use)
 # ---------------------------------------------------------------------------
-ensure_collections()

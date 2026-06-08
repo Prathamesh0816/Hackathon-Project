@@ -75,9 +75,7 @@ Verify: Open `http://localhost:3000` — you should see the Dashboard.
 
 ```bash
 cd database
-
-# Install chromadb (first time only)
-pip install chromadb
+pip install chromadb sentence-transformers
 
 # Seed the vector store with employee knowledge embeddings
 python seed_vectordb.py
@@ -287,7 +285,7 @@ ollama run qwen2.5:3b "hello"  # warm-up
 
 # 2. Seed vector database
 cd database
-pip install chromadb
+pip install chromadb sentence-transformers
 python seed_vectordb.py
 
 # 3. Test pipeline 3x (LangChain version)
