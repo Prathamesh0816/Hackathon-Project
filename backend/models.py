@@ -153,3 +153,43 @@ class HealthCheckResponse(BaseModel):
     pipeline_backend: str = "raw"
     langchain_available: bool = False
     endpoints: list[str]
+
+
+# ---------------------------------------------------------------------------
+# Analytics Weight Configuration
+# ---------------------------------------------------------------------------
+
+class IndicatorWeights(BaseModel):
+    resilience: float = 0.35
+    trust: float = 0.20
+    burnout: float = 0.25
+    retention: float = 0.20
+
+
+class BurnoutSubWeights(BaseModel):
+    hour_burnout: float = 0.45
+    pto_risk: float = 0.30
+    overdue_risk: float = 0.25
+
+
+class RetentionSubWeights(BaseModel):
+    engagement: float = 0.55
+    criticality: float = 0.30
+    backup_penalty: float = 0.15
+
+
+class ResilienceSubWeights(BaseModel):
+    backup_coverage: float = 0.40
+    severity_penalty_max: float = 40.0
+    doc_bonus_max: float = 20.0
+    team_bonus_max: float = 20.0
+
+
+class AnalyticsWeightConfig(BaseModel):
+    """Full analytics weight configuration. Users can provide custom weights,
+    or let AI generate them based on org context."""
+    indicator_weights: IndicatorWeights = IndicatorWeights()
+    burnout_sub_weights: BurnoutSubWeights = BurnoutSubWeights()
+    retention_sub_weights: RetentionSubWeights = RetentionSubWeights()
+    resilience_sub_weights: ResilienceSubWeights = ResilienceSubWeights()
+    source: str = "default"  # "default" | "user" | "ai"

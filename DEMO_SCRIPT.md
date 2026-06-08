@@ -51,6 +51,10 @@
 ---
 
 ### 0:40-1:20 — Segment 2: What-If (40s) → **User Experience**
+> **[Before clicking: hit Ctrl+K to open command palette, type "whatif", Enter to navigate. Quick dark mode toggle with Ctrl+D. Judges see the polished UX instantly.]**
+>
+> *"Notice the polish — command palette, dark mode, keyboard shortcuts. We built this like a real product, not a hackathon prototype."*
+>
 > **[Pre-select Vikram. Click "Run Simulation". Time Machine loads.]**
 >
 > "If Vikram leaves on Friday, here's what Monday looks like."
@@ -117,10 +121,12 @@
 
 ---
 
-### 2:55-3:30 — Segment 5: Report (35s) → **UX + Business Value**
-> **[Click "Generate Report". Show the report output.]**
+### 2:55-3:30 — Segment 5: Report + Chat (35s) → **UX + Business Value**
+> **[Click "Generate Report". While it loads, type "What happens if our top engineer leaves?" in the chat panel. The response streams in real-time with animated dots.]**
 >
 > "Everything — the analysis, the recommendations, the governance trace — goes into a downloadable report. One click, executive-ready. HTML, PDF, and plain text.
+>
+> **And while that's generating, you can ask our AI assistant anything in natural language.** Watch it stream the answer in real-time — WebSocket-powered, with automatic REST fallback if the connection drops. Copy any response with one click. Your conversation persists across page refreshes.
 >
 > This is what you put in front of your board next Monday."
 
@@ -137,7 +143,7 @@
 >
 > **Technical Excellence:** LangGraph StateGraph with conditional edges. Pydantic schemas on every agent. 4-level fallback chain. 9 tools wrapping real analytics. Docker Compose deployment.
 >
-> **User Experience:** One-click simulation. Time Machine before/after. Dependency graph. Stress test animation. Governance panel. Executive report in 2 formats (HTML + Text) with one-click print.
+> **User Experience:** Dark mode, `Ctrl+K` command palette, keyboard shortcuts (`?`), streaming AI chat with WebSocket+REST fallback, toast notifications, KPI pulse animations, one-click simulation, Time Machine before/after, dependency graph, stress test animation, governance panel, customizable weight sliders with live composite preview, chat persistence across refreshes, copy-to-clipboard, executive report in 2 formats with one-click print.
 >
 > **Demo & Presentation:** 6 segments. 5 minutes. One presenter. Three dry runs. Backup video ready. 30+ Q&A answers prepared. **4 one-pagers on your seat: WHATS_UNIQUE.md, BUSINESS_IMPACT.md, docs/CLIENT_PITCH.md, docs/ROADMAP.md.**
 >

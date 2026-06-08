@@ -19,6 +19,7 @@ export default function WhatIfFloating() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [loadError, setLoadError] = useState(null)
 
   useEffect(() => {
     if (!open) return
@@ -30,7 +31,7 @@ export default function WhatIfFloating() {
       const teams = [...new Set(emps.map((e) => e.team))].filter(Boolean).sort()
       setAllTeams(teams)
       if (teams.length > 0 && !restructureTeam) setRestructureTeam(teams[0])
-    }).catch(() => {})
+    }).catch((e) => setLoadError(e.message))
   }, [open])
 
   const runSimulation = async () => {
@@ -78,6 +79,11 @@ export default function WhatIfFloating() {
             </div>
 
             <div className="p-5 space-y-4">
+              {loadError && (
+                <div className="text-xs text-red-600 bg-red-50 p-2 rounded text-center">
+                  Failed to load employee data — {loadError}
+                </div>
+              )}
               <div className="grid grid-cols-3 gap-2">
                 {SCENARIOS.map((s) => (
                   <button

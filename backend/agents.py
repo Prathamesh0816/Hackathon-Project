@@ -44,7 +44,7 @@ if not OLLAMA_URL.rstrip("/").endswith("/api/generate"):
     OLLAMA_URL = OLLAMA_URL.rstrip("/") + "/api/generate"
 
 
-def _llm_call(prompt: str, json_mode: bool = True) -> tuple[str, float]:
+def _llm_call(prompt: str, json_mode: bool = True, timeout_sec: int = 15) -> tuple[str, float]:
     """Single LLM call. Returns (text, latency_seconds)."""
     start = time.time()
     try:
@@ -54,9 +54,9 @@ def _llm_call(prompt: str, json_mode: bool = True) -> tuple[str, float]:
                 "model": OLLAMA_MODEL,
                 "prompt": prompt,
                 "stream": False,
-                "options": {"temperature": 0.2 if json_mode else 0.4},
+                "options": {"temperature": 0.2 if json_mode else 0.4, "num_predict": 512},
             },
-            timeout=60,
+            timeout=timeout_sec,
         )
         r.raise_for_status()
         text = r.json().get("response", "").strip()
@@ -546,27 +546,30 @@ def run_pipeline_fallback(
 
 
 # ---------------------------------------------------------------------------
-# FEEDBACK STORE (in-memory, swap to DB in production)
+# FEEDBACK STORE (SQLite-backed for persistence across restarts)
 # ---------------------------------------------------------------------------
-_FEEDBACK: list[dict[str, Any]] = []
-_FEEDBACK_FILE = Path(__file__).resolve().parent / "uploaded_files" / ".feedback.json"
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+_FEEDBACK_DB_PATH = _PROJECT_ROOT / "trupulse-db" / "trupulse.db"
 
 
-def _load_feedback():
-    global _FEEDBACK
-    if not _FEEDBACK and _FEEDBACK_FILE.exists():
-        try:
-            _FEEDBACK = json.loads(_FEEDBACK_FILE.read_text())
-        except Exception:
-            _FEEDBACK = []
-
-
-def _save_feedback():
-    _FEEDBACK_FILE.parent.mkdir(parents=True, exist_ok=True)
-    _FEEDBACK_FILE.write_text(json.dumps(_FEEDBACK, indent=2))
-
-
-_load_feedback()
+def _get_feedback_db():
+    """Get SQLite connection for feedback, creating table if needed."""
+    import sqlite3
+    _FEEDBACK_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(_FEEDBACK_DB_PATH))
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS feedback_overrides (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            employee TEXT NOT NULL,
+            action_title TEXT NOT NULL,
+            decision TEXT CHECK(decision IN ('accept','veto','modify')) NOT NULL,
+            reason TEXT DEFAULT '',
+            created_at TEXT DEFAULT (datetime('now'))
+        )
+    """)
+    conn.commit()
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
 def record_feedback(
@@ -575,21 +578,25 @@ def record_feedback(
     decision: str,  # "accept" | "veto" | "modify"
     reason: str,
 ) -> dict[str, Any]:
-    entry = {
-        "id": len(_FEEDBACK) + 1,
-        "employee": employee,
-        "action_title": action_title,
-        "decision": decision,
-        "reason": reason,
-    }
-    _FEEDBACK.append(entry)
-    _save_feedback()
-    return entry
+    conn = _get_feedback_db()
+    cursor = conn.execute(
+        "INSERT INTO feedback_overrides (employee, action_title, decision, reason) VALUES (?, ?, ?, ?)",
+        (employee, action_title, decision, reason),
+    )
+    entry_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return {"id": entry_id, "employee": employee, "action_title": action_title, "decision": decision, "reason": reason}
 
 
 def get_feedback_overrides() -> list[dict[str, Any]]:
-    _load_feedback()
-    return _FEEDBACK
+    try:
+        conn = _get_feedback_db()
+        rows = conn.execute("SELECT * FROM feedback_overrides ORDER BY id DESC LIMIT 50").fetchall()
+        conn.close()
+        return [dict(r) for r in rows]
+    except Exception:
+        return []
 
 
 if __name__ == "__main__":

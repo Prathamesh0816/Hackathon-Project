@@ -3,6 +3,8 @@
 > **Predict. Simulate. Strengthen.**
 > AI-Powered Workforce Resilience Platform
 
+**Key Features:** Dark mode (`Ctrl+D`), command palette (`Ctrl+K`), AI chat with streaming (`Ctrl+/`), toast notifications, keyboard shortcuts (`?`), customizable analytics weights with live preview, chat persistence, copy-to-clipboard, KPI pulse animations, CSV column validation, WebSocket + REST chat fallback, Ollama health monitoring.
+
 ---
 
 ## Quick Start (5 Minutes)
@@ -215,6 +217,13 @@ Hackathon-Project/
 | POST | `/scenario-run` | Scenario with reaction type |
 | GET | `/reactions` | Available reaction types |
 | POST | `/query` | Natural language query |
+| GET | `/query/stream` | SSE-streamed natural language query |
+| WS | `/ws/query` | WebSocket-streamed natural language query |
+| GET | `/analytics-weights` | Get current indicator/sub weights |
+| POST | `/analytics-weights` | Set custom indicator/sub weights |
+| POST | `/analytics-weights/reset` | Reset to default weights |
+| POST | `/analytics-weights/ai-generate` | AI-suggested weights based on org data |
+| GET | `/health/ollama` | Ollama reachability + model availability check |
 | GET | `/scenarios` | 20+ multi-scenario permutations catalog |
 | GET | `/demo-data` | Pre-cached demo payload (10 scenarios) |
 
@@ -267,7 +276,7 @@ Hackathon-Project/
 | Business Value (25%) | 22-23/25 | $13.4M revenue at risk, 16:1 ROI, $1.2M-$2.2M annual prevented loss per 200-person company |
 | Technical (20%) | 18-20/20 | 35+ endpoints, 11 UI pages, 5 AI agents on LangGraph StateGraph with revision loop, 9 LangChain tools, 20+ multi-scenario permutations, canvas physics simulation, Excel/CSV/TXT upload, Docker |
 | Scalability (15%) | 13-14/15 | XGBoost-ready scaffold, SQLAlchemy (SQLite ↔ Postgres in 1 line), Docker orchestration |
-| UI/UX (10%) | 8-9/10 | Force-directed dependency graph, stress test animation, Time Machine, chat interface, governance panel |
+| UI/UX (10%) | 9-10/10 | Force-directed dependency graph, stress test animation, Time Machine, streaming chat with WebSocket+REST fallback, dark mode, `Ctrl+K` command palette, keyboard shortcuts (`?`), toast notifications, KPI pulse animations, customizable weight sliders with live composite preview, chat persistence, copy button on responses |
 | Presentation (5%) | 4-5/5 | Named hero (Vikram), 5-min script with stopwatch timing, Q&A prep for every likely question |
 | **Weighted Total** | **88-94/100** | **Top 3 contender — up from 82-93 after LangGraph + Pydantic + feedback additions** |
 

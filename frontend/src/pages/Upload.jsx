@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useToast } from '../context/ToastContext'
 import { uploadDataset, previewDataset, getDatasetInfo, getDatasetFiles, postDatasetActivate, postDatasetClear, getScenarios, postScenarioRun, getReactions } from '../services/api'
 
 export default function Upload() {
+  const { addToast } = useToast()
   const [mode, setMode] = useState('default') // 'default' | 'upload' | 'scenario'
   const [file, setFile] = useState(null)
   const [preview, setPreview] = useState(null)
@@ -71,9 +73,11 @@ export default function Upload() {
     try {
       const r = await uploadDataset(file)
       setResult(r)
+      addToast(`Dataset "${file.name}" uploaded successfully`)
       await loadInfo()
     } catch (err) {
       setError(err.message)
+      addToast(err.message, 'error')
     }
     setUploading(false)
   }
@@ -82,9 +86,11 @@ export default function Upload() {
     try {
       const r = await postDatasetActivate(filename)
       setResult(r)
+      addToast(`Activated: ${filename}`)
       await loadInfo()
     } catch (err) {
       setError(err.message)
+      addToast(err.message, 'error')
     }
   }
 
@@ -98,9 +104,11 @@ export default function Upload() {
       setSelectedScenario(null)
       setSelectedReaction('standard')
       setProbability(50)
+      addToast('Reset to default dataset')
       await loadInfo()
     } catch (err) {
       setError(err.message)
+      addToast(err.message, 'error')
     }
   }
 

@@ -63,6 +63,35 @@ EXPECTED_COLUMNS = {
 }
 
 
+REQUIRED_COLUMNS = ["employee", "team", "role"]
+OPTIONAL_BUT_HIGH_VALUE = ["criticality", "backup", "experience", "salary", "tenure"]
+
+
+def validate_dataset_columns(df: pd.DataFrame, mapping: dict[str, str]) -> dict:
+    """Validate that uploaded dataset has minimum required columns. Returns {valid, missing, warnings}."""
+    missing_required = [col for col in REQUIRED_COLUMNS if col not in mapping]
+    missing_optional = [col for col in OPTIONAL_BUT_HIGH_VALUE if col not in mapping]
+
+    warnings = []
+    if missing_required:
+        warnings.append(f"Missing required columns: {', '.join(missing_required)}. Scoring will not work.")
+    if missing_optional:
+        warnings.append(f"Missing recommended columns: {', '.join(missing_optional)}. Some analytics will use defaults.")
+
+    return {
+        "valid": len(missing_required) == 0,
+        "missing_required": missing_required,
+        "missing_optional": missing_optional,
+        "detected_columns": list(mapping.keys()),
+        "warnings": warnings,
+        "summary": (
+            f"Found {len(mapping)} of {len(REQUIRED_COLUMNS) + len(OPTIONAL_BUT_HIGH_VALUE)} expected columns. "
+            f"{'All good!' if len(missing_required) == 0 and len(missing_optional) == 0 else ''}"
+            f"{'Missing: ' + ', '.join(missing_required + missing_optional) if missing_required or missing_optional else ''}"
+        ),
+    }
+
+
 def _find_column(df: pd.DataFrame, expected_group: str) -> str | None:
     """Find the best matching column in df for an expected group."""
     candidates = EXPECTED_COLUMNS.get(expected_group, [])
@@ -276,6 +305,16 @@ def activate_dataset(filename: str, column_mapping: dict[str, str] | None = None
     else:
         mapping = infer_column_mapping(df)
 
+    # Validate required columns
+    validation = validate_dataset_columns(df, mapping)
+    if not validation["valid"]:
+        return {
+            "status": "error",
+            "error": f"Missing required columns: {', '.join(validation['missing_required'])}. "
+                     f"Cannot activate dataset. Please check your file has columns for: employee name, team, and role.",
+            "validation": validation,
+        }
+
     _active_mapping = mapping
     _active_filename = filename
 
@@ -309,7 +348,10 @@ def activate_dataset(filename: str, column_mapping: dict[str, str] | None = None
         "employee_count": employee_count,
         "columns_detected": len(mapping),
         "mapping": mapping,
-        "message": f"Loaded {employee_count} employees from {filename}",
+        "validation": validate_dataset_columns(df, mapping),
+        "message": f"Loaded {employee_count} employees from {filename}" + (
+            f" ({validation['summary']})" if validation.get("summary") else ""
+        ),
     }
 
 

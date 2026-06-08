@@ -24,7 +24,18 @@ export default function EmployeeProfile() {
 
   if (loading) return <SkeletonPage />
   if (error) return <ErrorState message={error} />
-  if (!profile || profile.error) return <ErrorState message={profile?.error || 'Employee not found'} />
+  if (!profile || profile.error) {
+    return (
+      <div className="text-center py-16">
+        <div className="text-6xl text-gray-300 mb-4">404</div>
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">Employee Not Found</h2>
+        <p className="text-gray-500 mb-6">{profile?.error || `No employee matching "${name}"`}</p>
+        <Link to="/employees" className="text-sm text-tru-600 hover:text-tru-700 underline">
+          ← Back to Employees
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

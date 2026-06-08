@@ -19,6 +19,7 @@ const SCENARIOS = [
 export default function WhatIf() {
   const [allEmployees, setAllEmployees] = useState([])
   const [allTeams, setAllTeams] = useState([])
+  const [employeesError, setEmployeesError] = useState(null)
   const [scenarioType, setScenarioType] = useState('attrition')
   const [removedEmployees, setRemovedEmployees] = useState([])
   const [workloadPct, setWorkloadPct] = useState(20)
@@ -33,8 +34,23 @@ export default function WhatIf() {
       const teams = [...new Set(emps.map((e) => e.team))].filter(Boolean).sort()
       setAllTeams(teams)
       if (teams.length > 0) setRestructureTeam(teams[0])
-    }).catch(() => {})
+    }).catch((e) => setEmployeesError(e.message))
   }, [])
+
+  if (employeesError) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">What-If Simulator</h1>
+          <p className="text-gray-500 mt-1">Simulate workforce scenarios and predict organizational impact</p>
+        </div>
+        <div className="bg-white rounded-lg border border-red-200 p-6 text-center">
+          <p className="text-red-600 font-medium mb-2">Failed to load employee data</p>
+          <p className="text-sm text-gray-500">{employeesError}</p>
+        </div>
+      </div>
+    )
+  }
 
   const saved = JSON.parse(localStorage.getItem('trupulse_whatif') || 'null')
   const [result, setResult] = useState(saved?.result || null)

@@ -147,7 +147,7 @@ def _load_from_csv() -> dict[str, pd.DataFrame]:
 
 
 _CACHE: dict[str, Any] = {"data": None, "ts": 0.0}
-_CACHE_TTL = 2.0  # seconds before cache invalidates
+_CACHE_TTL = 30.0  # seconds before cache invalidates (was 2s - increased 15x for performance)
 
 
 def load_all() -> dict[str, pd.DataFrame]:
@@ -237,10 +237,11 @@ def compute_burnout(workload: pd.DataFrame, performance: pd.DataFrame) -> dict[s
     df["pto_risk"] = (df["LastPTODays"] / 60).clip(0, 1)
     df["overdue_risk"] = (df["OverdueTasks"] / 3).clip(0, 1)
 
+    bw = _BURNOUT_SUB_WEIGHTS
     df["burnout_score"] = (
-        0.45 * df["hour_burnout"]
-        + 0.30 * df["pto_risk"]
-        + 0.25 * df["overdue_risk"]
+        bw["hour_burnout"] * df["hour_burnout"]
+        + bw["pto_risk"] * df["pto_risk"]
+        + bw["overdue_risk"] * df["overdue_risk"]
     )
 
     org_score = round(float(df["burnout_score"].mean() * 100), 1)
@@ -276,10 +277,11 @@ def compute_retention(employees: pd.DataFrame, performance: pd.DataFrame) -> dic
     df["criticality_weight"] = df["Criticality"].map({"High": 1.0, "Medium": 0.6, "Low": 0.2}).fillna(0.5)
     df["backup_penalty"] = (df["BackupAvailable"] == "No").astype(float) * 0.25
 
+    rw = _RETENTION_SUB_WEIGHTS
     df["flight_risk"] = (
-        0.55 * (1 - df["engagement_norm"])
-        + 0.30 * df["criticality_weight"] * 0.5
-        + 0.15 * df["backup_penalty"]
+        rw["engagement"] * (1 - df["engagement_norm"])
+        + rw["criticality"] * df["criticality_weight"] * 0.5
+        + rw["backup_penalty"] * df["backup_penalty"]
     )
     df["retention_score"] = ((1 - df["flight_risk"]) * 100).round(1)
 
@@ -343,25 +345,27 @@ def compute_resilience(
     no_backup_count = len(spofs)
     backup_ratio = (total - no_backup_count) / total if total > 0 else 1
 
-    # 1. Backup coverage (40% weight)
+    rw = _RESILIENCE_SUB_WEIGHTS
+
+    # 1. Backup coverage (configurable weight)
     backup_score = backup_ratio * 100
 
-    # 2. SPOF severity penalty (up to -40)
+    # 2. SPOF severity penalty (configurable max)
     severity_penalty = 0
     for s in spofs[:10]:  # Top 10 SPOFs contribute
         w = 4 if s["criticality"] == "High" else 2
         severity_penalty += w
-    severity_penalty = min(severity_penalty, 40)
+    severity_penalty = min(severity_penalty, rw["severity_penalty_max"])
 
-    # 3. Documentation bonus (up to +20)
+    # 3. Documentation bonus (configurable max)
     doc_bonus = 0
     if not knowledge.empty:
         doc_ratio = (knowledge["DocumentationLevel"] != "Low").mean()
-        doc_bonus = doc_ratio * 20
+        doc_bonus = doc_ratio * rw["doc_bonus_max"]
 
-    # 4. Team coverage bonus (up to +20)
+    # 4. Team coverage bonus (configurable max)
     team_coverage = employees.groupby("Team")["BackupAvailable"].apply(lambda x: (x == "Yes").mean()).mean()
-    team_bonus = team_coverage * 20
+    team_bonus = team_coverage * rw["team_bonus_max"]
 
     score = backup_score - severity_penalty + doc_bonus + team_bonus
     score = max(min(score, 100), 0)
@@ -388,6 +392,61 @@ def compute_resilience(
 # ---------------------------------------------------------------------------
 # COMPOSITE ORG HEALTH
 # ---------------------------------------------------------------------------
+# Default weights (can be overridden by user or AI)
+_INDICATOR_WEIGHTS = {"resilience": 0.35, "trust": 0.20, "burnout": 0.25, "retention": 0.20}
+_BURNOUT_SUB_WEIGHTS = {"hour_burnout": 0.45, "pto_risk": 0.30, "overdue_risk": 0.25}
+_RETENTION_SUB_WEIGHTS = {"engagement": 0.55, "criticality": 0.30, "backup_penalty": 0.15}
+_RESILIENCE_SUB_WEIGHTS = {
+    "backup_coverage": 0.40, "severity_penalty_max": 40.0,
+    "doc_bonus_max": 20.0, "team_bonus_max": 20.0,
+}
+_WEIGHT_SOURCE = "default"  # "default" | "user" | "ai"
+
+
+def set_weights(indicator: dict = None, burnout: dict = None,
+                retention: dict = None, resilience: dict = None,
+                source: str = "user"):
+    """Set custom weights for analytics. Returns updated config."""
+    global _INDICATOR_WEIGHTS, _BURNOUT_SUB_WEIGHTS, _RETENTION_SUB_WEIGHTS
+    global _RESILIENCE_SUB_WEIGHTS, _WEIGHT_SOURCE
+    if indicator:
+        _INDICATOR_WEIGHTS.update(indicator)
+    if burnout:
+        _BURNOUT_SUB_WEIGHTS.update(burnout)
+    if retention:
+        _RETENTION_SUB_WEIGHTS.update(retention)
+    if resilience:
+        _RESILIENCE_SUB_WEIGHTS.update(resilience)
+    _WEIGHT_SOURCE = source
+    return get_weights()
+
+
+def get_weights() -> dict:
+    """Get current weight configuration."""
+    return {
+        "indicator_weights": dict(_INDICATOR_WEIGHTS),
+        "burnout_sub_weights": dict(_BURNOUT_SUB_WEIGHTS),
+        "retention_sub_weights": dict(_RETENTION_SUB_WEIGHTS),
+        "resilience_sub_weights": dict(_RESILIENCE_SUB_WEIGHTS),
+        "source": _WEIGHT_SOURCE,
+    }
+
+
+def reset_weights():
+    """Reset weights to defaults."""
+    global _INDICATOR_WEIGHTS, _BURNOUT_SUB_WEIGHTS, _RETENTION_SUB_WEIGHTS
+    global _RESILIENCE_SUB_WEIGHTS, _WEIGHT_SOURCE
+    _INDICATOR_WEIGHTS = {"resilience": 0.35, "trust": 0.20, "burnout": 0.25, "retention": 0.20}
+    _BURNOUT_SUB_WEIGHTS = {"hour_burnout": 0.45, "pto_risk": 0.30, "overdue_risk": 0.25}
+    _RETENTION_SUB_WEIGHTS = {"engagement": 0.55, "criticality": 0.30, "backup_penalty": 0.15}
+    _RESILIENCE_SUB_WEIGHTS = {
+        "backup_coverage": 0.40, "severity_penalty_max": 40.0,
+        "doc_bonus_max": 20.0, "team_bonus_max": 20.0,
+    }
+    _WEIGHT_SOURCE = "default"
+    return get_weights()
+
+
 def compute_org_health() -> dict[str, Any]:
     data = load_all()
     resilience = compute_resilience(
@@ -397,13 +456,15 @@ def compute_org_health() -> dict[str, Any]:
     burnout = compute_burnout(data["workload"], data["performance"])
     retention = compute_retention(data["employees"], data["performance"])
 
+    w = _INDICATOR_WEIGHTS
     composite = round(
-        0.35 * resilience["score"]
-        + 0.20 * trust["score"]
-        + 0.25 * (100 - burnout["score"])  # burnout is inverted
-        + 0.20 * retention["score"],
+        w["resilience"] * resilience["score"]
+        + w["trust"] * trust["score"]
+        + w["burnout"] * (100 - burnout["score"])  # burnout is inverted
+        + w["retention"] * retention["score"],
         1,
     )
+    composite = max(0.0, min(100.0, composite))
 
     if composite >= 75:
         overall = "LOW"
@@ -424,6 +485,8 @@ def compute_org_health() -> dict[str, Any]:
         "team_count": int(data["employees"]["Team"].nunique()) if not data["employees"].empty else 0,
         "employee_count": int(len(data["employees"])),
         "project_count": int(len(data["projects"])),
+        "weight_source": _WEIGHT_SOURCE,
+        "weights": get_weights(),
     }
 
 
@@ -560,15 +623,16 @@ def simulate_scenario(
     if disruption_penalty > 0:
         resilience["score"] = max(0.0, resilience["score"] - disruption_penalty)
 
+    w = _INDICATOR_WEIGHTS
     composite = round(
-        0.35 * resilience["score"]
-        + 0.20 * trust["score"]
-        + 0.25 * (100 - burnout["score"])
-        + 0.20 * retention["score"],
+        w["resilience"] * resilience["score"]
+        + w["trust"] * trust["score"]
+        + w["burnout"] * (100 - burnout["score"])
+        + w["retention"] * retention["score"],
         1,
     )
 
-    composite = max(0.0, composite)
+    composite = max(0.0, min(100.0, composite))
 
     return {
         "scenario": scenario_type,

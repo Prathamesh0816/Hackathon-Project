@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
 import { getReportHtml, getEmployees } from '../services/api'
+import { useToast } from '../context/ToastContext'
 import { SkeletonCard } from '../components/Skeleton'
 
 export default function Report() {
+  const { addToast } = useToast()
   const [allEmployees, setAllEmployees] = useState([])
+  const [employeesError, setEmployeesError] = useState(null)
   const [scenarioType, setScenarioType] = useState('baseline')
   const [removed, setRemoved] = useState([])
   const [html, setHtml] = useState(null)
@@ -14,7 +17,7 @@ export default function Report() {
     getEmployees().then((data) => {
       const names = (data.employees || []).map((e) => e.name || e.Employee).filter(Boolean)
       setAllEmployees(names)
-    }).catch(() => {})
+    }).catch((e) => setEmployeesError(e.message))
   }, [])
 
   const toggleEmployee = (name) => {
@@ -29,11 +32,28 @@ export default function Report() {
     try {
       const h = await getReportHtml(scenarioType, removed.join(','))
       setHtml(h)
+      addToast('Report generated successfully')
     } catch (e) {
       setError(e.message)
+      addToast(e.message, 'error')
     } finally {
       setLoading(false)
     }
+  }
+
+  if (employeesError) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Resilience Report</h1>
+          <p className="text-gray-500 mt-1">Generate a downloadable HTML report</p>
+        </div>
+        <div className="bg-white rounded-lg border border-red-200 p-6 text-center">
+          <p className="text-red-600 font-medium mb-2">Failed to load employee data</p>
+          <p className="text-sm text-gray-500">{employeesError}</p>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -26,7 +26,13 @@ export default function Employees() {
 
   const filtered = employees.filter((e) => {
     if (teamFilter !== 'All' && e.team !== teamFilter) return false
-    if (search && !e.name.toLowerCase().includes(search.toLowerCase())) return false
+    if (search) {
+      const q = search.toLowerCase()
+      const name = (e.name || e.Employee || '').toLowerCase()
+      const team = (e.team || '').toLowerCase()
+      const role = (e.role || '').toLowerCase()
+      if (!name.includes(q) && !team.includes(q) && !role.includes(q)) return false
+    }
     return true
   })
 
@@ -40,7 +46,7 @@ export default function Employees() {
       <div className="flex flex-wrap gap-3 items-center">
         <input
           type="text"
-          placeholder="Search by name..."
+          placeholder="Search by name, team, role..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-tru-500"
@@ -73,23 +79,31 @@ export default function Employees() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filtered.map((emp) => (
-              <tr key={emp.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">{emp.name || emp.Employee}</td>
-                <td className="px-4 py-3">
-                  <StatusBadge level={emp.team} small />
-                </td>
-                <td className="px-4 py-3 text-gray-600">{emp.role}</td>
-                <td className="px-4 py-3 text-right">
-                  <Link
-                    to={`/employee/${encodeURIComponent(emp.name)}`}
-                    className="text-tru-600 hover:text-tru-800 font-medium text-xs"
-                  >
-                    View Profile →
-                  </Link>
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-4 py-12 text-center text-gray-400">
+                  {search ? 'No employees match your search' : 'No employees found'}
                 </td>
               </tr>
-            ))}
+            ) : (
+              filtered.map((emp) => (
+                <tr key={emp.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium text-gray-900">{emp.name || emp.Employee}</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge level={emp.team} small />
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">{emp.role || '—'}</td>
+                  <td className="px-4 py-3 text-right">
+                    <Link
+                      to={`/employee/${encodeURIComponent(emp.name || emp.Employee || '')}`}
+                      className="text-tru-600 hover:text-tru-800 font-medium text-xs"
+                    >
+                      View Profile →
+                    </Link>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

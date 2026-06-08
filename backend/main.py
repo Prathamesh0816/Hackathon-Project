@@ -13,10 +13,11 @@ import json
 import math
 import re
 import time
+import threading
 from pathlib import Path
 from typing import Any, Optional
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel
@@ -26,12 +27,55 @@ from models import (
     TextInputRequest, ApplyDecisionsRequest, ScenarioRunRequest,
     OrgHealthResponse, WhatIfResponse, WhatIfComparison, ScenarioRunResponse,
     FeedbackResponse, TextInputResponse, HealthCheckResponse,
+    AnalyticsWeightConfig,
 )
+
+
+# ---------------------------------------------------------------------------
+# Per-request memoization for analytics functions (avoids duplicate calls)
+# ---------------------------------------------------------------------------
+_request_local = threading.local()
+
+
+def _reset_request_cache():
+    """Call at start of each request to clear per-request cache."""
+    _request_local.cache = {}
+
+
+def _memoize(func, *args, **kwargs):
+    """Memoize a function call for the current request. Returns cached result if called again."""
+    cache = getattr(_request_local, "cache", None)
+    if cache is None:
+        _reset_request_cache()
+        cache = _request_local.cache
+    key = (func.__name__, str(args), str(kwargs))
+    if key not in cache:
+        cache[key] = func(*args, **kwargs)
+    return cache[key]
+
+
+def _memoized_spof_ranking():
+    """Memoized version of compute_spof_ranking for per-request dedup."""
+    return _memoize(compute_spof_ranking)
+
+
+def _memoized_skill_gaps():
+    """Memoized version of compute_skill_gaps for per-request dedup."""
+    return _memoize(compute_skill_gaps)
 
 
 class SafeJSONResponse(JSONResponse):
     def render(self, content: Any) -> bytes:
         return super().render(safe_json(content))
+
+
+def _safe_model_dump(model) -> dict:
+    """Pydantic v2/v1 compatible model serialization."""
+    if hasattr(model, "model_dump"):
+        return model.model_dump()
+    if hasattr(model, "dict"):
+        return model.dict()
+    return dict(model)
 
 
 def safe_json(obj: Any) -> Any:
@@ -64,6 +108,7 @@ from scoring import (
     get_employee_profile,
     simulate_scenario,
     compare_scenarios,
+    set_weights, get_weights, reset_weights,
 )
 from analytics_enhanced import (
     compute_skill_gaps,
@@ -116,6 +161,42 @@ def home():
             "/text-input", "/feedback/suggestions", "/feedback/apply",
             "/scenarios", "/demo-data", "/dataset/info",
         ],
+    }
+
+
+@app.get("/health/ollama")
+def ollama_health():
+    """Check if Ollama LLM is reachable and report status."""
+    from agents import OLLAMA_URL, OLLAMA_MODEL
+    ollama_ok = False
+    ollama_error = None
+    try:
+        import requests
+        base = OLLAMA_URL.replace("/api/generate", "").rstrip("/")
+        r = requests.get(f"{base}/api/tags", timeout=3)
+        if r.status_code == 200:
+            models = r.json().get("models", [])
+            model_found = any(OLLAMA_MODEL in m.get("name", "") for m in models)
+            ollama_ok = model_found
+            if not model_found:
+                ollama_error = f"Model '{OLLAMA_MODEL}' not found. Available: {', '.join(m['name'] for m in models[:5])}"
+        else:
+            ollama_error = f"Ollama returned status {r.status_code}"
+    except Exception as e:
+        ollama_error = f"Cannot reach Ollama at {OLLAMA_URL}: {e}"
+
+    return {
+        "ollama_url": OLLAMA_URL,
+        "ollama_model": OLLAMA_MODEL,
+        "ollama_available": ollama_ok,
+        "ollama_error": ollama_error,
+        "pipeline_backend": _PIPELINE_BACKEND,
+        "langchain_available": _LANGCHAIN_AVAILABLE,
+        "all_endpoints_functional": ollama_ok or _LANGCHAIN_AVAILABLE,
+        "recommendation": (
+            "All systems operational." if ollama_ok else
+            f"Ollama issue: {ollama_error}. Chat and AI features will use fallback mode."
+        ),
     }
 
 
@@ -895,6 +976,88 @@ def upskilling(employee_name: str):
 
 
 # ---------------------------------------------------------------------------
+# NEW: Analytics Weight Configuration (User + AI)
+# ---------------------------------------------------------------------------
+@app.get("/analytics-weights")
+def analytics_weights_get():
+    """Get current analytics weight configuration."""
+    return get_weights()
+
+
+@app.post("/analytics-weights")
+def analytics_weights_set(req: AnalyticsWeightConfig):
+    """Set custom analytics weights. Source 'user' means manual override, 'ai' means AI-generated."""
+    weights = set_weights(
+        indicator=_safe_model_dump(req.indicator_weights) if req.indicator_weights else None,
+        burnout=_safe_model_dump(req.burnout_sub_weights) if req.burnout_sub_weights else None,
+        retention=_safe_model_dump(req.retention_sub_weights) if req.retention_sub_weights else None,
+        resilience=_safe_model_dump(req.resilience_sub_weights) if req.resilience_sub_weights else None,
+        source=req.source,
+    )
+    return {"status": "ok", "weights": weights}
+
+
+@app.post("/analytics-weights/reset")
+def analytics_weights_reset():
+    """Reset analytics weights to system defaults."""
+    weights = reset_weights()
+    return {"status": "ok", "weights": weights}
+
+
+@app.post("/analytics-weights/ai-generate")
+def analytics_weights_ai_generate():
+    """Use AI to suggest optimal analytics weights based on current org context."""
+    try:
+        from agents import _llm_call
+        health = compute_org_health()
+        context = (
+            f"Composite: {health['composite_score']}/100. "
+            f"Resilience: {health['indicators']['resilience']['score']} (SPOFs: {health['indicators']['resilience']['details'].get('spof_count', 0)}), "
+            f"Trust: {health['indicators']['trust']['score']}, "
+            f"Burnout: {health['indicators']['burnout']['score']}, "
+            f"Retention: {health['indicators']['retention']['score']}. "
+            f"Employees: {health['employee_count']}, Teams: {health['team_count']}."
+        )
+        prompt = f"""You are an AI workforce analytics optimizer. Based on this org data, suggest optimal indicator weights.
+
+Org Data: {context}
+
+Return ONLY valid JSON with weights that sum to 1.0 for indicator_weights:
+{{
+  "indicator_weights": {{"resilience": 0.35, "trust": 0.20, "burnout": 0.25, "retention": 0.20}},
+  "burnout_sub_weights": {{"hour_burnout": 0.45, "pto_risk": 0.30, "overdue_risk": 0.25}},
+  "retention_sub_weights": {{"engagement": 0.55, "criticality": 0.30, "backup_penalty": 0.15}},
+  "resilience_sub_weights": {{"backup_coverage": 0.40, "severity_penalty_max": 40.0, "doc_bonus_max": 20.0, "team_bonus_max": 20.0}},
+  "rationale": "Brief explanation of why these weights suit the current org state"
+}}"""
+        text, _ = _llm_call(prompt, json_mode=True, timeout_sec=10)
+        import json as _json
+        try:
+            ai_weights = _json.loads(text)
+        except Exception:
+            # Fall back to defaults if AI fails
+            return {"status": "error", "detail": "AI generation failed, using defaults", "weights": get_weights()}
+
+        indicator = ai_weights.get("indicator_weights", None)
+        burnout = ai_weights.get("burnout_sub_weights", None)
+        retention = ai_weights.get("retention_sub_weights", None)
+        resilience = ai_weights.get("resilience_sub_weights", None)
+
+        weights = set_weights(
+            indicator=indicator, burnout=burnout,
+            retention=retention, resilience=resilience,
+            source="ai",
+        )
+        return {
+            "status": "ok",
+            "weights": weights,
+            "rationale": ai_weights.get("rationale", "AI-optimized for current org state"),
+        }
+    except Exception as exc:
+        return {"status": "error", "detail": str(exc), "weights": get_weights()}
+
+
+# ---------------------------------------------------------------------------
 # Helper: run LLM pipeline with fallback chain
 # ---------------------------------------------------------------------------
 def _run_llm_pipeline(health, scenario=None):
@@ -902,45 +1065,156 @@ def _run_llm_pipeline(health, scenario=None):
     try:
         return run_pipeline(health, scenario, feedback_overrides=feedback)
     except Exception:
-        try:
-            from agents import run_pipeline as _raw_pipeline
-            return _raw_pipeline(health, scenario, feedback_overrides=feedback)
-        except Exception:
-            return run_pipeline_fallback(health, scenario)
+        return run_pipeline_fallback(health, scenario)
 
 
 # ---------------------------------------------------------------------------
-# Helper: LLM-powered chat response for novel queries
+# Query response cache (simple in-memory TTL cache)
+# ---------------------------------------------------------------------------
+_QUERY_CACHE: dict[str, dict] = {}
+_QUERY_CACHE_TTL = 30  # seconds
+
+
+def _get_cached(query: str) -> dict | None:
+    key = query.lower().strip()
+    entry = _QUERY_CACHE.get(key)
+    if entry and (time.time() - entry["ts"]) < _QUERY_CACHE_TTL:
+        return entry["response"]
+    return None
+
+
+def _set_cache(query: str, response: dict):
+    key = query.lower().strip()
+    _QUERY_CACHE[key] = {"response": response, "ts": time.time()}
+    # Prune old entries
+    now = time.time()
+    stale = [k for k, v in _QUERY_CACHE.items() if now - v["ts"] > _QUERY_CACHE_TTL * 2]
+    for k in stale:
+        del _QUERY_CACHE[k]
+
+
+# ---------------------------------------------------------------------------
+# Helper: build comprehensive org context string for LLM
+# ---------------------------------------------------------------------------
+def _build_org_context(health: dict) -> str:
+    lines = [
+        f"Org health composite: {health['composite_score']}/100 ({health['overall_risk']} risk).",
+        f"Resilience: {health['indicators']['resilience']['score']} (SPOFs: {health['indicators']['resilience']['details'].get('spof_count', 0)}).",
+        f"Trust: {health['indicators']['trust']['score']} (documentation quality).",
+        f"Burnout: {health['indicators']['burnout']['score']} (high burnout: {health['indicators']['burnout']['details'].get('high_burnout_count', 0)} employees).",
+        f"Retention: {health['indicators']['retention']['score']} (flight risk).",
+        f"Employees: {health['employee_count']}, Teams: {health['team_count']}.",
+    ]
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Helper: build comprehensive context with SPOFs, skill gaps, succession data
+# ---------------------------------------------------------------------------
+def _build_full_context(query: str, health: dict) -> str:
+    ctx = [_build_org_context(health)]
+    try:
+        spofs = _memoized_spof_ranking()
+        top_spofs = spofs.get("spofs", [])[:3]
+        if top_spofs:
+            ctx.append("Top SPOFs:")
+            for s in top_spofs:
+                ctx.append(f"  - {s['employee']} ({s['team']}): {s['severity_level']}, ${s.get('revenue_at_risk_usd', 0):,} at risk")
+    except Exception:
+        pass
+    try:
+        gaps = compute_skill_gaps()
+        if gaps.get("teams"):
+            worst = gaps["teams"][0]
+            ctx.append(f"Worst skill gap: {worst['team']} at {worst['coverage_pct']}% coverage")
+    except Exception:
+        pass
+    return "\n".join(ctx)
+
+
+# ---------------------------------------------------------------------------
+# Helper: LLM-powered chat response for novel queries (with full context)
 # ---------------------------------------------------------------------------
 def _llm_chat(query: str, health: dict, messages: list | None = None) -> str | None:
     try:
         from agents import _llm_call
-        context = (
-            f"Org health composite: {health['composite_score']}/100 ({health['overall_risk']} risk). "
-            f"Resilience: {health['indicators']['resilience']['score']}, "
-            f"Trust: {health['indicators']['trust']['score']}, "
-            f"Burnout: {health['indicators']['burnout']['score']}, "
-            f"Retention: {health['indicators']['retention']['score']}. "
-            f"Employees: {health['employee_count']}, Teams: {health['team_count']}."
-        )
+        context = _build_full_context(query, health)
         history = ""
         if messages:
-            recent = [m for m in messages if m.get("text") and m.get("role") != "system"][-6:]
+            recent = [m for m in messages if m.get("text") and m.get("role") != "system"][-4:]
             for m in recent:
                 role = "User" if m.get("role") == "user" else "Assistant"
                 history += f"{role}: {m['text']}\n"
         prompt = (
-            "You are TruPulse AI, a workforce resilience analyst. Answer concisely in 2-3 sentences "
-            "using the org data provided. Use conversation history for context. "
-            "If you cannot answer from the data, suggest what the user "
-            "can ask about (risks, teams, scenarios, SPOFs, skills, burnout).\n\n"
-            f"Org Data: {context}\n\n"
+            "You are TruPulse AI, a workforce resilience analyst. Answer concisely in 1-2 sentences "
+            "using the org data below. Be specific - use actual numbers from the data. "
+            "If the question is about risks, teams, scenarios, SPOFs, skills, or burnout, answer from data.\n\n"
+            f"Org Data:\n{context}\n\n"
             f"{history}User: {query}\n\nResponse:"
         )
-        text, _ = _llm_call(prompt, json_mode=False)
-        return text.strip()
+        text, latency = _llm_call(prompt, json_mode=False, timeout_sec=10)
+        if text and "error" not in text.lower():
+            return text.strip()
+        return None
     except Exception:
         return None
+
+
+# ---------------------------------------------------------------------------
+# Helper: fuzzy match employee or team name in query
+# ---------------------------------------------------------------------------
+def _fuzzy_match(query: str, names: list[str], threshold: float = 0.5) -> list[str]:
+    """Fuzzy match - checks exact name, name parts, and first-name matches."""
+    query_lower = query.lower().strip()
+    matches = []
+    seen = set()
+    for name in names:
+        if name in seen:
+            continue
+        name_lower = name.lower()
+        # Exact match
+        if name_lower in query_lower:
+            matches.append(name)
+            seen.add(name)
+            continue
+        # Multi-word name (e.g., "Neha Kapoor"): all parts must be in query
+        name_parts = name_lower.replace("-", " ").split()
+        if len(name_parts) > 1 and all(part in query_lower for part in name_parts):
+            matches.append(name)
+            seen.add(name)
+            continue
+        # Single name part match (first or last name)
+        for part in name_parts:
+            if len(part) > 2 and part in query_lower:
+                matches.append(name)
+                seen.add(name)
+                break
+    return matches[:5]  # limit to top 5 matches
+
+
+# ---------------------------------------------------------------------------
+# Helper: get employee and team names from data
+# ---------------------------------------------------------------------------
+def _get_all_employee_names() -> list[str]:
+    try:
+        from scoring import load_all
+        data = load_all()
+        if "employees" in data and not data["employees"].empty:
+            return data["employees"]["Employee"].tolist()
+    except Exception:
+        pass
+    return []
+
+
+def _get_all_team_names() -> list[str]:
+    try:
+        from scoring import load_all
+        data = load_all()
+        if "employees" in data and not data["employees"].empty:
+            return data["employees"]["Team"].unique().tolist()
+    except Exception:
+        pass
+    return []
 
 
 # ---------------------------------------------------------------------------
@@ -948,7 +1222,7 @@ def _llm_chat(query: str, health: dict, messages: list | None = None) -> str | N
 # ---------------------------------------------------------------------------
 def _team_spofs(team_name: str, limit: int = 3) -> list[str]:
     try:
-        spof_data = compute_spof_ranking()
+        spof_data = _memoized_spof_ranking()
         return [s["employee"] for s in spof_data["spofs"] if s["team"].lower() == team_name.lower()][:limit]
     except Exception:
         return []
@@ -959,150 +1233,543 @@ def _team_spofs(team_name: str, limit: int = 3) -> list[str]:
 # ---------------------------------------------------------------------------
 @app.post("/query")
 def natural_language_query(req: QueryRequest):
-    query = req.query.lower()
+    _reset_request_cache()  # Clear per-request memoization cache
+    query = req.query.lower().strip()
     health = compute_org_health()
 
-    if "vikram" in query and ("leave" in query or "quit" in query or "fire" in query or "depart" in query or "what if" in query):
-        removed = ["Vikram"]
-        scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = _run_llm_pipeline(health, scenario)
-        return {
-            "answer": f"If Vikram (Sales Manager) leaves, composite score drops from {health['composite_score']} to {scenario['composite_score']}. He owns $8M+ in strategic accounts with NO backup. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}. Account recovery takes 6-9 months.",
-            "scenario": scenario,
-            "summary": result["summary"],
-        }
+    # Check cache first
+    cached = _get_cached(req.query)
+    if cached:
+        return cached
 
-    if "sales" in query and ("all" in query or "entire" in query or "team" in query) and ("leave" in query or "quit" in query):
-        removed = _team_spofs("Sales", 5) or ["Vikram", "Vikram Sharma", "Tanvi", "Jatin"]
-        scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = _run_llm_pipeline(health, scenario)
-        return {
-            "answer": f"If the ENTIRE Sales team SPOFs leave ({', '.join(removed)}), composite craters from {health['composite_score']} to {scenario['composite_score']}. Total revenue at risk: ${scenario['revenue_at_risk_usd']:,}. This represents 60%+ of the sales pipeline collapsing simultaneously.",
-            "scenario": scenario,
-            "summary": result["summary"],
-        }
+    # Pre-load names for fuzzy matching
+    all_names = _get_all_employee_names()
+    all_teams = _get_all_team_names()
 
-    if ("engineer" in query or "engineering" in query) and ("leave" in query or "quit" in query or "fire" in query):
-        removed = _team_spofs("Engineering", 3) or ["Neha Kapoor", "Lalit", "Ishita"]
-        scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = _run_llm_pipeline(health, scenario)
-        return {
-            "answer": f"If {', '.join(removed)} leave, the composite drops from {health['composite_score']} to {scenario['composite_score']}. Engineering loses its top SPOFs. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
-            "scenario": scenario,
-            "summary": result["summary"],
-        }
+    # Detect departure/attrition intent
+    departure_words = ["leave", "quit", "fire", "depart", "resign", "gone", "lost", "exit", "fired", "laid off", "let go"]
+    is_departure = any(w in query for w in departure_words)
 
-    if ("security" in query or "sec") in query and ("leave" in query or "quit" in query):
-        removed = _team_spofs("Security", 3) or ["Anita Verma", "Meera", "Poonam"]
-        scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = _run_llm_pipeline(health, scenario)
-        return {
-            "answer": f"If {', '.join(removed)} leave, composite drops from {health['composite_score']} to {scenario['composite_score']}. Security Org loses its top SPOFs. Govt security contracts and SOC2 compliance are at immediate risk. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
-            "scenario": scenario,
-            "summary": result["summary"],
-        }
+    # Detect matched employees in query
+    matched_emps = _fuzzy_match(query, all_names)
+    matched_teams = _fuzzy_match(query, all_teams)
 
-    if ("market" in query or "marketing") in query and ("leave" in query or "quit" in query):
-        removed = _team_spofs("Marketing", 3) or ["Shikha Dubey", "Priya", "Hari"]
-        scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = _run_llm_pipeline(health, scenario)
-        return {
-            "answer": f"If {', '.join(removed)} leave, composite drops from {health['composite_score']} to {scenario['composite_score']}. Marketing loses its top SPOFs. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
-            "scenario": scenario,
-            "summary": result["summary"],
-        }
+    # --- INTENT 1: General org health ---
+    if any(w in query for w in ["health", "overall", "org status", "how is", "organization", "company health", "summary"]):
+        answer = (
+            f"Overall organizational health: {health['composite_score']}/100 ({health['overall_risk']} risk). "
+            f"Resilience: {health['indicators']['resilience']['score']}, Trust: {health['indicators']['trust']['score']}, "
+            f"Burnout: {health['indicators']['burnout']['score']}, Retention: {health['indicators']['retention']['score']}. "
+            f"{health['employee_count']} employees across {health['team_count']} teams."
+        )
+        result = {"answer": answer, "health": health}
+        _set_cache(req.query, result)
+        return result
 
-    if ("architect" in query or "neha" in query) and ("leave" in query or "quit" in query):
-        removed = ["Neha Kapoor"]
-        scenario = simulate_scenario("attrition", removed_employees=removed)
-        result = _run_llm_pipeline(health, scenario)
-        return {
-            "answer": f"If Neha Kapoor (Chief Architect) leaves, composite drops from {health['composite_score']} to {scenario['composite_score']}. She is the sole design authority for ALL engineering projects. Her knowledge is entirely undocumented. 4 senior engineers depend on her technical direction. Project delays estimated at 4+ months. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}.",
-            "scenario": scenario,
-            "summary": result["summary"],
-        }
+    # --- INTENT 2: SPOF / single points of failure ---
+    if any(w in query for w in ["spof", "single point", "failure", "bus factor", "no backup", "critical employee"]):
+        spof_data = _memoized_spof_ranking()
+        top = spof_data["spofs"][:5]
+        names = ", ".join(s["employee"] for s in top[:3])
+        answer = (
+            f"We have {spof_data['total_spofs']} single points of failure ({spof_data['critical_spofs']} critical). "
+            f"Highest risk: {names}. "
+            f"Total annual revenue at risk: ${spof_data['total_annual_revenue_at_risk_usd']:,}. "
+            f"These employees have no backup and hold critical undocumented knowledge."
+        )
+        result = {"answer": answer, "spofs": spof_data["spofs"][:5]}
+        _set_cache(req.query, result)
+        return result
 
-    if "burnout" in query or "overwork" in query:
+    # --- INTENT 3: Burnout / overwork ---
+    if any(w in query for w in ["burnout", "overwork", "stress", "overloaded", "working too much", "pto"]):
         burnout = health["indicators"]["burnout"]
         high = burnout["details"].get("high_burnout_employees", [])
-        extra = "Ravi Deshmukh (DevOps) works 72hrs/week — the highest in the org. He's projected to reach critical burnout within 4-6 weeks."
-        return {
-            "answer": f"Burnout score: {burnout['score']} ({burnout['risk_level']} risk). {len(high)} employees show high burnout signals: {', '.join(high[:5])}. {extra} PTO deficit and overdue tasks are the main drivers.",
-            "burnout": burnout,
-        }
+        extra = ""
+        if high:
+            extra = f"Highest: {high[0]} shows critical burnout signals."
+        answer = (
+            f"Burnout score: {burnout['score']} ({burnout['risk_level']} risk). "
+            f"{burnout['details'].get('high_burnout_count', 0)} employees at high burnout risk: "
+            f"{', '.join(high[:5])}. {extra} PTO deficit and overdue tasks are the main drivers."
+        )
+        result = {"answer": answer, "burnout": burnout}
+        _set_cache(req.query, result)
+        return result
 
-    if "what if" in query or "scenario" in query or "combination" in query or "multiple" in query:
-        all_employees = set()
-        from scoring import load_all
-        data = load_all()
-        emp_df = data.get("employees", None)
-        if emp_df is not None and not emp_df.empty and "Employee" in emp_df.columns:
-            known_names = set(emp_df["Employee"].tolist())
-            for word in query.replace(",", " ").split():
-                w = word.strip().title()
-                if w in known_names:
-                    all_employees.add(w)
-        if len(all_employees) >= 2:
-            removed = sorted(all_employees)
-            scenario = simulate_scenario("attrition", removed_employees=removed)
-            result = _run_llm_pipeline(health, scenario)
-            return {
-                "answer": f"Scenario: {', '.join(removed)} leaving. Composite drops from {health['composite_score']} to {scenario['composite_score']}. Revenue at risk: ${scenario['revenue_at_risk_usd']:,}. This combination reveals {len(removed)} interrelated SPOFs leaving simultaneously.",
-                "scenario": scenario,
-                "summary": result["summary"],
-            }
-
-    if ("top" in query or "all" in query) and ("spof" in query or "critical" in query) and ("leave" in query or "depart" in query):
-        spof_data = compute_spof_ranking()
-        top5 = [s["employee"] for s in spof_data["spofs"][:5]]
-        scenario = simulate_scenario("attrition", removed_employees=top5)
-        result = _run_llm_pipeline(health, scenario)
-        return {
-            "answer": f"Worst-case: Top 5 SPOFs ({', '.join(top5)}) leaving simultaneously. Composite collapses from {health['composite_score']} to {scenario['composite_score']}. Total annual revenue at risk: ${scenario['revenue_at_risk_usd']:,}. This is the maximum-impact permutation — recovery would take 12-18 months.",
-            "scenario": scenario,
-            "summary": result["summary"],
-        }
-
-    if "spof" in query or "single point" in query or "failure" in query:
-        spof_data = compute_spof_ranking()
-        top = spof_data["spofs"][:3]
-        names = ", ".join(s["employee"] for s in top)
-        return {
-            "answer": f"We have {spof_data['total_spofs']} single points of failure. The highest risk: {names}. Total annual revenue at risk: ${spof_data['total_annual_revenue_at_risk_usd']:,}. These employees have no backup and hold critical undocumented knowledge.",
-            "spofs": spof_data["spofs"][:5],
-        }
-
-    if "skill gap" in query or "skill" in query:
+    # --- INTENT 4: Skill gaps ---
+    if any(w in query for w in ["skill gap", "skill", "knowledge gap", "missing skill", "training need", "competency"]):
         gaps = compute_skill_gaps()
-        worst = min(gaps["teams"], key=lambda t: t["coverage_pct"])
-        return {
-            "answer": f"Org-wide skill gaps: {gaps['total_gap_count']}. The {worst['team']} team has the lowest coverage at {worst['coverage_pct']}% with {len(worst['missing_areas'])} missing knowledge areas including {', '.join(worst['missing_areas'][:3])}.",
-            "gaps": worst,
-        }
+        worst = min(gaps["teams"], key=lambda t: t["coverage_pct"]) if gaps["teams"] else None
+        if worst:
+            answer = (
+                f"Org-wide skill gaps: {gaps['total_gap_count']}. "
+                f"The {worst['team']} team has the lowest coverage at {worst['coverage_pct']}% "
+                f"with {len(worst['missing_areas'])} missing areas including {', '.join(worst['missing_areas'][:3])}."
+            )
+        else:
+            answer = "No significant skill gaps detected across the organization."
+        result = {"answer": answer, "gaps": gaps}
+        _set_cache(req.query, result)
+        return result
 
-    if "health" in query or "overall" in query or "organization" in query:
-        return {
-            "answer": f"Overall organizational health: {health['composite_score']}/100 ({health['overall_risk']} risk). Resilience: {health['indicators']['resilience']['score']}, Trust: {health['indicators']['trust']['score']}, Burnout: {health['indicators']['burnout']['score']}, Retention: {health['indicators']['retention']['score']}. {health['employee_count']} employees across {health['team_count']} teams.",
-            "health": health,
-        }
+    # --- INTENT 5: Cross-train / upskill recommendations ---
+    if any(w in query for w in ["cross-train", "train", "upskill", "learning", "develop", "mentor", "training"]):
+        spof_data = _memoized_spof_ranking()
+        answer = (
+            f"Top priority: cross-train backups for {spof_data['total_spofs']} SPOFs. "
+            f"Start with {spof_data['spofs'][0]['employee']} ({spof_data['spofs'][0]['team']}) - "
+            f"they have {spof_data['spofs'][0]['dependents_count']} dependents and no backup. "
+            f"Also document critical processes within 60 days to improve Trust score."
+        )
+        result = {"answer": answer, "spofs": spof_data["spofs"][:3]}
+        _set_cache(req.query, result)
+        return result
 
-    if "cross-train" in query or "train" in query or "upskill" in query:
-        spof_data = compute_spof_ranking()
-        pipeline = _run_llm_pipeline(health, None)
-        actions = pipeline["summary"]["coaching"]["actions"]
-        return {
-            "answer": f"Top priority: cross-train backups for {spof_data['total_spofs']} SPOFs. Recommended: {actions[0]['title']} within {actions[0]['deadline_days']} days (est. ${actions[0]['estimated_cost_usd']:,}). Also document critical processes within 60 days.",
-            "actions": actions[:3],
-        }
+    # --- INTENT 6: Specific employee departure scenario ---
+    if is_departure and matched_emps:
+        emp = matched_emps[0]
+        scenario = simulate_scenario("attrition", removed_employees=[emp])
+        spof_data = _memoized_spof_ranking()
+        emp_spof = next((s for s in spof_data["spofs"] if s["employee"] == emp), None)
+        rev_risk = scenario.get('revenue_at_risk_usd', 0)
+        role_info = f" ({emp_spof['role']}, {emp_spof['team']})" if emp_spof else ""
+        answer = (
+            f"If {emp}{role_info} leaves, composite drops from {health['composite_score']} "
+            f"to {scenario['composite_score']}. Revenue at risk: ${rev_risk:,}. "
+        )
+        if emp_spof:
+            answer += f"They have {emp_spof['dependents_count']} dependents and {emp_spof['low_doc_areas']} undocumented areas."
+        result = {"answer": answer, "scenario": scenario}
+        _set_cache(req.query, result)
+        return result
 
+    # --- INTENT 7: Team departure scenario ---
+    if is_departure and matched_teams:
+        team = matched_teams[0]
+        spofs_in_team = _team_spofs(team, 5)
+        if spofs_in_team:
+            scenario = simulate_scenario("attrition", removed_employees=spofs_in_team)
+            answer = (
+                f"If {team} team loses its top SPOFs ({', '.join(spofs_in_team[:3])}), "
+                f"composite drops from {health['composite_score']} to {scenario['composite_score']}. "
+                f"Revenue at risk: ${scenario['revenue_at_risk_usd']:,}."
+            )
+            result = {"answer": answer, "scenario": scenario}
+            _set_cache(req.query, result)
+            return result
+
+    # --- INTENT 8: All / top SPOFs leaving (worst case) ---
+    if is_departure and any(w in query for w in ["top", "all", "every", "worst", "multiple"]):
+        spof_data = _memoized_spof_ranking()
+        top_count = 5 if "all" in query or "top" in query else min(3, len(spof_data["spofs"]))
+        top = [s["employee"] for s in spof_data["spofs"][:top_count]]
+        if top:
+            scenario = simulate_scenario("attrition", removed_employees=top)
+            answer = (
+                f"Worst-case: Top {top_count} SPOFs ({', '.join(top)}) leaving simultaneously. "
+                f"Composite collapses from {health['composite_score']} to {scenario['composite_score']}. "
+                f"Total annual revenue at risk: ${scenario['revenue_at_risk_usd']:,}. "
+                f"Recovery would take 6-18 months depending on the roles."
+            )
+            result = {"answer": answer, "scenario": scenario}
+            _set_cache(req.query, result)
+            return result
+
+    # --- INTENT 9: Succession / replacement planning ---
+    if any(w in query for w in ["succession", "replacement", "backfill", "backup", "successor", "ready"]):
+        try:
+            from analytics_enhanced import compute_succession_planning
+            succession = compute_succession_planning()
+            roles = succession.get("roles", [])
+            ready = sum(1 for r in roles if r.get("has_ready_successor"))
+            answer = (
+                f"Succession readiness: {succession['org_readiness']}% ({ready}/{succession['total_high_roles']} critical roles have a ready successor). "
+                f"Roles needing urgent attention: {', '.join(r['role'] for r in roles[:3] if not r.get('has_ready_successor'))}."
+            )
+            result = {"answer": answer, "succession": succession}
+            _set_cache(req.query, result)
+            return result
+        except Exception:
+            pass
+
+    # --- INTENT 10: Workload / hours ---
+    if any(w in query for w in ["workload", "hours", "overtime", "working hours", "overloaded"]):
+        burnout = health["indicators"]["burnout"]
+        high_count = burnout["details"].get("high_burnout_count", 0)
+        answer = (
+            f"Workload analysis: {high_count} employees are overworked. "
+            f"Burnout score is {burnout['score']} ({burnout['risk_level']} risk). "
+            f"Main drivers are excessive hours, PTO deficit, and overdue tasks."
+        )
+        result = {"answer": answer, "burnout": burnout}
+        _set_cache(req.query, result)
+        return result
+
+    # --- INTENT 11: Workforce readiness / project capacity ---
+    if any(w in query for w in ["readiness", "capacity", "project pipeline", "delivery", "bandwidth"]):
+        try:
+            from analytics_enhanced import compute_workforce_readiness
+            readiness = compute_workforce_readiness()
+            answer = (
+                f"Workforce readiness: {readiness['readiness_score']}/100 ({readiness['readiness_level']}). "
+                f"{len(readiness['team_readiness'])} teams analyzed. "
+            )
+            if readiness.get("team_readiness"):
+                weakest = readiness["team_readiness"][0]
+                answer += f"Most strained: {weakest['team']} (readiness: {weakest['readiness_score']}, {weakest['active_projects']} active projects)."
+            result = {"answer": answer, "readiness": readiness}
+            _set_cache(req.query, result)
+            return result
+        except Exception:
+            pass
+
+    # --- INTENT 12: Knowledge concentration / bus factor ---
+    if any(w in query for w in ["knowledge", "bus factor", "concentration", "tribal knowledge", "documentation"]):
+        try:
+            from analytics_enhanced import compute_knowledge_concentration
+            kc = compute_knowledge_concentration()
+            answer = (
+                f"Knowledge concentration risk: {kc['org_exposure_pct']}% of areas are Critical/High risk. "
+                f"{kc['critical_areas']} out of {kc['total_areas']} knowledge areas have dangerous concentration. "
+                f"Top risk: {kc['concentrated_areas'][0]['knowledge_area']} (risk score: {kc['concentrated_areas'][0]['risk_score']})."
+            )
+            result = {"answer": answer, "knowledge_concentration": kc}
+            _set_cache(req.query, result)
+            return result
+        except Exception:
+            pass
+
+    # --- INTENT 13: What-if with specific named employees ---
+    if any(w in query for w in ["what if", "scenario", "combination", "multiple", "imagine"]):
+        matched = [e for e in all_names if e.lower() in query]
+        if len(matched) >= 2:
+            scenario = simulate_scenario("attrition", removed_employees=matched)
+            answer = (
+                f"Scenario: {', '.join(matched)} leaving. "
+                f"Composite drops from {health['composite_score']} to {scenario['composite_score']}. "
+                f"Revenue at risk: ${scenario['revenue_at_risk_usd']:,}. "
+                f"This combination reveals interrelated SPOFs leaving simultaneously."
+            )
+            result = {"answer": answer, "scenario": scenario}
+            _set_cache(req.query, result)
+            return result
+
+    # --- INTENT 14: Employee lookup / directory ---
+    if any(w in query for w in ["who is", "tell me about", "employee", "profile", "details on", "about "]):
+        for emp_name in all_names:
+            if emp_name.lower() in query:
+                try:
+                    profile = get_employee_profile(emp_name)
+                    answer = (
+                        f"{profile['employee']} - {profile['role']} on {profile['team']}. "
+                        f"{'SPOF - no backup!' if profile.get('is_spof') else 'Has backup available.'} "
+                        f"{profile['experience_years']} years experience, ${profile['annual_salary_usd']:,} salary. "
+                        f"{profile.get('low_doc_areas', 0)} undocumented knowledge areas."
+                    )
+                    result = {"answer": answer, "profile": profile}
+                    _set_cache(req.query, result)
+                    return result
+                except Exception:
+                    pass
+
+    # --- INTENT 15: Resilience / SPOF score specific ---
+    if any(w in query for w in ["resilience", "how resilient", "recover", "disruption"]):
+        res = health["indicators"]["resilience"]
+        spof_count = res["details"].get("spof_count", 0)
+        answer = (
+            f"Resilience score: {res['score']} ({res['risk_level']} risk). "
+            f"{spof_count} SPOFs across the organization. "
+            f"Backup coverage: {res['details'].get('backup_coverage_pct', 0)}%. "
+            f"Recommendation: cross-train top SPOFs and document critical knowledge to improve resilience."
+        )
+        result = {"answer": answer, "resilience": res}
+        _set_cache(req.query, result)
+        return result
+
+    # --- INTENT 16: Retention / flight risk ---
+    if any(w in query for w in ["retention", "flight risk", "attrition", "turnover", "stay", "leave risk"]):
+        ret = health["indicators"]["retention"]
+        at_risk = ret["details"].get("at_risk_employees", [])
+        names = ", ".join(e["Employee"] for e in at_risk[:3])
+        answer = (
+            f"Retention score: {ret['score']} ({ret['risk_level']} risk). "
+            f"{len(at_risk)} employees at retention risk. "
+            f"Highest risk: {names}. "
+            f"Engagement scores and criticality are the main factors."
+        )
+        result = {"answer": answer, "retention": ret}
+        _set_cache(req.query, result)
+        return result
+
+    # --- INTENT 17: Trust / documentation ---
+    if any(w in query for w in ["trust", "documentation", "knowledge base", "process", "tribal"]):
+        trust = health["indicators"]["trust"]
+        details = trust["details"]
+        answer = (
+            f"Trust score: {trust['score']} ({trust['risk_level']} risk). "
+            f"{details.get('low_documentation_areas', 0)} of {details.get('total_knowledge_areas', 0)} "
+            f"knowledge areas are poorly documented. "
+            f"Improvement: run a documentation sprint targeting SPOF knowledge areas."
+        )
+        result = {"answer": answer, "trust": trust}
+        _set_cache(req.query, result)
+        return result
+
+    # --- INTENT 18: Teams list / team info ---
+    if any(w in query for w in ["teams", "departments", "org chart", "structure", "how many teams"]):
+        teams_info = []
+        for team in all_teams:
+            team_emps = [e for e in all_names if e.lower() in query]  # simplified
+        spof_data = _memoized_spof_ranking()
+        team_spofs = {}
+        for s in spof_data["spofs"]:
+            team_spofs[s["team"]] = team_spofs.get(s["team"], 0) + 1
+        team_lines = [f"{t}" for t in all_teams[:8]]
+        answer = (
+            f"Organization has {health['team_count']} teams with {health['employee_count']} employees. "
+            f"Teams: {', '.join(team_lines)}. "
+            f"Most SPOFs: {max(team_spofs, key=team_spofs.get)} ({max(team_spofs.values())} SPOFs)."
+        )
+        result = {"answer": answer}
+        _set_cache(req.query, result)
+        return result
+
+    # --- INTENT 19: Indicators breakdown ---
+    if any(w in query for w in ["indicator", "score", "kpi", "metric", "how are we doing", "performance"]):
+        ind = health["indicators"]
+        answer = (
+            f"4 Health Indicators: "
+            f"Resilience {ind['resilience']['score']} ({ind['resilience']['risk_level']}), "
+            f"Trust {ind['trust']['score']} ({ind['trust']['risk_level']}), "
+            f"Burnout {ind['burnout']['score']} ({ind['burnout']['risk_level']}), "
+            f"Retention {ind['retention']['score']} ({ind['retention']['risk_level']}). "
+            f"Composite: {health['composite_score']}/100 ({health['overall_risk']} risk)."
+        )
+        result = {"answer": answer, "health": health}
+        _set_cache(req.query, result)
+        return result
+
+    # --- INTENT 20: Workload increase scenario ---
+    if any(w in query for w in ["workload increase", "increase workload", "add work", "more projects"]):
+        pct = 20
+        for word in query.split():
+            if word.rstrip("%").isdigit():
+                pct = int(word.rstrip("%"))
+                break
+        scenario = simulate_scenario("workload_increase", workload_increase_pct=pct)
+        answer = (
+            f"If workload increases by {pct}% across all teams, "
+            f"composite drops from {health['composite_score']} to {scenario['composite_score']}. "
+            f"Burnout score increases to {scenario['indicators']['burnout']}. "
+            f"Consider hiring or redistributing work to mitigate."
+        )
+        result = {"answer": answer, "scenario": scenario}
+        _set_cache(req.query, result)
+        return result
+
+    # --- LLM FALLBACK: Use AI to answer novel queries ---
     llm_answer = _llm_chat(req.query, health, req.messages)
     if llm_answer:
-        return {"answer": llm_answer}
-    pipeline = _run_llm_pipeline(health, None)
-    return {
-        "answer": pipeline["summary"]["insight"]["headline"] + " I've analyzed the full organizational data. Ask me about specific risks, teams, or scenarios.",
-        "summary": pipeline["summary"],
+        result = {"answer": llm_answer, "health": health}
+        _set_cache(req.query, result)
+        return result
+
+    # --- FINAL FALLBACK: Always give a real answer based on data ---
+    spof_data = _memoized_spof_ranking()
+    gaps = compute_skill_gaps()
+    worst_team = min(gaps["teams"], key=lambda t: t["coverage_pct"]) if gaps.get("teams") else None
+    top_spof = spof_data["spofs"][0] if spof_data.get("spofs") else None
+
+    answers = []
+    answers.append(f"Org health: {health['composite_score']}/100 ({health['overall_risk']} risk).")
+    if top_spof:
+        answers.append(f"Top SPOF: {top_spof['employee']} ({top_spof['team']}) - ${top_spof.get('revenue_at_risk_usd', 0):,} at risk.")
+    if worst_team:
+        answers.append(f"Biggest skill gap: {worst_team['team']} at {worst_team['coverage_pct']}% coverage.")
+    answers.append(f"Use 'what if [employee] leaves', 'burnout', 'spofs', or 'skill gaps' for specific analysis.")
+
+    result = {
+        "answer": " ".join(answers),
+        "health": health,
+        "spofs": spof_data["spofs"][:3],
     }
+    _set_cache(req.query, result)
+    return result
+
+
+# ---------------------------------------------------------------------------
+# NEW: WebSocket Endpoint for Real-Time Chat
+# ---------------------------------------------------------------------------
+@app.websocket("/ws/query")
+async def websocket_query(websocket: WebSocket):
+    await websocket.accept()
+    _reset_request_cache()
+    try:
+        while True:
+            data = await websocket.receive_json()
+            query = data.get("query", "").strip()
+            if not query:
+                continue
+
+            health = compute_org_health()
+
+            # Send streaming chunks
+            all_names = _get_all_employee_names()
+            all_teams = _get_all_team_names()
+            departure_words = ["leave", "quit", "fire", "depart", "resign", "gone", "lost", "exit", "fired", "laid off", "let go"]
+            is_departure = any(w in query.lower() for w in departure_words)
+            matched_emps = _fuzzy_match(query.lower(), all_names)
+            matched_teams = _fuzzy_match(query.lower(), all_teams)
+
+            # SPOF intent
+            if any(w in query.lower() for w in ["spof", "single point", "failure", "bus factor", "no backup", "critical employee"]):
+                spof_data = _memoized_spof_ranking()
+                top = spof_data["spofs"][:5]
+                names = ", ".join(s["employee"] for s in top[:3])
+                answer = (
+                    f"We have {spof_data['total_spofs']} single points of failure ({spof_data['critical_spofs']} critical). "
+                    f"Highest risk: {names}. "
+                    f"Total annual revenue at risk: ${spof_data['total_annual_revenue_at_risk_usd']:,}."
+                )
+                await websocket.send_json({"type": "answer", "content": answer, "spofs": spof_data["spofs"][:5]})
+                await websocket.send_json({"type": "done"})
+                continue
+
+            # Health intent
+            if any(w in query.lower() for w in ["health", "overall", "org status", "how is", "organization", "company health"]):
+                answer = (
+                    f"Overall organizational health: {health['composite_score']}/100 ({health['overall_risk']} risk). "
+                    f"Resilience: {health['indicators']['resilience']['score']}, Trust: {health['indicators']['trust']['score']}, "
+                    f"Burnout: {health['indicators']['burnout']['score']}, Retention: {health['indicators']['retention']['score']}. "
+                    f"{health['employee_count']} employees across {health['team_count']} teams."
+                )
+                await websocket.send_json({"type": "answer", "content": answer, "health": health})
+                await websocket.send_json({"type": "done"})
+                continue
+
+            # LLM fallback
+            try:
+                from agents import _llm_call
+                context = _build_full_context(query, health)
+                prompt = (
+                    "You are TruPulse AI. Answer concisely in 1-2 sentences using the org data below.\n\n"
+                    f"Org Data:\n{context}\n\nUser: {query}\n\nResponse:"
+                )
+                text, _ = _llm_call(prompt, json_mode=False, timeout_sec=10)
+                if text and "error" not in text.lower():
+                    await websocket.send_json({"type": "answer", "content": text.strip(), "health": health})
+                    await websocket.send_json({"type": "done"})
+                    continue
+            except Exception:
+                pass
+
+            # Final fallback
+            spof_data = _memoized_spof_ranking()
+            gaps = compute_skill_gaps()
+            worst_team = min(gaps["teams"], key=lambda t: t["coverage_pct"]) if gaps.get("teams") else None
+            top_spof = spof_data["spofs"][0] if spof_data.get("spofs") else None
+            parts = [f"Org health: {health['composite_score']}/100 ({health['overall_risk']} risk)."]
+            if top_spof:
+                parts.append(f"Top SPOF: {top_spof['employee']} - ${top_spof.get('revenue_at_risk_usd', 0):,} at risk.")
+            if worst_team:
+                parts.append(f"Biggest skill gap: {worst_team['team']} at {worst_team['coverage_pct']}% coverage.")
+            await websocket.send_json({"type": "answer", "content": " ".join(parts), "health": health})
+            await websocket.send_json({"type": "done"})
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:
+        try:
+            await websocket.send_json({"type": "error", "content": str(e)})
+        except Exception:
+            pass
+
+
+# ---------------------------------------------------------------------------
+# NEW: Streaming Query Endpoint (Server-Sent Events)
+# ---------------------------------------------------------------------------
+@app.post("/query/stream")
+def natural_language_query_stream(req: QueryRequest):
+    """Streaming version of /query. Returns SSE events for real-time display."""
+    from fastapi.responses import StreamingResponse
+    import asyncio
+
+    async def event_stream():
+        query = req.query.lower().strip()
+        health = compute_org_health()
+
+        # Check cache first
+        cached = _get_cached(req.query)
+        if cached:
+            yield f"data: {json.dumps(cached)}\n\n"
+            yield "data: [DONE]\n\n"
+            return
+
+        # Build result (use same logic as /query but yield partial info)
+        all_names = _get_all_employee_names()
+        all_teams = _get_all_team_names()
+        departure_words = ["leave", "quit", "fire", "depart", "resign", "gone", "lost", "exit", "fired", "laid off", "let go"]
+        is_departure = any(w in query for w in departure_words)
+        matched_emps = _fuzzy_match(query, all_names)
+        matched_teams = _fuzzy_match(query, all_teams)
+
+        # SPOF intent
+        if any(w in query for w in ["spof", "single point", "failure", "bus factor", "no backup", "critical employee"]):
+            spof_data = _memoized_spof_ranking()
+            top = spof_data["spofs"][:5]
+            names = ", ".join(s["employee"] for s in top[:3])
+            answer = (
+                f"We have {spof_data['total_spofs']} single points of failure ({spof_data['critical_spofs']} critical). "
+                f"Highest risk: {names}. "
+                f"Total annual revenue at risk: ${spof_data['total_annual_revenue_at_risk_usd']:,}."
+            )
+            yield f"data: {json.dumps({'answer': answer, 'spofs': spof_data['spofs'][:5]})}\n\n"
+            yield "data: [DONE]\n\n"
+            return
+
+        # Health intent
+        if any(w in query for w in ["health", "overall", "org status", "how is", "organization", "company health"]):
+            answer = (
+                f"Overall organizational health: {health['composite_score']}/100 ({health['overall_risk']} risk). "
+                f"Resilience: {health['indicators']['resilience']['score']}, Trust: {health['indicators']['trust']['score']}, "
+                f"Burnout: {health['indicators']['burnout']['score']}, Retention: {health['indicators']['retention']['score']}. "
+                f"{health['employee_count']} employees across {health['team_count']} teams."
+            )
+            yield f"data: {json.dumps({'answer': answer, 'health': health})}\n\n"
+            yield "data: [DONE]\n\n"
+            return
+
+        # Generic: run LLM with streaming
+        try:
+            from agents import _llm_call
+            context = _build_full_context(query, health)
+            prompt = (
+                "You are TruPulse AI. Answer concisely in 1-2 sentences using the org data below.\n\n"
+                f"Org Data:\n{context}\n\n"
+                f"User: {query}\n\nResponse:"
+            )
+            text, _ = _llm_call(prompt, json_mode=False, timeout_sec=10)
+            if text and "error" not in text.lower():
+                yield f"data: {json.dumps({'answer': text.strip(), 'health': health})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
+        except Exception:
+            pass
+
+        # Final fallback
+        spof_data = compute_spof_ranking()
+        gaps = compute_skill_gaps()
+        worst_team = min(gaps["teams"], key=lambda t: t["coverage_pct"]) if gaps.get("teams") else None
+        top_spof = spof_data["spofs"][0] if spof_data.get("spofs") else None
+        parts = [f"Org health: {health['composite_score']}/100 ({health['overall_risk']} risk)."]
+        if top_spof:
+            parts.append(f"Top SPOF: {top_spof['employee']} - ${top_spof.get('revenue_at_risk_usd', 0):,} at risk.")
+        if worst_team:
+            parts.append(f"Biggest skill gap: {worst_team['team']} at {worst_team['coverage_pct']}% coverage.")
+        yield f"data: {json.dumps({'answer': ' '.join(parts), 'health': health})}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
 
 
 # ---------------------------------------------------------------------------

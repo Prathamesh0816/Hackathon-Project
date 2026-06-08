@@ -66,8 +66,17 @@ export const postDatasetActivate = (filename, mapping) => poster('/dataset/activ
 export const postDatasetClear = () => poster('/dataset/clear', {})
 export const getDatasetEmployees = () => fetcher('/dataset/employees')
 
+// ---- Health / Status API ----
+export const getOllamaHealth = () => fetcher('/health/ollama')
+
 // ---- Scenarios API ----
 export const getScenarios = () => fetcher('/scenarios')
 export const postRunScenario = (body) => poster('/whatif', body)
 export const postScenarioRun = (body) => poster('/scenario-run', body)
 export const getReactions = () => fetcher('/reactions')
+
+// ---- Analytics Weights API ----
+export const getAnalyticsWeights = () => fetcher('/analytics-weights')
+export const postAnalyticsWeights = (body) => poster('/analytics-weights', body)
+export const postAnalyticsWeightsReset = () => poster('/analytics-weights/reset', {})
+export const postAnalyticsWeightsAiGenerate = () => poster('/analytics-weights/ai-generate', {})

@@ -203,7 +203,7 @@ def _get_llm(temperature: float = 0.2) -> ChatOllama:
         model=OLLAMA_MODEL,
         base_url=OLLAMA_BASE_URL,
         temperature=temperature,
-        num_predict=2048,
+        num_predict=512,
     )
 
 
