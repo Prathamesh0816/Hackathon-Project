@@ -912,7 +912,7 @@ def _run_llm_pipeline(health, scenario=None):
 # ---------------------------------------------------------------------------
 # Helper: LLM-powered chat response for novel queries
 # ---------------------------------------------------------------------------
-def _llm_chat(query: str, health: dict) -> str | None:
+def _llm_chat(query: str, health: dict, messages: list | None = None) -> str | None:
     try:
         from agents import _llm_call
         context = (
@@ -923,11 +923,19 @@ def _llm_chat(query: str, health: dict) -> str | None:
             f"Retention: {health['indicators']['retention']['score']}. "
             f"Employees: {health['employee_count']}, Teams: {health['team_count']}."
         )
+        history = ""
+        if messages:
+            recent = [m for m in messages if m.get("text") and m.get("role") != "system"][-6:]
+            for m in recent:
+                role = "User" if m.get("role") == "user" else "Assistant"
+                history += f"{role}: {m['text']}\n"
         prompt = (
             "You are TruPulse AI, a workforce resilience analyst. Answer concisely in 2-3 sentences "
-            "using the org data provided. If you cannot answer from the data, suggest what the user "
+            "using the org data provided. Use conversation history for context. "
+            "If you cannot answer from the data, suggest what the user "
             "can ask about (risks, teams, scenarios, SPOFs, skills, burnout).\n\n"
-            f"Org Data: {context}\n\nUser Query: {query}\n\nResponse:"
+            f"Org Data: {context}\n\n"
+            f"{history}User: {query}\n\nResponse:"
         )
         text, _ = _llm_call(prompt, json_mode=False)
         return text.strip()
@@ -1087,7 +1095,7 @@ def natural_language_query(req: QueryRequest):
             "actions": actions[:3],
         }
 
-    llm_answer = _llm_chat(req.query, health)
+    llm_answer = _llm_chat(req.query, health, req.messages)
     if llm_answer:
         return {"answer": llm_answer}
     pipeline = _run_llm_pipeline(health, None)

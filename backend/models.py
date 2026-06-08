@@ -37,6 +37,7 @@ class FeedbackRequest(BaseModel):
 
 class QueryRequest(BaseModel):
     query: str
+    messages: list[dict] | None = None  # conversation history: [{"role": "user"|"assistant", "text": "..."}]
 
 
 class TextInputRequest(BaseModel):

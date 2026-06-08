@@ -35,7 +35,7 @@ export default function ChatPanel({ onResult }) {
       const res = await fetch('/api/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query, messages }),
       })
       const data = await res.json()
 
