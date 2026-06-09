@@ -164,6 +164,13 @@ export default function Upload() {
     return 'text-gray-600'
   }
 
+  function isActivatableFile(f) {
+    const name = typeof f === 'string' ? f : f?.filename || f?.name || ''
+    return name.toLowerCase().endsWith('.csv') || name.toLowerCase().endsWith('.xlsx')
+  }
+
+  const selectedFileCanActivate = file && isActivatableFile(file.name)
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold text-gray-800">Data Source & Scenarios</h1>
@@ -674,7 +681,9 @@ export default function Upload() {
               )}
               <button onClick={handleUpload} disabled={uploading}
                 className="w-full py-2 bg-tru-600 text-white rounded-lg text-sm font-medium hover:bg-tru-700 disabled:opacity-50">
-                {uploading ? 'Uploading & Activating...' : `Upload & Activate "${file?.name}"`}
+                {uploading
+                  ? (selectedFileCanActivate ? 'Uploading & Activating...' : 'Uploading...')
+                  : `${selectedFileCanActivate ? 'Upload & Activate' : 'Upload'} "${file?.name}"`}
               </button>
             </div>
           )}
@@ -700,7 +709,11 @@ export default function Upload() {
             {uploadedFiles.map((f) => (
               <div key={f.filename} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
                 <div><span className="font-medium text-gray-700">{f.filename}</span><span className="text-gray-400 ml-2">({(f.size_bytes / 1024).toFixed(1)} KB)</span></div>
-                <button onClick={() => handleActivate(f.filename)} className="text-xs text-tru-600 hover:text-tru-800 px-3 py-1 border border-tru-200 rounded">Activate</button>
+                {isActivatableFile(f) ? (
+                  <button onClick={() => handleActivate(f.filename)} className="text-xs text-tru-600 hover:text-tru-800 px-3 py-1 border border-tru-200 rounded">Activate</button>
+                ) : (
+                  <span className="text-xs text-gray-500 px-3 py-1 border border-gray-200 rounded">Stored as note</span>
+                )}
               </div>
             ))}
           </div>

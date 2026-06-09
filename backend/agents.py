@@ -467,6 +467,9 @@ def run_pipeline_fallback(
             if narrative_parts:
                 scenario_narrative = f"Removing {', '.join(narrative_parts)} — composite drops to {scenario.get('composite_score', 0):.0f}. Revenue at risk: ${scenario.get('revenue_at_risk_usd', 0):,}."
 
+            else:
+                scenario_narrative = f"Removing {', '.join(removed)} drops composite to {scenario.get('composite_score', 0):.0f}. Revenue at risk: ${scenario.get('revenue_at_risk_usd', 0):,}."
+
     insight = {
         "agent": "Insight",
         "headline": (

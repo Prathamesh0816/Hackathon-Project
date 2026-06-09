@@ -16,7 +16,7 @@ import time
 from pathlib import Path
 from typing import Any, Optional
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel
@@ -54,6 +54,7 @@ from storage import (
     get_employee_text_notes,
     load_metadata,
     save_uploaded_file,
+    search_text_notes,
 )
 from file_classifier import classify_file, quick_classify_csv
 from analyzer import analyze_employee_context
@@ -150,6 +151,12 @@ from data_manager import (
 )
 import pandas as pd
 
+
+class DatasetActivateRequest(BaseModel):
+    filename: str
+    column_mapping: dict[str, str] | None = None
+
+
 @app.post("/dataset/upload")
 async def dataset_upload(file: UploadFile = File(...), auto_activate: bool = True):
     """Upload a CSV/XLSX file and optionally activate it as the primary dataset."""
@@ -166,6 +173,8 @@ async def dataset_upload(file: UploadFile = File(...), auto_activate: bool = Tru
         # Auto-activate if requested
         if auto_activate and filename.lower().endswith((".csv", ".xlsx")):
             activation = activate_dataset(filename)
+            if activation.get("status") == "error":
+                raise HTTPException(400, detail=activation)
             return {
                 "message": f"{filename} uploaded and activated",
                 "upload": result,
@@ -184,9 +193,13 @@ async def dataset_upload(file: UploadFile = File(...), auto_activate: bool = Tru
 
 
 @app.post("/dataset/activate")
-def dataset_activate(filename: str, column_mapping: dict[str, str] | None = None):
+def dataset_activate(payload: DatasetActivateRequest | None = Body(default=None), filename: str | None = None):
     """Activate an uploaded file as the primary dataset for all scoring."""
-    result = activate_dataset(filename, column_mapping)
+    target_filename = payload.filename if payload else filename
+    column_mapping = payload.column_mapping if payload else None
+    if not target_filename:
+        raise HTTPException(422, detail="filename is required")
+    result = activate_dataset(target_filename, column_mapping)
     if result.get("status") == "error":
         raise HTTPException(400, detail=result.get("error", "Activation failed"))
     return result
@@ -548,6 +561,7 @@ def pipeline(req: PipelineRequest):
     start = time.time()
     if req.use_fallback:
         result = run_pipeline_fallback(health, scenario_payload)
+        result["pipeline_type"] = "deterministic_fallback"
     elif req.use_langchain and _LANGCHAIN_AVAILABLE:
         try:
             result = run_pipeline(
@@ -558,13 +572,17 @@ def pipeline(req: PipelineRequest):
             result["pipeline_type"] = result.get("pipeline_type", "langchain")
         except Exception:
             # LangChain failed — fall back to raw agents
-            from agents import run_pipeline as _raw_pipeline
-            result = _raw_pipeline(
-                health,
-                scenario_payload,
-                feedback_overrides=get_feedback_overrides()[-10:],
-            )
-            result["pipeline_type"] = "raw_fallback"
+            try:
+                from agents import run_pipeline as _raw_pipeline
+                result = _raw_pipeline(
+                    health,
+                    scenario_payload,
+                    feedback_overrides=get_feedback_overrides()[-10:],
+                )
+                result["pipeline_type"] = "raw_fallback"
+            except Exception:
+                result = run_pipeline_fallback(health, scenario_payload)
+                result["pipeline_type"] = "deterministic_fallback"
     else:
         try:
             from agents import run_pipeline as _raw_pipeline
@@ -1080,6 +1098,36 @@ def _format_data_source_answer() -> dict[str, Any]:
     }
 
 
+def _format_text_note_answer(query: str) -> dict[str, Any] | None:
+    notes = search_text_notes(query)
+    if not notes:
+        return None
+
+    note = notes[0]
+    content = " ".join(note["content"].split())
+    if len(content) > 700:
+        content = content[:700].rstrip() + "..."
+
+    answer = (
+        f"I found this in the uploaded text note `{note['filename']}`: {content} "
+        "This person may not be present in the active CSV/XLSX dataset, so I can answer from the note, "
+        "but they will not appear in scoring, dashboards, or SPOF analytics until they are added to the main dataset."
+    )
+    return {
+        "answer": answer,
+        "text_notes": [
+            {
+                "filename": item["filename"],
+                "file_type": item["file_type"],
+                "description": item["description"],
+                "content": item["content"],
+            }
+            for item in notes
+        ],
+        "source": "uploaded_text_notes",
+    }
+
+
 def _format_top_spof_answer(spof_data: dict[str, Any]) -> dict[str, Any]:
     spofs = spof_data.get("spofs", [])
     if not spofs:
@@ -1551,6 +1599,10 @@ def natural_language_query(req: QueryRequest):
             "answer": f"Top priority: cross-train backups for {spof_data['total_spofs']} SPOFs. Recommended: {actions[0]['title']} within {actions[0]['deadline_days']} days (est. ${actions[0]['estimated_cost_usd']:,}). Also document critical processes within 60 days.",
             "actions": actions[:3],
         }
+
+    text_note_answer = _format_text_note_answer(req.query)
+    if text_note_answer:
+        return text_note_answer
 
     llm_answer = _llm_chat(req.query, health, req.messages)
     if llm_answer:

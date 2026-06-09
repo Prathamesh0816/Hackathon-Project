@@ -245,6 +245,12 @@ def activate_dataset(filename: str, column_mapping: dict[str, str] | None = None
 
     csv_path = CSV_DIR / filename
     if not csv_path.exists():
+        text_path = TEXT_DIR / filename
+        if text_path.exists():
+            return {
+                "error": f"{filename} is a text note. Text files are uploaded and stored, but only CSV/XLSX files can be activated as datasets.",
+                "status": "error",
+            }
         return {"error": f"File {filename} not found in uploads", "status": "error"}
 
     # Read the file
@@ -354,11 +360,21 @@ def get_active_info() -> dict[str, Any]:
     _load_active_state()
     if not _active_dataset:
         csv_files = [f.name for f in DEFAULT_DATA_DIR.glob("*.csv")] if DEFAULT_DATA_DIR.is_dir() else []
+        employee_count = 0
+        team_count = 0
+        employees_path = DEFAULT_DATA_DIR / "employees.csv"
+        if employees_path.exists():
+            try:
+                employees = pd.read_csv(employees_path)
+                employee_count = len(employees)
+                team_count = int(employees["Team"].nunique()) if "Team" in employees.columns else 0
+            except Exception:
+                pass
         return {
-            "active": True,
+            "active": False,
             "filename": "employees.csv",
-            "employee_count": 0,
-            "team_count": 0,
+            "employee_count": employee_count,
+            "team_count": team_count,
             "data_source": "default CSVs from backend/data/",
             "available_files": csv_files,
         }

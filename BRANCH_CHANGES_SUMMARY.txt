@@ -1,0 +1,227 @@
+Branch Changes Summary
+Branch: fix/docker-upload-flow
+Base commit: e37a8bf - Add changes for better chatbot replies use of RAG
+
+Purpose
+This branch focuses on fixing the upload/data-source flow, improving chatbot behavior for uploaded text notes, and clarifying confusing UI behavior around dataset activation and reset.
+
+Important note
+At the time this file was generated, these changes are present as working-tree changes on the branch, not as a new commit yet.
+
+
+1. Upload activation contract fixed
+
+Files changed:
+- backend/main.py
+- frontend/src/services/api.js
+
+Problem:
+The frontend sent POST /dataset/activate as a JSON body:
+
+  { "filename": "...", "column_mapping": null }
+
+But the backend endpoint expected filename as a query parameter. This caused errors like:
+
+  POST /dataset/activate failed: 422
+  Field required: query filename
+
+Resolution:
+Added DatasetActivateRequest in backend/main.py and changed /dataset/activate so it accepts the frontend JSON body. The endpoint also still supports query-style filename input for compatibility.
+
+Result:
+The Activate button can now call the backend successfully for CSV/XLSX files.
+
+
+2. Text files are treated as notes, not datasets
+
+Files changed:
+- backend/data_manager.py
+- frontend/src/pages/Upload.jsx
+
+Problem:
+Text files like aradhana-review.txt were uploaded successfully, but the UI showed an Activate button for them. When clicked, the backend searched only the CSV upload folder and returned "file not found", which was misleading.
+
+Resolution:
+Backend:
+- If a requested activation file exists under uploaded_files/text, the backend now returns a clear error:
+
+  "<filename> is a text note. Text files are uploaded and stored, but only CSV/XLSX files can be activated as datasets."
+
+Frontend:
+- Added isActivatableFile().
+- CSV/XLSX files show "Upload & Activate" and an Activate button.
+- TXT files show "Upload" and later display "Stored as note" instead of Activate.
+
+Result:
+Users can upload review notes without trying to activate them as scoring datasets.
+
+
+3. Upload error messages made readable
+
+File changed:
+- frontend/src/services/api.js
+
+Problem:
+When the backend returned validation errors, the UI showed raw JSON or generic messages like:
+
+  Upload failed: 400
+  POST /dataset/activate failed: 422 {...}
+
+Resolution:
+Added errorMessage(), which parses backend error responses and extracts the useful detail string.
+
+Result:
+The UI now shows clearer messages, such as missing columns or "text note cannot be activated".
+
+
+4. Chatbot can answer from uploaded text notes
+
+Files changed:
+- backend/storage.py
+- backend/main.py
+
+Problem:
+If someone existed only in an uploaded text file and not in the active CSV/XLSX dataset, the chatbot could not reliably answer questions about that person.
+
+Example:
+- aradhana-review.txt exists.
+- Aradhana is missing from the active CSV.
+- User asks: "tell me about Aradhana"
+
+Previously, the chatbot mostly depended on structured CSV data or the LLM/RAG path and could miss the note.
+
+Resolution:
+Added search_text_notes(query) in backend/storage.py:
+- Scans uploaded_files/text/*.txt.
+- Scores notes by filename/content token overlap.
+- Returns matching note snippets.
+
+Added _format_text_note_answer(query) in backend/main.py:
+- Uses search_text_notes().
+- Returns a deterministic answer from the matched text note before falling back to the generic LLM path.
+- Clearly tells the user that text-note-only people do not appear in dashboards/scoring until added to CSV/XLSX.
+
+Verified behavior:
+Query:
+
+  tell me about aradhana
+
+Returns an answer based on:
+
+  aradhana-review.txt
+
+Result:
+The chatbot can now answer from stored text notes even when the person is absent from the active dataset.
+
+
+5. Reset button behavior clarified
+
+File changed:
+- backend/data_manager.py
+
+Problem:
+The Upload Data page Reset button called /dataset/clear and reset the active uploaded dataset, but the UI still appeared unchanged. The reason was get_active_info() returned:
+
+  active: true
+
+even when the app had fallen back to default backend/data CSVs.
+
+Resolution:
+Changed get_active_info() so default CSV mode reports:
+
+  active: false
+  filename: employees.csv
+  data_source: default CSVs from backend/data/
+
+It now also calculates real default employee_count and team_count from backend/data/employees.csv.
+
+Result:
+After Reset, the UI can correctly show "Using Default Dataset" instead of pretending an uploaded dataset is active.
+
+
+6. Default employees CSV updated
+
+File changed:
+- backend/data/employees.csv
+
+Change:
+Added this employee row:
+
+  EMP062,Aradhana,Finance,Accountant,Medium,No,8,090990,8
+
+Reason:
+This appears to have been added so Aradhana can exist in the structured dataset as well as in uploaded text notes.
+
+Important caution:
+This row reuses EmployeeID EMP062, which already belongs to Rekha in the same file. Duplicate EmployeeID values can confuse joins across performance, workload, knowledge, and dependency data.
+
+Recommendation:
+Change Aradhana to a unique EmployeeID before relying on dashboard/scoring results.
+
+
+7. OrgPulseTicker text changed
+
+File changed:
+- frontend/src/components/OrgPulseTicker.jsx
+
+Change:
+The hardcoded ticker text changed from:
+
+  Composite health score: 47.5/100 - HIGH risk
+
+to:
+
+  Composite health score: 27.5/100 - HIGH risk
+
+Reason:
+This seems to align the ticker with a changed/demo score.
+
+Important caution:
+OrgPulseTicker is still static/hardcoded. It does not calculate live values from /org-health. Dashboard KPI cards are dynamic, but this ticker is not.
+
+Recommendation:
+If accuracy matters, replace the hardcoded EVENTS array with values derived from getOrgHealth(), getSpofRanking(), and related API calls.
+
+
+Validation performed
+
+Backend:
+- Imported backend/main.py successfully using backend/venv.
+- Directly tested chatbot note fallback with:
+
+  tell me about aradhana
+
+and received a response from aradhana-review.txt.
+
+Frontend:
+- Ran npm.cmd run build successfully after upload UI changes.
+
+
+Current behavior after these changes
+
+CSV/XLSX upload:
+- Can be uploaded and activated.
+- Drives dashboard, employee list, scoring, SPOF, what-if, and analytics.
+
+TXT upload:
+- Is stored as a note.
+- Is searchable by the chatbot.
+- Does not affect dashboard/scoring unless the person/data is also added to the structured CSV/XLSX dataset.
+
+Reset:
+- Deactivates the uploaded dataset.
+- Returns the app to default backend/data CSVs.
+- Does not delete uploaded files.
+
+
+Suggested next improvements
+
+1. Add a separate "Clear Uploaded Files" button if the user wants to delete uploads.
+2. Make OrgPulseTicker dynamic instead of hardcoded.
+3. Fix duplicate EmployeeID EMP062 in employees.csv.
+4. Add tests for:
+   - JSON /dataset/activate body.
+   - TXT upload not showing Activate.
+   - Chatbot answering from uploaded text notes.
+   - Reset returning active: false for default CSV mode.
+5. Commit the branch changes once reviewed.

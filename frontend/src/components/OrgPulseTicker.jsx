@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 const EVENTS = [
-  { icon: '📊', text: 'Composite health score: 47.5/100 — HIGH risk', type: 'alert' },
+  { icon: '📊', text: 'Composite health score: 27.5/100 — HIGH risk', type: 'alert' },
   { icon: '⚠️', text: '56 single points of failure detected across 14 teams', type: 'alert' },
   { icon: '💰', text: '$5.6M annual revenue at risk from top-3 SPOFs', type: 'risk' },
   { icon: '👤', text: 'Vikram (Sales) — no backup, 8yr tenure, $2.7M revenue at risk', type: 'risk' },

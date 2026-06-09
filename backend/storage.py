@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from pathlib import Path
 import pandas as pd
 from io import StringIO
@@ -145,3 +146,42 @@ def get_employee_text_notes(employee_id):
             })
 
     return notes
+
+
+def search_text_notes(query: str, limit: int = 3):
+    """Search uploaded text notes by filename/content tokens."""
+    query_tokens = {
+        token
+        for token in re.findall(r"[a-z0-9]+", query.lower())
+        if len(token) > 2 and token not in {"what", "who", "how", "about", "tell", "show", "give", "the", "and", "for"}
+    }
+    if not query_tokens:
+        return []
+
+    metadata_by_name = {item.get("filename"): item for item in load_metadata()}
+    candidates = []
+    for file_name in os.listdir(TEXT_DIR):
+        if not file_name.lower().endswith(".txt"):
+            continue
+        path = os.path.join(TEXT_DIR, file_name)
+        try:
+            with open(path, "r", encoding="utf-8", errors="replace") as f:
+                content = f.read()
+        except Exception:
+            continue
+
+        haystack = f"{file_name} {content}".lower()
+        score = sum(3 if token in file_name.lower() else 1 for token in query_tokens if token in haystack)
+        if score <= 0:
+            continue
+
+        candidates.append({
+            "filename": file_name,
+            "file_type": metadata_by_name.get(file_name, {}).get("file_type", "review_notes"),
+            "description": metadata_by_name.get(file_name, {}).get("description", "Uploaded text note"),
+            "content": content,
+            "score": score,
+        })
+
+    candidates.sort(key=lambda item: item["score"], reverse=True)
+    return candidates[:limit]

@@ -1,5 +1,17 @@
 const BASE = '/api'
 
+async function errorMessage(res, fallback) {
+  const text = await res.text().catch(() => '')
+  if (!text) return fallback
+  try {
+    const data = JSON.parse(text)
+    if (typeof data.detail === 'string') return data.detail
+    if (data.detail?.error) return data.detail.error
+    if (data.error) return data.error
+  } catch {}
+  return `${fallback} ${text}`
+}
+
 async function fetcher(path) {
   const res = await fetch(`${BASE}${path}`)
   if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`)
@@ -13,8 +25,7 @@ async function poster(path, body) {
     body: JSON.stringify(body),
   })
   if (!res.ok) {
-    const detail = await res.text().catch(() => '')
-    throw new Error(`POST ${path} failed: ${res.status} ${detail}`)
+    throw new Error(await errorMessage(res, `POST ${path} failed: ${res.status}`))
   }
   return res.json()
 }
@@ -48,7 +59,7 @@ export const uploadDataset = async (file) => {
   form.append('file', file)
   form.append('auto_activate', 'true')
   const res = await fetch(`${BASE}/dataset/upload`, { method: 'POST', body: form })
-  if (!res.ok) throw new Error(`Upload failed: ${res.status}`)
+  if (!res.ok) throw new Error(await errorMessage(res, `Upload failed: ${res.status}`))
   return res.json()
 }
 
@@ -56,7 +67,7 @@ export const previewDataset = async (file) => {
   const form = new FormData()
   form.append('file', file)
   const res = await fetch(`${BASE}/dataset/preview`, { method: 'POST', body: form })
-  if (!res.ok) throw new Error(`Preview failed: ${res.status}`)
+  if (!res.ok) throw new Error(await errorMessage(res, `Preview failed: ${res.status}`))
   return res.json()
 }
 
