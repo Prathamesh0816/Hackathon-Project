@@ -55,7 +55,7 @@ export default function Dashboard() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Organizational Health Dashboard</h1>
           <p className="text-gray-500 mt-1">
-            {health.employee_count} employees · {health.team_count} teams · {health.project_count} active projects
+            {health.employee_count} employees · {health.team_count} teams · {health.project_count} projects
           </p>
         </div>
         <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs">

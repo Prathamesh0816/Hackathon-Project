@@ -1098,7 +1098,22 @@ def _format_data_source_answer() -> dict[str, Any]:
     }
 
 
+def _is_uploaded_note_query(query: str) -> bool:
+    q = query.lower()
+    return (
+        "uploaded note" in q
+        or "text note" in q
+        or "uploaded text" in q
+        or "assignment" in q
+        or "file note" in q
+        or (("note" in q or "file" in q or "document" in q) and ("find" in q or "search" in q or "uploaded" in q))
+    )
+
+
 def _format_text_note_answer(query: str) -> dict[str, Any] | None:
+    if not _is_uploaded_note_query(query):
+        return None
+
     notes = search_text_notes(query)
     if not notes:
         return None
@@ -1195,6 +1210,25 @@ def _format_spof_reason(spof_data: dict[str, Any], employee_name: str | None = N
         },
         "spofs": spofs[:5],
     }
+
+
+def _format_spof_evidence_answer(spof_data: dict[str, Any]) -> dict[str, Any]:
+    spofs = spof_data.get("spofs", [])[:3]
+    if not spofs:
+        return {"answer": "I could not find current SPOF evidence in the active dataset."}
+
+    evidence = [
+        f"{s['employee']} has BackupAvailable = No and {s.get('low_doc_areas', 0)} low-documentation knowledge areas"
+        for s in spofs
+    ]
+    answer = (
+        "I say they have undocumented knowledge from the active seed CSV data, not from an uploaded note. "
+        "`employees.csv` marks these top SPOFs as having no backup, and `knowledge.csv` counts their "
+        "`DocumentationLevel = Low` knowledge areas. Evidence: "
+        + "; ".join(evidence)
+        + "."
+    )
+    return {"answer": answer, "spofs": spofs}
 
 
 def _valuable_employees(limit: int = 5) -> list[dict[str, Any]]:
@@ -1407,6 +1441,14 @@ def natural_language_query(req: QueryRequest):
         if any(term in conversation_text for term in ("spof", "single point", "critical", "important", "risk")):
             return _format_top_spof_answer(spof_data)
 
+    is_spof_evidence_followup = (
+        ("how" in query or "why" in query or "source" in query or "evidence" in query)
+        and ("they" in query or "them" in query or "those" in query or "spof" in query)
+        and ("undocumented" in query or "documentation" in query or "knowledge" in query or "backup" in query)
+    )
+    if is_spof_evidence_followup and any(term in conversation_text for term in ("spof", "single point", "failure", "undocumented", "backup")):
+        return _format_spof_evidence_answer(spof_data)
+
     if (
         ("why" in query or "reason" in query or "explain" in query)
         and ("him" in query or "her" in query or "farhan" in query or "critical" in query or "important" in query or "imp" in query)
@@ -1566,6 +1608,25 @@ def natural_language_query(req: QueryRequest):
             "answer": f"Worst-case: Top 5 SPOFs ({', '.join(top5)}) leaving simultaneously. Composite collapses from {health['composite_score']} to {scenario['composite_score']}. Total annual revenue at risk: ${scenario['revenue_at_risk_usd']:,}. This is the maximum-impact permutation — recovery would take 12-18 months.",
             "scenario": scenario,
             "summary": result["summary"],
+        }
+
+    if (
+        "what is spof" in query
+        or "what are spofs" in query
+        or "meaning of spof" in query
+        or "spof meaning" in query
+        or "define spof" in query
+        or "full form of spof" in query
+        or "what does spof" in query
+        or "single point of failure meaning" in query
+    ):
+        return {
+            "answer": (
+                "SPOF means Single Point of Failure. In TruPulse, a SPOF is an employee, role, "
+                "or knowledge area that creates business risk because there is no reliable backup. "
+                "If that person leaves, burns out, or becomes unavailable, important work, client "
+                "knowledge, project delivery, or revenue can be affected."
+            )
         }
 
     if "spof" in query or "single point" in query or "failure" in query:
