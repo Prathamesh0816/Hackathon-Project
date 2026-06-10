@@ -6,7 +6,6 @@ import StatusBadge from '../components/StatusBadge'
 import TimeMachine from '../components/TimeMachine'
 import GovernancePanel from '../components/GovernancePanel'
 import FeedbackModal from '../components/FeedbackModal'
-import TextInput from '../components/TextInput'
 import FeedbackPanel from '../components/FeedbackPanel'
 
 const SCENARIOS = [
@@ -218,8 +217,6 @@ export default function WhatIf() {
           </button>
         </div>
       </div>
-
-      <TextInput />
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
