@@ -42,6 +42,11 @@ export default function Dashboard() {
   if (!health) return <ErrorState message="No health data returned" />
 
   const indicators = health.indicators
+  const readinessRisk = readiness?.readiness_level === 'High'
+    ? 'LOW'
+    : readiness?.readiness_level === 'Medium'
+      ? 'MEDIUM'
+      : 'HIGH'
   const indChartData = [
     { name: 'Resilience', score: indicators.resilience.score },
     { name: 'Trust', score: indicators.trust.score },
@@ -137,7 +142,7 @@ export default function Dashboard() {
             label="Workforce Readiness"
             value={`${readiness.readiness_score}`}
             subtitle={readiness.readiness_level}
-            risk={readiness.readiness_level}
+            risk={readinessRisk}
           />
           <KPICard
             label="Org-Wide Skill Gaps"

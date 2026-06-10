@@ -29,29 +29,37 @@ export default function WhatIf() {
       const emps = data.employees || []
       setAllEmployees(emps)
       const names = emps.map((e) => e.name || e.Employee).filter(Boolean)
-      if (names.length > 0) setRemovedEmployees([names[0]])
+      if (names.length > 0) {
+        const defaultEmployee = names.find((name) => name === 'Vikram') || names[0]
+        setRemovedEmployees([defaultEmployee])
+      }
       const teams = [...new Set(emps.map((e) => e.team))].filter(Boolean).sort()
       setAllTeams(teams)
       if (teams.length > 0) setRestructureTeam(teams[0])
     }).catch(() => {})
   }, [])
 
-  const saved = JSON.parse(localStorage.getItem('trupulse_whatif') || 'null')
-  const [result, setResult] = useState(saved?.result || null)
-  const [pipelineResult, setPipelineResult] = useState(saved?.pipelineResult || null)
+  const [result, setResult] = useState(null)
+  const [pipelineResult, setPipelineResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [pipelineLoading, setPipelineLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [showPipeline, setShowPipeline] = useState(saved?.showPipeline || false)
+  const [showPipeline, setShowPipeline] = useState(false)
   const [feedbackTarget, setFeedbackTarget] = useState(null)
 
   useEffect(() => {
-    if (result || pipelineResult) {
-      localStorage.setItem('trupulse_whatif', JSON.stringify({ result, pipelineResult, showPipeline }))
-    }
-  }, [result, pipelineResult, showPipeline])
+    localStorage.removeItem('trupulse_whatif')
+  }, [])
+
+  const clearAnalysis = () => {
+    setResult(null)
+    setPipelineResult(null)
+    setShowPipeline(false)
+    setError(null)
+  }
 
   const toggleEmployee = (name) => {
+    clearAnalysis()
     setRemovedEmployees((prev) =>
       prev.includes(name) ? prev.filter((e) => e !== name) : [...prev, name]
     )
@@ -61,6 +69,7 @@ export default function WhatIf() {
     setLoading(true)
     setError(null)
     setPipelineResult(null)
+    setShowPipeline(false)
     try {
       const res = await postWhatIf({
         scenario_type: scenarioType,
@@ -85,7 +94,8 @@ export default function WhatIf() {
         removed_employees: removedEmployees,
         workload_increase_pct: workloadPct,
         restructure_team: restructureTeam,
-        use_fallback: false,
+        use_fallback: true,
+        use_langchain: false,
       })
       setPipelineResult(res)
       setShowPipeline(true)
@@ -110,7 +120,10 @@ export default function WhatIf() {
             {SCENARIOS.map((s) => (
               <button
                 key={s.value}
-                onClick={() => setScenarioType(s.value)}
+                onClick={() => {
+                  setScenarioType(s.value)
+                  clearAnalysis()
+                }}
                 className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
                   scenarioType === s.value
                     ? 'border-tru-500 bg-tru-50 text-tru-700'
@@ -156,7 +169,10 @@ export default function WhatIf() {
               min="10"
               max="100"
               value={workloadPct}
-              onChange={(e) => setWorkloadPct(Number(e.target.value))}
+              onChange={(e) => {
+                setWorkloadPct(Number(e.target.value))
+                clearAnalysis()
+              }}
               className="w-full"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
@@ -171,7 +187,10 @@ export default function WhatIf() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Team to Restructure</label>
             <select
               value={restructureTeam}
-              onChange={(e) => setRestructureTeam(e.target.value)}
+              onChange={(e) => {
+                setRestructureTeam(e.target.value)
+                clearAnalysis()
+              }}
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
             >
               {(allTeams.length > 0 ? allTeams : ['Engineering']).map((t) => (
